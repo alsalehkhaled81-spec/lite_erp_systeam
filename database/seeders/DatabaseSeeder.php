@@ -59,7 +59,12 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         $defaultPassword = Hash::make('password'); // كلمة المرور للجميع: password
 
-        $keyUsers = [['name' => 'أحمد المدير', 'email' => 'admin@erp.com', 'role' => 'super_admin', 'job' => 'CEO', 'salary' => 15000],['name' => 'سارة الموارد', 'email' => 'hr@erp.com', 'role' => 'hr_manager', 'job' => 'HR Manager', 'salary' => 8000],['name' => 'عمر المشاريع', 'email' => 'pm@erp.com', 'role' => 'project_manager', 'job' => 'Project Manager', 'salary' => 10000],['name' => 'خالد المحاسب', 'email' => 'acc@erp.com', 'role' => 'accountant', 'job' => 'Senior Accountant', 'salary' => 7000],['name' => 'فاطمة المبرمجة', 'email' => 'emp1@erp.com', 'role' => 'employee', 'job' => 'Senior Laravel Developer', 'salary' => 6000],['name' => 'محمود المصمم', 'email' => 'emp2@erp.com', 'role' => 'employee', 'job' => 'UI/UX Designer', 'salary' => 5000],
+        $keyUsers = [['name' => 'أحمد المدير', 'email' => 'admin@erp.com', 'role' => 'super_admin', 'job' => 'CEO', 'salary' => 15000],
+        ['name' => 'سارة الموارد', 'email' => 'hr@erp.com', 'role' => 'hr_manager', 'job' => 'HR Manager', 'salary' => 8000],
+        ['name' => 'عمر المشاريع', 'email' => 'pm@erp.com', 'role' => 'project_manager', 'job' => 'Project Manager', 'salary' => 10000],
+        ['name' => 'خالد المحاسب', 'email' => 'acc@erp.com', 'role' => 'accountant', 'job' => 'Senior Accountant', 'salary' => 7000],
+        ['name' => 'فاطمة المبرمجة', 'email' => 'emp1@erp.com', 'role' => 'employee', 'job' => 'Senior Laravel Developer', 'salary' => 6000],
+        ['name' => 'محمود المصمم', 'email' => 'emp2@erp.com', 'role' => 'employee', 'job' => 'UI/UX Designer', 'salary' => 5000],
         ];
 
         $employeeIds =[]; // لحفظ أرقام الموظفين لاستخدامها لاحقاً في المهام

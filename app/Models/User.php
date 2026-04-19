@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Filament\Panel; // إضافة
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use  HasFactory,Notifiable;
@@ -42,6 +44,31 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+   public function canAccessPanel(Panel $panel): bool
+    {
+        // 1. إذا لم يكن للمستخدم أي دور، نمنعه من الدخول
+        if (!$this->role) {
+            return false;
+        }
+
+        $roleName = $this->role->name;
+
+        // 2. المدير العام له الحق في دخول أي لوحة تحكم في النظام
+        if ($roleName === 'super_admin') {
+            return true;
+        }
+
+        // 3. توجيه بقية الأدوار للوحاتهم المخصصة فقط
+        return match ($panel->getId()) {
+            'admin'      => $roleName === 'super_admin',
+            'hr'         => $roleName === 'hr_manager',
+            'pm'         => $roleName === 'project_manager',
+            'accountant' => $roleName === 'accountant',
+            'employee'   => $roleName === 'employee',
+            default      => false,
+        };
     }
 
 
