@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Livewire\Auth;
+
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
+
+class Login extends Component
+{
+    public $email;
+    public $password;
+    public $remember = false;
+
+public function login()
+{
+    $this->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+
+    if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+        session()->regenerate();
+
+        $roleName = Auth::user()->role->name ?? null;
+
+        // 1. تحديد المسار الافتراضي بناءً على الدور
+        $defaultPath = match ($roleName) {
+            'super_admin'     => '/admin',
+            'hr_manager'      => '/hr',
+            'project_manager' => '/pm',
+            'accountant'      => '/accountant',
+            'employee'        => '/employee',
+            default           => null,
+        };
+
+        // 2. إذا لم يكن لديه دور صالح في النظام (نخرجه فوراً حمايةً للنظام)
+        if (!$defaultPath) {
+            Auth::logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
+            $this->addError('email', 'حسابك لا يملك صلاحية للدخول إلى النظام.');
+            return;
+        }
+
+        // 3. التوجيه الذكي:
+        // سيتم توجيهه للرابط الذي كان يقصده قبل الدخول (إن وُجد)، أو للمسار الافتراضي للوحته
+        return redirect()->intended($defaultPath);
+    }
+
+    $this->addError('email', 'بيانات الدخول غير صحيحة.');
+}
+    public function render()
+    {
+        return view('livewire.auth.login')->layout('components.layouts.app');
+    }
+}

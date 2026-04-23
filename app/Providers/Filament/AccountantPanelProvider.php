@@ -25,7 +25,6 @@ class AccountantPanelProvider extends PanelProvider
         return $panel
             ->id('accountant')
             ->path('accountant')
-            ->login()
             ->colors([
                 'primary' => Color::Emerald,
             ])

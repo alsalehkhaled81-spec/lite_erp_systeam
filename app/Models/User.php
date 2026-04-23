@@ -56,9 +56,9 @@ class User extends Authenticatable implements FilamentUser
         $roleName = $this->role->name;
 
         // 2. المدير العام له الحق في دخول أي لوحة تحكم في النظام
-        if ($roleName === 'super_admin') {
-            return true;
-        }
+        // if ($roleName === 'super_admin') {
+        //     return true;
+        // }
 
         // 3. توجيه بقية الأدوار للوحاتهم المخصصة فقط
         return match ($panel->getId()) {

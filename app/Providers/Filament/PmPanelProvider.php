@@ -25,7 +25,6 @@ class PmPanelProvider extends PanelProvider
         return $panel
             ->id('pm')
             ->path('pm')
-            ->login()
             ->colors([
                 'primary' => Color::Blue,
             ])
