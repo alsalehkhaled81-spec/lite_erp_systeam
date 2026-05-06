@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->foreignId('client_id')->constrained()->cascadeOnDelete();
             $table->foreignId('project_id')->nullable()->constrained()->nullOnDelete();
             $table->string('invoice_number')->unique();
-            $table->decimal('amount', 12, 2);
+           $table->decimal('amount', 12, 2)->unsigned();
             $table->date('issue_date')->nullable();
             $table->date('due_date')->nullable();
             $table->enum('status', ['unpaid', 'paid', 'overdue'])->default('unpaid');

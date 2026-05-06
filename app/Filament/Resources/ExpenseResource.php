@@ -48,6 +48,7 @@ class ExpenseResource extends Resource
                         Forms\Components\TextInput::make('amount')
                             ->label('المبلغ')
                             ->numeric()
+                            ->minValue(0)
                             ->prefix('$')
                             ->required(),
                         Forms\Components\DatePicker::make('expense_date')

@@ -20,9 +20,14 @@ class InvoicesRelationManager extends RelationManager
                 ->label('المشروع (اختياري)')
                 ->relationship('project', 'name'),
             Forms\Components\TextInput::make('invoice_number')
-                ->label('رقم الفاتورة')->required(),
+                ->label('رقم الفاتورة')
+                ->required(),
             Forms\Components\TextInput::make('amount')
-                ->label('المبلغ')->numeric()->required()->prefix('$'),
+                ->label('المبلغ')
+                ->numeric()
+                ->minValue(0)
+                ->required()
+                ->prefix('$'),
             Forms\Components\Select::make('status')
                 ->label('الحالة')
                 ->options(['unpaid' => 'غير مدفوعة', 'paid' => 'مدفوعة', 'overdue' => 'متأخرة'])->default('unpaid'),
@@ -36,9 +41,11 @@ class InvoicesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('invoice_number')->label('رقم الفاتورة'),
                 Tables\Columns\TextColumn::make('amount')->label('المبلغ')->money('usd'),
                 Tables\Columns\TextColumn::make('status')->label('الحالة')->badge()
-                ->color(fn (string $state): string => match ($state) {
-                    'unpaid' => 'warning', 'paid' => 'success', 'overdue' => 'danger',
-                }),
+                    ->color(fn(string $state): string => match ($state) {
+                        'unpaid' => 'warning',
+                        'paid' => 'success',
+                        'overdue' => 'danger',
+                    }),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()->label('إصدار فاتورة'),

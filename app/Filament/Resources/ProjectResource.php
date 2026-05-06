@@ -45,6 +45,7 @@ class ProjectResource extends Resource
                         Forms\Components\TextInput::make('budget')
                             ->label('الميزانية')
                             ->numeric()
+                            ->minValue(0)
                             ->prefix('$'),
                         Forms\Components\Select::make('status')
                             ->label('حالة المشروع')

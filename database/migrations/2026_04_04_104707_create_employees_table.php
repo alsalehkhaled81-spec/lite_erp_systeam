@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
             $table->string('job_title')->nullable();
-            $table->decimal('salary', 10, 2)->nullable();
+            $table->decimal('salary', 10, 2)->unsigned()->nullable();
             $table->enum('status', ['active', 'on_leave', 'terminated'])->default('active');
             $table->date('hire_date')->nullable();
             $table->timestamps();

@@ -26,38 +26,30 @@ class Register extends Component
             'role_id' => 'required|exists:roles,id',
         ]);
 
-        // 1. إنشاء المستخدم
         $user = User::create([
             'name' => $this->name,
             'email' => $this->email,
-            'password' => Hash::make($this->password),
+            'password' => \Illuminate\Support\Facades\Hash::make($this->password),
             'role_id' => $this->role_id,
         ]);
 
-        // 2. إنشاء ملف موظف مرتبط به (هام جداً لكي يعمل النظام معه)
-        Employee::create([
-            'user_id' => $user->id,
-            'status' => 'active',
-            'hire_date' => now(),
-        ]);
+        \Illuminate\Support\Facades\Auth::login($user);
 
-        // 3. تسجيل الدخول
-        Auth::login($user);
-
-        // 4. التوجيه بناءً على الدور
         return $this->redirectBasedOnRole($user->role->name);
     }
 
     private function redirectBasedOnRole($roleName)
     {
         return match ($roleName) {
+            'super_admin' => redirect('/admin'),
             'hr_manager' => redirect('/hr'),
             'project_manager' => redirect('/pm'),
             'accountant' => redirect('/accountant'),
-            'employee' => redirect('/employee'),
+            'employee' => redirect()->route('job.apply'), // توجيهه لصفحة التوظيف
             default => redirect('/'),
         };
     }
+
 
     public function render()
     {

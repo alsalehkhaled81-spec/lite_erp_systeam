@@ -44,6 +44,7 @@ class InvoiceResource extends Resource
                         Forms\Components\TextInput::make('amount')
                             ->label('المبلغ')
                             ->numeric()
+                             ->minValue(0)
                             ->required()
                             ->prefix('$'),
                         Forms\Components\Select::make('status')

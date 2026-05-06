@@ -26,10 +26,22 @@ class ResumeResource extends Resource
             Forms\Components\Section::make('ملف السيرة الذاتية')
                 ->schema([
                     Forms\Components\Select::make('employee_id')
-                        ->label('الموظف')
-                        ->relationship('employee.user', 'name')
-                        ->required()
-                        ->searchable(),
+    ->label('الموظف')
+    // نستخدم options لجلب الموظفين الذين ليس لديهم سيرة ذاتية فقط
+    ->options(function (?\App\Models\Resume $record) {
+        return \App\Models\Employee::with('user')
+            ->whereDoesntHave('resume') // جلب من ليس لديهم سيرة ذاتية
+            ->when($record, function ($query) use ($record) {
+                // إذا كنا في صفحة "التعديل"، نجلب أيضاً الموظف صاحب هذه السيرة
+                $query->orWhere('id', $record->employee_id);
+            })
+            ->get()
+            // المفتاح هو id الموظف، والقيمة المعروضة هي اسم المستخدم
+            ->pluck('user.name', 'id');
+    })
+    ->required()
+    ->searchable()
+    ->unique(ignoreRecord: true),
                     Forms\Components\FileUpload::make('file_path')
                         ->label('ملف الـ PDF / Word')
                         ->directory('resumes')

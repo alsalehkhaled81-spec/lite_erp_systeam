@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // من سجل المصروف
             $table->string('title');
             $table->string('category')->nullable(); // مثلاً: رواتب، تشغيل..
-            $table->decimal('amount', 12, 2);
+            $table->decimal('amount', 12, 2)->unsigned();
             $table->date('expense_date')->nullable();
             $table->string('receipt_url')->nullable(); // صورة الإيصال
             $table->timestamps();

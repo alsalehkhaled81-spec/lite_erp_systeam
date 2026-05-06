@@ -5,6 +5,7 @@ use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\ResetPassword;
+use App\Http\Controllers\JobApplicationController;
 
 
 
@@ -28,3 +29,10 @@ Route::post('/logout', function () {
     request()->session()->regenerateToken();
     return redirect('/login');
 })->name('logout');
+
+    Route::middleware('auth')->group(function () {
+
+    Route::get('/apply', [JobApplicationController::class, 'index'])->name('job.apply');
+    
+    Route::post('/apply', [JobApplicationController::class, 'store'])->name('job.store');
+});

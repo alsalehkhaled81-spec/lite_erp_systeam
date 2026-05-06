@@ -37,6 +37,7 @@ class EmployeeResource extends Resource
                     Forms\Components\TextInput::make('salary')
                         ->label('الراتب')
                         ->numeric()
+                        ->minValue(0) // منع القيمة السالبة
                         ->prefix('$'),
                     Forms\Components\Select::make('status')
                         ->label('حالة الموظف')

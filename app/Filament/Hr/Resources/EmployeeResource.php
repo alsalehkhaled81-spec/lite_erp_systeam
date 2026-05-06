@@ -23,12 +23,49 @@ class EmployeeResource extends Resource
 {
     return $form
         ->schema([
-            Forms\Components\Section::make('البيانات الوظيفية')
-                ->schema([
-                    Forms\Components\Select::make('user_id')
-                        ->label('حساب المستخدم')
-                        ->relationship('user', 'name')
-                        ->required(),
+            Forms\Components\Select::make('user_id')
+    ->label('حساب المستخدم')
+    ->relationship(
+        name: 'user',
+        titleAttribute: 'name',
+        modifyQueryUsing: function (Builder $query, ?Employee $record) {
+            $query->whereHas('role', function ($q) {
+                // 1. جلب الحسابات التي دورها "موظف" فقط
+                $q->where('name', 'employee');
+            })
+            ->where(function ($q) use ($record) {
+                // 2. جلب الحسابات التي لم يتم تعيينها بعد (ليس لها ملف موظف)
+                $q->doesntHave('employee');
+
+                // 3. (حماية لتجنب الأخطاء): إذا كنا في صفحة "التعديل"،
+                // يجب أن نسمح بعرض اسم المستخدم المربوط حالياً بهذا الموظف
+                if ($record) {
+                    $q->orWhere('id', $record->user_id);
+                }
+            });
+        }
+    )
+    ->required()
+    ->unique(ignoreRecord: true)
+    ->searchable()
+
+    // (اختياري) أضفت لك زر إنشاء مستخدم سريع من الرد السابق لتبقى لوحتك متكاملة
+    ->createOptionForm([
+        Forms\Components\TextInput::make('name')->label('الاسم الكامل')->required(),
+        Forms\Components\TextInput::make('email')->label('البريد الإلكتروني')->email()->required()->unique('users', 'email'),
+        Forms\Components\TextInput::make('password')->label('كلمة المرور')->password()->required(),
+    ])
+    ->createOptionUsing(function (array $data) {
+        $role = \App\Models\Role::where('name', 'employee')->first();
+        $user = \App\Models\User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
+            'role_id' => $role ? $role->id : null,
+        ]);
+        return $user->id;
+    }),
+
                     Forms\Components\TextInput::make('job_title')
                         ->label('المسمى الوظيفي')
                         ->maxLength(255),
@@ -47,8 +84,7 @@ class EmployeeResource extends Resource
                         ->required(),
                     Forms\Components\DatePicker::make('hire_date')
                         ->label('تاريخ التعيين'),
-                ])->columns(2),
-        ]);
+                ])->columns(2);
 }
 
 
@@ -67,15 +103,28 @@ class EmployeeResource extends Resource
                 ->label('الراتب')
                 ->money('usd')
                 ->sortable(),
-            Tables\Columns\TextColumn::make('status')
-                ->label('الحالة')
-                ->badge()
-                ->color(fn (string $state): string => match ($state) {
-                    'active' => 'success',
-                    'on_leave' => 'warning',
-                    'terminated' => 'danger',
-                }),
-            Tables\Columns\TextColumn::make('hire_date')
+Tables\Columns\TextColumn::make('status')
+    ->label('الحالة')
+    ->badge()
+    // ترجمة الكلمة الإنجليزية إلى عربية في الواجهة
+    ->formatStateUsing(fn (string $state): string => match ($state) {
+        'pending' => 'قيد المراجعة',
+        'active' => 'على رأس العمل',
+        'on_leave' => 'في إجازة',
+        'terminated' => 'مفصول',
+        'rejected' => 'مرفوض طلب التوظيف',
+        default => $state,
+    })
+    // إعطاء لون لكل حالة مع وضع default لتجنب هذا الخطأ مستقبلاً
+    ->color(fn (string $state): string => match ($state) {
+        'pending' => 'warning',
+        'active' => 'success',
+        'on_leave' => 'info',
+        'terminated' => 'danger',
+        'rejected' => 'danger',
+        default => 'gray',
+    }),
+                Tables\Columns\TextColumn::make('hire_date')
                 ->label('تاريخ التعيين')
                 ->date()
                 ->sortable(),
@@ -89,9 +138,41 @@ class EmployeeResource extends Resource
                     'terminated' => 'مفصول'
                 ])
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
+->actions([
+    Tables\Actions\EditAction::make(),
+
+    // زر القبول (يظهر فقط لمن حالتهم pending)
+    Tables\Actions\Action::make('accept')
+        ->label('قبول وتوظيف')
+        ->color('success')
+        ->icon('heroicon-o-check-circle')
+        ->requiresConfirmation()
+        ->action(function (Employee $record) {
+            $record->update([
+                'status' => 'active',
+                'hire_date' => now(), // تسجيل تاريخ اليوم كتاريخ تعيين
+            ]);
+        })
+        ->visible(fn (Employee $record) => $record->status === 'pending'),
+
+    // زر الرفض (يفتح نافذة لطلب سبب الرفض)
+    Tables\Actions\Action::make('reject')
+        ->label('رفض الطلب')
+        ->color('danger')
+        ->icon('heroicon-o-x-circle')
+        ->form([
+            Forms\Components\Textarea::make('rejection_reason')
+                ->label('سبب الرفض (سيتم عرضه للمتقدم)')
+                ->required()
+        ])
+        ->action(function (Employee $record, array $data) {
+            $record->update([
+                'status' => 'rejected',
+                'rejection_reason' => $data['rejection_reason'],
+            ]);
+        })
+        ->visible(fn (Employee $record) => $record->status === 'pending'),
+])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

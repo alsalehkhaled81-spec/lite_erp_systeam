@@ -112,7 +112,8 @@ class DatabaseSeeder extends Seeder
                 'phone' => $faker->phoneNumber,
                 'address' => $faker->address,
             ]);
-        }
+                }
+
 
         // ==========================================
         // 5. إنشاء المشاريع وربطها بالموظفين (Projects)
@@ -130,6 +131,7 @@ class DatabaseSeeder extends Seeder
                 'budget' => $projData['budget'],
                 'start_date' => Carbon::now()->subDays(rand(10, 60)),
                 'end_date' => Carbon::now()->addDays(rand(30, 100)),
+                
                 'status' => $faker->randomElement($projectStatuses),
             ]);
 

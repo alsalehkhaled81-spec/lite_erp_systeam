@@ -12,10 +12,10 @@ return new class extends Migration {
             $table->foreignId('client_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('budget', 12, 2)->nullable();
+            $table->decimal('budget', 12, 2)->unsigned()->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->enum('status',['pending', 'in_progress', 'completed', 'canceled'])->default('pending');
+            $table->enum('status', ['pending', 'in_progress', 'completed', 'canceled'])->default('pending');
             $table->timestamps();
         });
     }
