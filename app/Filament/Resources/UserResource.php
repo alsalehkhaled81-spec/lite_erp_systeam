@@ -40,7 +40,7 @@ class UserResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('role_id')
                             ->label(__('filament.fields.role'))
-                            ->relationship('roles', 'name')
+                            ->relationship('role', 'name')
                             ->required(),
                         Forms\Components\TextInput::make('name')
                             ->label(__('filament.fields.full_name'))
@@ -70,13 +70,13 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->label(__('filament.columns.email'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('roles.name')
+                Tables\Columns\TextColumn::make('role.name')
                     ->label(__('filament.columns.role')),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('role_id')
                     ->label(__('filament.filters.filter_by_role'))
-                    ->relationship('roles', 'name'),
+                    ->relationship('role', 'name'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

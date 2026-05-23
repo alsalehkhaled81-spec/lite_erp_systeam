@@ -33,7 +33,7 @@ Model Provider (Google Gemini / NVIDIA / etc.)
 
 ```
 AI_API_URL=https://api.abdalgani.com/openai/deployments/gemini-3-flash-preview/chat/completions
-AI_API_KEY=sk-cNcVoQXSKw-AsDOulzw6OA
+AI_API_KEY=
 AI_MODEL=gemini-3-flash-preview
 ```
 

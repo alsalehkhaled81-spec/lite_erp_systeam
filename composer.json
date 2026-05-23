@@ -13,7 +13,8 @@
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "mokhosh/filament-kanban": "*",
-        "openai-php/laravel": "*"
+        "openai-php/laravel": "*",
+        "parsedown/laravel": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

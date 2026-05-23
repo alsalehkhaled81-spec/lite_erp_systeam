@@ -8,6 +8,6 @@
             </div>
             <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">{{ __('filament.kanban.ai_evaluation') }}</h3>
         </div>
-        <div class="prose dark:prose-invert max-w-none whitespace-pre-wrap text-sm leading-relaxed text-gray-700 dark:text-gray-300">{{ $evaluation }}</div>
+        <div class="prose dark:prose-invert max-w-none text-sm leading-relaxed text-gray-700 dark:text-gray-300">{!! Illuminate\Support\Str::markdown($evaluation) !!}</div>
     </div>
 </x-filament-panels::page>
