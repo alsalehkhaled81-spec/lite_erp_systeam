@@ -25,6 +25,7 @@ class PmPanelProvider extends PanelProvider
         return $panel
             ->id('pm')
             ->path('pm')
+            ->brandName(fn () => __('filament.brand.pm'))
             ->colors([
                 'primary' => Color::Blue,
             ])
@@ -36,7 +37,6 @@ class PmPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Pm/Widgets'), for: 'App\\Filament\\Pm\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

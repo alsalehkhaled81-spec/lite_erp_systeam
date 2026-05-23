@@ -18,46 +18,62 @@ class InvoiceResource extends Resource
     protected static ?string $model = Invoice::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.nav.invoices');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.model.invoice');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.model.invoices');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('الارتباطات')
+                Forms\Components\Section::make(__('filament.sections.associations'))
                     ->schema([
                         Forms\Components\Select::make('client_id')
-                            ->label('العميل')
+                            ->label(__('filament.fields.client'))
                             ->relationship('client', 'name')
                             ->required()
                             ->searchable(),
                         Forms\Components\Select::make('project_id')
-                            ->label('المشروع (اختياري)')
+                            ->label(__('filament.fields.project_optional'))
                             ->relationship('project', 'name')
                             ->searchable(),
                     ])->columns(2),
 
-                Forms\Components\Section::make('بيانات الفاتورة')
+                Forms\Components\Section::make(__('filament.sections.invoice_data'))
                     ->schema([
                         Forms\Components\TextInput::make('invoice_number')
-                            ->label('رقم الفاتورة')
+                            ->label(__('filament.fields.invoice_number'))
                             ->required()
                             ->unique(ignoreRecord: true),
                         Forms\Components\TextInput::make('amount')
-                            ->label('المبلغ')
+                            ->label(__('filament.fields.amount'))
                             ->numeric()
                              ->minValue(0)
                             ->required()
                             ->prefix('$'),
                         Forms\Components\Select::make('status')
-                            ->label('الحالة')
+                            ->label(__('filament.fields.status'))
                             ->options([
-                                'unpaid' => 'غير مدفوعة',
-                                'paid' => 'مدفوعة',
-                                'overdue' => 'متأخرة',
+                                'unpaid' => __('filament.status.unpaid'),
+                                'paid' => __('filament.status.paid'),
+                                'overdue' => __('filament.status.overdue'),
                             ])->default('unpaid'),
                         Forms\Components\DatePicker::make('issue_date')
-                            ->label('تاريخ الإصدار'),
+                            ->label(__('filament.fields.issue_date')),
                         Forms\Components\DatePicker::make('due_date')
-                            ->label('تاريخ الاستحقاق'),
+                            ->label(__('filament.fields.due_date_invoice')),
                     ])->columns(3),
             ]);
     }
@@ -68,32 +84,38 @@ class InvoiceResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('client.name')
-                    ->label('العميل')
+                    ->label(__('filament.columns.client'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('project.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('invoice_number')
-                    ->label('رقم الفاتورة')
+                    ->label(__('filament.columns.invoice_number'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->label('المبلغ')
+                    ->label(__('filament.columns.amount'))
                     ->money('usd')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('issue_date')
-                    ->label('تاريخ الإصدار')
+                    ->label(__('filament.columns.issue_date'))
                     ->date(),
                 Tables\Columns\TextColumn::make('due_date')
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('الحالة')
+                    ->label(__('filament.columns.status'))
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'unpaid' => 'warning',
                         'paid' => 'success',
                         'overdue' => 'danger',
+                    })
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'unpaid' => __('filament.status.unpaid'),
+                        'paid' => __('filament.status.paid'),
+                        'overdue' => __('filament.status.overdue'),
+                        default => $state,
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -106,11 +128,11 @@ class InvoiceResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->label('تصفية بالحالة')
+                    ->label(__('filament.filters.invoice_status'))
                     ->options([
-                        'unpaid' => 'غير مدفوعة',
-                        'paid' => 'مدفوعة',
-                        'overdue' => 'متأخرة',
+                        'unpaid' => __('filament.status.unpaid'),
+                        'paid' => __('filament.status.paid'),
+                        'overdue' => __('filament.status.overdue'),
                     ]),
             ])
             ->actions([

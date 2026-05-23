@@ -26,6 +26,7 @@ class HrPanelProvider extends PanelProvider
         return $panel
             ->id('hr')
             ->path('hr')
+            ->brandName(fn () => __('filament.brand.hr'))
             ->colors([
                 'primary' => Color::Rose,
             ])
@@ -37,7 +38,6 @@ class HrPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Hr/Widgets'), for: 'App\\Filament\\Hr\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

@@ -1,0 +1,187 @@
+@import 'tailwindcss';
+
+@source '../../vendor/filament/**/*.blade.php';
+@source '../../app/Filament/**/*.php';
+@source '../../resources/views/filament/**/*.blade.php';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+:root {
+    --font-ar: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+    --font-en: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+    --erp-radius-lg: 14px;
+    --erp-radius-xl: 20px;
+}
+
+.fi-body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PREMIUM DYNAMIC PANEL COLORING & GLOW EFFECTS
+   ══════════════════════════════════════════════════════════════ */
+
+/* Main Background with Subtle Glow */
+.fi-main {
+    background-color: #f8fafc !important;
+    background-image: 
+        radial-gradient(circle at 0% 0%, rgba(var(--primary-300), 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(var(--primary-400), 0.1) 0%, transparent 40%) !important;
+    background-attachment: fixed;
+}
+.dark .fi-main {
+    background-color: #0f172a !important;
+    background-image: 
+        radial-gradient(circle at 0% 0%, rgba(var(--primary-900), 0.3) 0%, transparent 45%),
+        radial-gradient(circle at 100% 100%, rgba(var(--primary-800), 0.2) 0%, transparent 45%) !important;
+    background-attachment: fixed;
+}
+
+/* Sidebar Styling (Safe Targeting to Prevent Overlap) */
+aside.fi-sidebar {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-inline-end: 1px solid rgba(var(--primary-200), 0.3) !important;
+}
+.dark aside.fi-sidebar {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border-inline-end: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Sidebar Items Hover & Active States */
+.fi-sidebar-item > a,
+.fi-sidebar-item > button {
+    border-radius: var(--erp-radius-lg) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.fi-sidebar-item > a:hover,
+.fi-sidebar-item > button:hover {
+    background: linear-gradient(to right, rgba(var(--primary-100), 0.5), rgba(var(--primary-50), 0.1)) !important;
+    transform: translateX(4px);
+}
+[dir="rtl"] .fi-sidebar-item > a:hover,
+[dir="rtl"] .fi-sidebar-item > button:hover {
+    transform: translateX(-4px);
+    background: linear-gradient(to left, rgba(var(--primary-100), 0.5), rgba(var(--primary-50), 0.1)) !important;
+}
+
+.dark .fi-sidebar-item > a:hover,
+.dark .fi-sidebar-item > button:hover {
+    background: linear-gradient(to right, rgba(var(--primary-900), 0.4), transparent) !important;
+}
+[dir="rtl"] .dark .fi-sidebar-item > a:hover,
+[dir="rtl"] .dark .fi-sidebar-item > button:hover {
+    background: linear-gradient(to left, rgba(var(--primary-900), 0.4), transparent) !important;
+}
+
+/* Topbar Styling */
+.fi-topbar nav {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(var(--primary-200), 0.3) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+.dark .fi-topbar nav {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+
+/* Stats Overview Widgets */
+.fi-wi-stats-overview-stat {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-radius: var(--erp-radius-xl) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(12px);
+}
+
+.dark .fi-wi-stats-overview-stat {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06), 0 0 15px rgba(var(--primary-400), 0.15) !important;
+    border-color: rgba(var(--primary-200), 0.5) !important;
+}
+
+.dark .fi-wi-stats-overview-stat:hover {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(var(--primary-700), 0.2) !important;
+    border-color: rgba(var(--primary-600), 0.4) !important;
+}
+
+/* Charts */
+.fi-wi-chart {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-radius: var(--erp-radius-xl) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(12px);
+}
+
+.dark .fi-wi-chart {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+.fi-wi-chart:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), 0 0 20px rgba(var(--primary-200), 0.1) !important;
+    transform: translateY(-2px);
+}
+.dark .fi-wi-chart:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 20px rgba(var(--primary-800), 0.15) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PREMIUM TABLES STYLING
+   ══════════════════════════════════════════════════════════════ */
+.fi-ta {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-radius: var(--erp-radius-xl) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(12px);
+}
+
+.dark .fi-ta {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Form Container */
+.fi-fo-wizard, .fi-fo-component {
+    border-radius: var(--erp-radius-xl) !important;
+}
+
+/* Form Labels */
+.fi-fo-field-wrp-label label {
+    font-weight: 600 !important;
+    color: rgb(var(--primary-700)) !important;
+    letter-spacing: 0.02em !important;
+}
+.dark .fi-fo-field-wrp-label label {
+    color: rgb(var(--primary-300)) !important;
+}
+
+/* Colored Action Buttons */
+.fi-btn.fi-color-danger,
+.fi-ta-actions .fi-icon-btn.fi-color-danger,
+.fi-ta-actions .fi-link.fi-color-danger {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #ef4444 !important;
+    border: 1px solid rgba(239, 68, 68, 0.2) !important;
+}
+.fi-btn.fi-color-danger:hover,
+.fi-ta-actions .fi-icon-btn.fi-color-danger:hover,
+.fi-ta-actions .fi-link.fi-color-danger:hover {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3) !important;
+}

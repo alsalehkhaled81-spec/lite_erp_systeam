@@ -115,4 +115,19 @@ class ResumeResource extends Resource
             'edit' => Pages\EditResume::route('/{record}/edit'),
         ];
     }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.model.resume');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.model.resumes');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.nav.resumes');
+    }
 }

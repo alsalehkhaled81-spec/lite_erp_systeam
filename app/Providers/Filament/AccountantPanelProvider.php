@@ -25,6 +25,7 @@ class AccountantPanelProvider extends PanelProvider
         return $panel
             ->id('accountant')
             ->path('accountant')
+            ->brandName(fn () => __('filament.brand.accountant'))
             ->colors([
                 'primary' => Color::Emerald,
             ])
@@ -36,7 +37,6 @@ class AccountantPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Accountant/Widgets'), for: 'App\\Filament\\Accountant\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

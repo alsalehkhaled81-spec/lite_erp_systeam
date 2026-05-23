@@ -20,54 +20,69 @@ class ClientResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
-{
-    return $form
-        ->schema([
-            Forms\Components\Section::make('البيانات الأساسية للعميل')
-                ->schema([
-                    Forms\Components\TextInput::make('name')
-                        ->label('اسم العميل / المندوب')
-                        ->required()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('company_name')
-                        ->label('اسم الشركة (إن وجد)')
-                        ->maxLength(255),
-                ])->columns(2),
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.nav.clients');
+    }
 
-            Forms\Components\Section::make('معلومات التواصل')
-                ->schema([
-                    Forms\Components\TextInput::make('email')
-                        ->label('البريد الإلكتروني')
-                        ->email()
-                        ->unique(ignoreRecord: true),
-                    Forms\Components\TextInput::make('phone')
-                        ->label('رقم الهاتف')
-                        ->tel(),
-                    Forms\Components\Textarea::make('address')
-                        ->label('العنوان')
-                        ->columnSpanFull(),
-                ])->columns(2),
-        ]);
-}
+    public static function getModelLabel(): string
+    {
+        return __('filament.model.client');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.model.clients');
+    }
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Section::make(__('filament.sections.client_basic_data'))
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label(__('filament.fields.client_name_rep'))
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('company_name')
+                            ->label(__('filament.fields.company_name'))
+                            ->maxLength(255),
+                    ])->columns(2),
+
+                Forms\Components\Section::make(__('filament.sections.contact_info'))
+                    ->schema([
+                        Forms\Components\TextInput::make('email')
+                            ->label(__('filament.fields.email'))
+                            ->email()
+                            ->unique(ignoreRecord: true),
+                        Forms\Components\TextInput::make('phone')
+                            ->label(__('filament.fields.phone'))
+                            ->tel(),
+                        Forms\Components\Textarea::make('address')
+                            ->label(__('filament.fields.address'))
+                            ->columnSpanFull(),
+                    ])->columns(2),
+            ]);
+    }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                            Tables\Columns\TextColumn::make('name')
-                ->label('الاسم')
-                ->searchable()
-                ->sortable(),
-            Tables\Columns\TextColumn::make('company_name')
-                ->label('الشركة')
-                ->searchable(),
-            Tables\Columns\TextColumn::make('email')
-                ->label('البريد الإلكتروني')
-                ->searchable(),
-            Tables\Columns\TextColumn::make('phone')
-                ->label('الهاتف')
-                ->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('filament.columns.name'))
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('company_name')
+                    ->label(__('filament.columns.company'))
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('email')
+                    ->label(__('filament.columns.email'))
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('phone')
+                    ->label(__('filament.columns.phone'))
+                    ->searchable(),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -94,8 +109,7 @@ class ClientResource extends Resource
     public static function getRelations(): array
     {
         return [
-                    InvoicesRelationManager::class,
-
+            InvoicesRelationManager::class,
         ];
     }
 

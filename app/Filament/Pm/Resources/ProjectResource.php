@@ -10,52 +10,48 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProjectResource extends Resource
 {
     protected static ?string $model = Project::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('تفاصيل المشروع')
+                Forms\Components\Section::make(__('filament.sections.project_details'))
                     ->schema([
                         Forms\Components\Select::make('client_id')
-                            ->label('العميل')
+                            ->label(__('filament.fields.client'))
                             ->relationship('client', 'name')
                             ->searchable(),
                         Forms\Components\TextInput::make('name')
-                            ->label('اسم المشروع')
+                            ->label(__('filament.fields.project_name'))
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Textarea::make('description')
-                            ->label('وصف المشروع')
+                            ->label(__('filament.fields.project_description'))
                             ->columnSpanFull(),
                     ])->columns(2),
-
-                Forms\Components\Section::make('المالية والزمنية')
+                Forms\Components\Section::make(__('filament.sections.financial_temporal'))
                     ->schema([
                         Forms\Components\TextInput::make('budget')
-                            ->label('الميزانية')
+                            ->label(__('filament.fields.budget'))
                             ->numeric()
                             ->prefix('$'),
                         Forms\Components\Select::make('status')
-                            ->label('حالة المشروع')
+                            ->label(__('filament.fields.project_status'))
                             ->options([
-                                'pending' => 'قيد الانتظار',
-                                'in_progress' => 'قيد التنفيذ',
-                                'completed' => 'مكتمل',
-                                'canceled' => 'ملغى',
+                                'pending' => __('filament.status.pending'),
+                                'in_progress' => __('filament.status.in_progress'),
+                                'completed' => __('filament.status.completed'),
+                                'canceled' => __('filament.status.canceled'),
                             ])->default('pending'),
                         Forms\Components\DatePicker::make('start_date')
-                            ->label('تاريخ البدء'),
+                            ->label(__('filament.fields.start_date')),
                         Forms\Components\DatePicker::make('end_date')
-                            ->label('تاريخ الانتهاء'),
+                            ->label(__('filament.fields.end_date')),
                     ])->columns(2),
             ]);
     }
@@ -65,25 +61,21 @@ class ProjectResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('اسم المشروع')
+                    ->label(__('filament.fields.project_name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('client.name')
-                    ->label('العميل')
+                    ->label(__('filament.columns.client'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('budget')
-                    ->label('الميزانية')
+                    ->label(__('filament.columns.budget'))
                     ->money('usd')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('start_date')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('end_date')
-                    ->date()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('start_date')->date()->sortable(),
+                Tables\Columns\TextColumn::make('end_date')->date()->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('الحالة')
+                    ->label(__('filament.columns.status'))
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'pending' => 'gray',
@@ -92,41 +84,31 @@ class ProjectResource extends Resource
                         'canceled' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->label('حالة المشروع')
+                    ->label(__('filament.filters.project_status'))
                     ->options([
-                        'pending' => 'قيد الانتظار',
-                        'in_progress' => 'قيد التنفيذ',
-                        'completed' => 'مكتمل',
-                        'canceled' => 'ملغى',
+                        'pending' => __('filament.status.pending'),
+                        'in_progress' => __('filament.status.in_progress'),
+                        'completed' => __('filament.status.completed'),
+                        'canceled' => __('filament.status.canceled'),
                     ]),
-
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
+            ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()]),
             ]);
     }
 
     public static function getRelations(): array
     {
         return [
-                    RelationManagers\EmployeesRelationManager::class,
-                    RelationManagers\TasksRelationManager::class,
-
+            RelationManagers\EmployeesRelationManager::class,
+            RelationManagers\TasksRelationManager::class,
         ];
     }
 
@@ -137,5 +119,20 @@ class ProjectResource extends Resource
             'create' => Pages\CreateProject::route('/create'),
             'edit' => Pages\EditProject::route('/{record}/edit'),
         ];
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.model.project');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.model.projects');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.nav.projects');
     }
 }

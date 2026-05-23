@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ExpenseResource\Pages;
-use App\Filament\Resources\ExpenseResource\RelationManagers;
 use App\Models\Expense;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -23,39 +22,37 @@ class ExpenseResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('بيانات المصروف')
+                Forms\Components\Section::make(__('filament.sections.expense_data'))
                     ->schema([
                         Forms\Components\Select::make('user_id')
-                            ->label('سُجل بواسطة')
+                            ->label(__('filament.fields.registered_by'))
                             ->relationship('user', 'name')
-                            ->default(auth()->id())
                             ->required(),
                         Forms\Components\TextInput::make('title')
-                            ->label('عنوان المصروف')
+                            ->label(__('filament.fields.expense_title'))
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Select::make('category')
-                            ->label('التصنيف')
+                            ->label(__('filament.fields.category'))
                             ->options([
-                                'رواتب' => 'رواتب',
-                                'تشغيل' => 'مصاريف تشغيلية',
-                                'أدوات' => 'أدوات وبرمجيات',
-                                'تسويق' => 'تسويق وإعلانات',
-                                'أخرى' => 'أخرى',
+                                'salaries' => __('filament.expense_category.salaries'),
+                                'operations' => __('filament.expense_category.operations'),
+                                'tools' => __('filament.expense_category.tools'),
+                                'marketing' => __('filament.expense_category.marketing'),
+                                'other' => __('filament.expense_category.other'),
                             ])
                             ->searchable()
                             ->required(),
                         Forms\Components\TextInput::make('amount')
-                            ->label('المبلغ')
+                            ->label(__('filament.fields.amount'))
                             ->numeric()
-                            ->minValue(0)
                             ->prefix('$')
                             ->required(),
                         Forms\Components\DatePicker::make('expense_date')
-                            ->label('تاريخ المصروف')
+                            ->label(__('filament.fields.expense_date'))
                             ->default(now()),
                         Forms\Components\FileUpload::make('receipt_url')
-                            ->label('صورة الإيصال / الفاتورة')
+                            ->label(__('filament.fields.receipt_image'))
                             ->directory('receipts')
                             ->image()
                             ->columnSpanFull(),
@@ -63,28 +60,27 @@ class ExpenseResource extends Resource
             ]);
     }
 
-
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->label('البيان')
+                    ->label(__('filament.columns.title'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('category')
-                    ->label('التصنيف')
+                    ->label(__('filament.columns.category'))
                     ->badge()
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->label('المبلغ')
+                    ->label(__('filament.columns.amount'))
                     ->money('usd')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('سُجل بواسطة')
+                    ->label(__('filament.columns.registered_by'))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('expense_date')
-                    ->label('التاريخ')
+                    ->label(__('filament.columns.expense_date'))
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('receipt_url')
@@ -100,13 +96,13 @@ class ExpenseResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('category')
-                    ->label('تصفية بالتصنيف')
+                    ->label(__('filament.filters.filter_by_category'))
                     ->options([
-                        'رواتب' => 'رواتب',
-                        'تشغيل' => 'مصاريف تشغيلية',
-                        'أدوات' => 'أدوات وبرمجيات',
-                        'تسويق' => 'تسويق وإعلانات',
-                        'أخرى' => 'أخرى',
+                        'salaries' => __('filament.expense_category.salaries'),
+                        'operations' => __('filament.expense_category.operations'),
+                        'tools' => __('filament.expense_category.tools'),
+                        'marketing' => __('filament.expense_category.marketing'),
+                        'other' => __('filament.expense_category.other'),
                     ]),
             ])
             ->actions([
@@ -133,5 +129,20 @@ class ExpenseResource extends Resource
             'create' => Pages\CreateExpense::route('/create'),
             'edit' => Pages\EditExpense::route('/{record}/edit'),
         ];
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.model.expense');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.model.expenses');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.nav.expenses');
     }
 }

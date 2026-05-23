@@ -23,59 +23,58 @@ class TaskResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('الإسناد والتعيين')
+                Forms\Components\Section::make(__('filament.sections.task_assignment'))
                     ->schema([
                         Forms\Components\Select::make('project_id')
-                            ->label('المشروع')
+                            ->label(__('filament.fields.project'))
                             ->relationship('project', 'name')
                             ->required()
                             ->searchable(),
                         Forms\Components\Select::make('employee_id')
-                            ->label('الموظف المسؤول')
+                            ->label(__('filament.fields.responsible_employee'))
                             ->relationship('employee.user', 'name')
                             ->required()
                             ->searchable(),
                     ])->columns(2),
 
-                Forms\Components\Section::make('تفاصيل المهمة')
+                Forms\Components\Section::make(__('filament.sections.task_details'))
                     ->schema([
                         Forms\Components\TextInput::make('title')
-                            ->label('عنوان المهمة')
+                            ->label(__('filament.fields.task_title'))
                             ->required(),
                         Forms\Components\Textarea::make('description')
-                            ->label('الوصف')
+                            ->label(__('filament.fields.description'))
                             ->columnSpanFull(),
                         Forms\Components\DatePicker::make('due_date')
-                            ->label('تاريخ التسليم'),
+                            ->label(__('filament.fields.due_date')),
                         Forms\Components\Select::make('status')
-                            ->label('حالة المهمة')
+                            ->label(__('filament.fields.task_status'))
                             ->options([
-                                'todo' => 'مطلوبة',
-                                'in_progress' => 'قيد التنفيذ',
-                                'review' => 'للمراجعة',
-                                'done' => 'منتهية',
+                                'todo' => __('filament.status.todo'),
+                                'in_progress' => __('filament.status.in_progress'),
+                                'review' => __('filament.status.review'),
+                                'done' => __('filament.status.done'),
                             ])->default('todo'),
                     ])->columns(2),
             ]);
     }
-
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->label('المهمة')
+                    ->label(__('filament.columns.task'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('project.name')
-                    ->label('المشروع')
+                    ->label(__('filament.columns.project'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('employee.user.name')
-                    ->label('الموظف')
+                    ->label(__('filament.fields.employee'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('الحالة')
+                    ->label(__('filament.columns.status'))
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'todo' => 'gray',
@@ -84,7 +83,7 @@ class TaskResource extends Resource
                         'done' => 'success',
                     }),
                 Tables\Columns\TextColumn::make('due_date')
-                    ->label('التسليم')
+                    ->label(__('filament.columns.due_date'))
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('employee.id')
@@ -101,17 +100,16 @@ class TaskResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('project_id')
-                ->label('تصفية بالمشروع')
-                ->relationship('project', 'name'),
-            Tables\Filters\SelectFilter::make('status')
-                ->label('حالة المهمة')
-                ->options([
-                            'todo' => 'مطلوبة',
-                            'in_progress' => 'قيد التنفيذ',
-                            'review' => 'للمراجعة',
-                            'done' => 'منتهية',
-                        ]),
-
+                    ->label(__('filament.filters.filter_by_project'))
+                    ->relationship('project', 'name'),
+                Tables\Filters\SelectFilter::make('status')
+                    ->label(__('filament.filters.task_status'))
+                    ->options([
+                        'todo' => __('filament.status.todo'),
+                        'in_progress' => __('filament.status.in_progress'),
+                        'review' => __('filament.status.review'),
+                        'done' => __('filament.status.done'),
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -137,5 +135,20 @@ class TaskResource extends Resource
             'create' => Pages\CreateTask::route('/create'),
             'edit' => Pages\EditTask::route('/{record}/edit'),
         ];
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.model.task');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.model.tasks');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.nav.tasks');
     }
 }

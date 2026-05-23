@@ -1,0 +1,275 @@
+/* ═══════════════════════════════════════════════════════════════════
+   ERP LITE — SHARED BASE COMPONENT STYLES (v2.0)
+   Filament v3.3 + Tailwind CSS v4 | Light & Dark Mode | RTL Ready
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Design Tokens ── */
+:root {
+    --erp-radius-xs: 4px;
+    --erp-radius-sm: 6px;
+    --erp-radius-md: 10px;
+    --erp-radius-lg: 14px;
+    --erp-radius-xl: 20px;
+    --erp-radius-2xl: 24px;
+    --erp-radius-full: 9999px;
+    --erp-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --erp-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --erp-transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --erp-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.04);
+    --erp-shadow-sm: 0 2px 6px rgb(0 0 0 / 0.05), 0 1px 2px rgb(0 0 0 / 0.03);
+    --erp-shadow-md: 0 4px 14px rgb(0 0 0 / 0.06), 0 2px 6px rgb(0 0 0 / 0.04);
+    --erp-shadow-lg: 0 10px 28px rgb(0 0 0 / 0.08), 0 4px 10px rgb(0 0 0 / 0.04);
+    --erp-shadow-xl: 0 20px 48px rgb(0 0 0 / 0.1), 0 8px 20px rgb(0 0 0 / 0.06);
+}
+
+/* ═══ 1. GLOBAL ═══ */
+.fi-body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* ═══ 2. SIDEBAR ═══ */
+.fi-sidebar-item-active > a,
+.fi-sidebar-item-active > button {
+    background: linear-gradient(135deg, rgb(var(--primary-100) / 0.85), rgb(var(--primary-50) / 0.45)) !important;
+    color: rgb(var(--primary-700)) !important;
+    font-weight: 600 !important;
+    box-shadow: var(--erp-shadow-xs) !important;
+}
+
+.dark .fi-sidebar-item-active > a,
+.dark .fi-sidebar-item-active > button {
+    background: linear-gradient(135deg, rgb(var(--primary-800) / 0.55), rgb(var(--primary-900) / 0.3)) !important;
+    color: rgb(var(--primary-300)) !important;
+}
+
+/* ═══ 3. TOPBAR ═══ */
+.fi-topbar nav {
+    backdrop-filter: blur(14px) saturate(1.5);
+    -webkit-backdrop-filter: blur(14px) saturate(1.5);
+}
+
+/* ═══ 4. BUTTONS ═══ */
+.fi-btn {
+    border-radius: var(--erp-radius-md) !important;
+    transition: all var(--erp-transition) !important;
+    font-weight: 600 !important;
+}
+
+.fi-btn.fi-color-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--erp-shadow-md), 0 8px 24px rgb(var(--primary-500) / 0.28) !important;
+    filter: brightness(1.05);
+}
+
+.fi-btn.fi-color-primary:active {
+    transform: translateY(0) scale(0.98) !important;
+    transition-duration: 100ms !important;
+}
+
+.fi-btn:focus-visible {
+    outline: 2px solid rgb(var(--primary-500) / 0.7) !important;
+    outline-offset: 3px !important;
+}
+
+.fi-icon-btn {
+    border-radius: var(--erp-radius-md) !important;
+    transition: all var(--erp-transition) !important;
+}
+
+.fi-icon-btn:hover {
+    transform: scale(1.08) !important;
+}
+
+/* ═══ 5. FORMS ═══ */
+.fi-input-wrp:focus-within {
+    border-color: rgb(var(--primary-500)) !important;
+    box-shadow: 0 0 0 3px rgb(var(--primary-100) / 0.5) !important;
+}
+
+.dark .fi-input-wrp:focus-within {
+    border-color: rgb(var(--primary-400)) !important;
+    box-shadow: 0 0 0 3px rgb(var(--primary-900) / 0.5) !important;
+}
+
+.fi-fo-field-wrp-label label {
+    font-weight: 600 !important;
+    color: rgb(var(--primary-800)) !important;
+}
+
+.dark .fi-fo-field-wrp-label label {
+    color: rgb(var(--primary-200)) !important;
+}
+
+/* ═══ 6. TABLES ═══ */
+.fi-ta {
+    border-radius: var(--erp-radius-xl) !important;
+    box-shadow: var(--erp-shadow-md) !important;
+    overflow: hidden;
+}
+
+.fi-ta-header {
+    background: linear-gradient(135deg, rgb(var(--primary-50) / 0.8), rgb(var(--primary-100) / 0.35)) !important;
+    border-bottom: 2px solid rgb(var(--primary-200) / 0.35) !important;
+}
+
+.dark .fi-ta-header {
+    background: linear-gradient(135deg, rgb(var(--primary-950) / 0.5), rgb(var(--primary-900) / 0.25)) !important;
+    border-bottom: 2px solid rgb(var(--primary-800) / 0.25) !important;
+}
+
+.fi-ta-header-cell {
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.06em !important;
+    color: rgb(var(--primary-700)) !important;
+}
+
+.dark .fi-ta-header-cell {
+    color: rgb(var(--primary-300)) !important;
+}
+
+/* Striped rows */
+.fi-ta-row:nth-child(even) {
+    background: rgb(var(--primary-50) / 0.3) !important;
+}
+
+.dark .fi-ta-row:nth-child(even) {
+    background: rgb(var(--primary-950) / 0.15) !important;
+}
+
+/* Row hover */
+.fi-ta-row:hover {
+    background: rgb(var(--primary-100) / 0.55) !important;
+    transition: background var(--erp-transition) !important;
+}
+
+.dark .fi-ta-row:hover {
+    background: rgb(var(--primary-900) / 0.25) !important;
+}
+
+/* ═══ 7. STATS & WIDGETS ═══ */
+.fi-wi-stats-overview-stat {
+    border-radius: var(--erp-radius-xl) !important;
+    box-shadow: var(--erp-shadow-md) !important;
+    transition: all var(--erp-transition-smooth) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.fi-wi-stats-overview-stat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, rgb(var(--primary-400)), rgb(var(--primary-600)));
+    opacity: 0;
+    transition: opacity var(--erp-transition-smooth);
+}
+
+.fi-wi-stats-overview-stat:hover::before {
+    opacity: 1;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: var(--erp-shadow-xl) !important;
+}
+
+.fi-wi-chart {
+    border-radius: var(--erp-radius-xl) !important;
+    box-shadow: var(--erp-shadow-md) !important;
+    transition: all var(--erp-transition-smooth) !important;
+}
+
+.fi-wi-chart:hover {
+    box-shadow: var(--erp-shadow-lg) !important;
+    transform: translateY(-2px);
+}
+
+/* ═══ 8. MODALS ═══ */
+.fi-modal-window {
+    border-radius: var(--erp-radius-xl) !important;
+    box-shadow: var(--erp-shadow-xl) !important;
+}
+
+/* ═══ 9. NOTIFICATIONS ═══ */
+.fi-notification {
+    border-radius: var(--erp-radius-lg) !important;
+    box-shadow: var(--erp-shadow-lg) !important;
+    transition: all var(--erp-transition) !important;
+}
+
+.fi-notification:hover {
+    transform: translateX(4px) !important;
+}
+
+[dir="rtl"] .fi-notification:hover {
+    transform: translateX(-4px) !important;
+}
+
+/* ═══ 10. BADGES ═══ */
+.fi-badge {
+    border-radius: var(--erp-radius-full) !important;
+    font-weight: 600 !important;
+}
+
+/* ═══ 11. DROPDOWNS ═══ */
+.fi-dropdown-panel {
+    border-radius: var(--erp-radius-lg) !important;
+    box-shadow: var(--erp-shadow-lg) !important;
+    overflow: hidden;
+}
+
+/* ═══ 12. SCROLLBAR ═══ */
+.fi-sidebar ::-webkit-scrollbar {
+    width: 4px;
+}
+
+.fi-sidebar ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.fi-sidebar ::-webkit-scrollbar-thumb {
+    background: rgb(var(--primary-300) / 0.3);
+    border-radius: 9999px;
+}
+
+.fi-sidebar ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--primary-300) / 0.5);
+}
+
+.dark .fi-sidebar ::-webkit-scrollbar-thumb {
+    background: rgb(var(--primary-700) / 0.3);
+}
+
+/* ═══ 13. LOGIN PAGE ═══ */
+.fi-simple-page {
+    border-radius: var(--erp-radius-2xl) !important;
+    box-shadow: var(--erp-shadow-xl) !important;
+}
+
+/* ═══ 14. PAGE HEADERS ═══ */
+.fi-header-heading {
+    font-weight: 800 !important;
+}
+
+/* ═══ 15. BREADCRUMBS ═══ */
+.fi-breadcrumbs li a:hover {
+    color: rgb(var(--primary-600)) !important;
+}
+
+/* ═══ 16. ANIMATIONS ═══ */
+@keyframes erp-fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.fi-wi-stats-overview-stat,
+.fi-wi-chart {
+    animation: erp-fade-in 0.4s ease-out both;
+}

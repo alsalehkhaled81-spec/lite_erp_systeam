@@ -1,50 +1,50 @@
 <div>
-    <div class="text-center mb-8">
-        <h2 class="text-2xl font-bold text-gray-800">إنشاء حساب موظف</h2>
-        <p class="text-sm text-gray-500 mt-2">انضم إلى فريق العمل الآن</p>
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h2>{{ __('filament.auth.create_employee_account') }}</h2>
+        <p class="subtitle">{{ __('filament.auth.join_team') }}</p>
     </div>
 
-    <form wire:submit.prevent="register" class="space-y-4">
-        <div>
-            <label class="block text-sm font-medium text-gray-700">الاسم الكامل</label>
-            <input type="text" wire:model="name" class="mt-1 w-full p-3 border border-gray-300 rounded-lg">
-            @error('name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+    <form wire:submit.prevent="register">
+        <div class="form-group">
+            <label>{{ __('filament.fields.full_name') }}</label>
+            <input type="text" wire:model="name" placeholder="{{ __('filament.auth.enter_full_name') }}">
+            @error('name') <span class="error-text">{{ $message }}</span> @enderror
         </div>
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700">البريد الإلكتروني</label>
-            <input type="email" wire:model="email" class="mt-1 w-full p-3 border border-gray-300 rounded-lg">
-            @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+        <div class="form-group">
+            <label>{{ __('filament.fields.email') }}</label>
+            <input type="email" wire:model="email" placeholder="example@company.com">
+            @error('email') <span class="error-text">{{ $message }}</span> @enderror
         </div>
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700">كلمة المرور</label>
-            <input type="password" wire:model="password" class="mt-1 w-full p-3 border border-gray-300 rounded-lg">
-            @error('password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+        <div class="form-group">
+            <label>{{ __('filament.fields.password') }}</label>
+            <input type="password" wire:model="password" placeholder="••••••••">
+            @error('password') <span class="error-text">{{ $message }}</span> @enderror
         </div>
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700">تأكيد كلمة المرور</label>
-            <input type="password" wire:model="password_confirmation" class="mt-1 w-full p-3 border border-gray-300 rounded-lg">
+        <div class="form-group">
+            <label>{{ __('filament.fields.confirm_password') }}</label>
+            <input type="password" wire:model="password_confirmation" placeholder="••••••••">
         </div>
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700">الصفة الوظيفية (الدور)</label>
-            <select wire:model="role_id" class="mt-1 w-full p-3 border border-gray-300 rounded-lg bg-white">
-                <option value="">-- اختر صفة --</option>
+        <div class="form-group">
+            <label>{{ __('filament.fields.role') }}</label>
+            <select wire:model="role_id">
+                <option value="">-- {{ __('filament.auth.choose_role') }} --</option>
                 @foreach($roles as $role)
                     <option value="{{ $role->id }}">{{ $role->description ?? $role->name }}</option>
                 @endforeach
             </select>
-            @error('role_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            @error('role_id') <span class="error-text">{{ $message }}</span> @enderror
         </div>
 
-        <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition">
-            تسجيل الحساب
+        <button type="submit" class="btn-primary btn-success">
+            {{ __('filament.auth.register_account') }}
         </button>
     </form>
 
-    <div class="mt-6 text-center text-sm">
-        <p class="text-gray-600">لديك حساب بالفعل؟ <a href="{{ route('login') }}" class="text-blue-600 font-bold hover:underline">تسجيل الدخول</a></p>
+    <div class="footer-text">
+        <p>{{ __('filament.auth.already_have_account') }} <a href="{{ route('login') }}">{{ __('filament.auth.login') }}</a></p>
     </div>
 </div>

@@ -1,0 +1,49 @@
+@import 'tailwindcss';
+
+@source '../../vendor/filament/**/*.blade.php';
+@source '../../app/Filament/**/*.php';
+@source '../../resources/views/filament/**/*.blade.php';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@import '../_base.css';
+
+/* ═══════════════════════════════════════════════════════════════════
+   PM PANEL — Amber | Dynamic & Energetic
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+    --erp-panel-radius: var(--erp-radius-md);
+}
+
+/* --- PM: bold & energetic buttons --- */
+.fi-btn {
+    border-radius: var(--erp-radius-md) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+}
+
+.fi-icon-btn {
+    border-radius: var(--erp-radius-md) !important;
+}
+
+/* --- PM primary buttons — Stronger presence --- */
+.fi-btn.fi-color-primary {
+    box-shadow: var(--erp-shadow-sm),
+        0 3px 12px rgba(245, 158, 11, 0.25) !important;
+}
+
+.fi-btn.fi-color-primary:hover {
+    transform: translateY(-2px) scale(1.01) !important;
+    box-shadow: var(--erp-shadow-md),
+        0 8px 28px rgba(245, 158, 11, 0.35) !important;
+}
+
+.fi-btn.fi-color-primary:active {
+    transform: translateY(0) scale(0.97) !important;
+    transition-duration: 80ms !important;
+}
+
+/* --- PM stats accent --- */
+.fi-wi-stats-overview-stat::before {
+    background: linear-gradient(to right, rgba(245, 158, 11, 0.85), rgba(251, 191, 36, 0.65)) !important;
+}

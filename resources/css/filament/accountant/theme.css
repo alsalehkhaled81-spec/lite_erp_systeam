@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+
+@source '../../vendor/filament/**/*.blade.php';
+@source '../../app/Filament/**/*.php';
+@source '../../resources/views/filament/**/*.blade.php';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@import '../_base.css';
+
+/* ═══════════════════════════════════════════════════════════════════
+   ACCOUNTANT PANEL — Teal | Precise & Trustworthy
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+    --erp-panel-radius: var(--erp-radius-md);
+}
+
+/* --- Accountant: medium precise corners --- */
+.fi-btn {
+    border-radius: var(--erp-radius-md) !important;
+}
+
+.fi-icon-btn {
+    border-radius: var(--erp-radius-md) !important;
+}
+
+/* --- Accountant tables — Data-dense --- */
+.fi-ta-header-cell {
+    font-size: 0.7rem !important;
+    letter-spacing: 0.08em !important;
+    font-weight: 800 !important;
+}
+
+/* --- Accountant primary buttons — Teal shadow --- */
+.fi-btn.fi-color-primary {
+    box-shadow: var(--erp-shadow-sm),
+        0 2px 8px rgba(20, 184, 166, 0.18) !important;
+}
+
+.fi-btn.fi-color-primary:hover {
+    box-shadow: var(--erp-shadow-md),
+        0 6px 20px rgba(20, 184, 166, 0.28) !important;
+}
+
+/* --- Accountant stats accent --- */
+.fi-wi-stats-overview-stat::before {
+    background: linear-gradient(to right, rgba(20, 184, 166, 0.85), rgba(94, 234, 212, 0.65)) !important;
+}
+
+/* --- Accountant numbers — Tabular figures for alignment --- */
+.fi-ta-row td {
+    font-variant-numeric: tabular-nums !important;
+}

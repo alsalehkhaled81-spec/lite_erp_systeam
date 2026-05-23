@@ -1,0 +1,41 @@
+@import 'tailwindcss';
+
+@source '../../vendor/filament/**/*.blade.php';
+@source '../../app/Filament/**/*.php';
+@source '../../resources/views/filament/**/*.blade.php';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@import '../_base.css';
+
+/* ═══════════════════════════════════════════════════════════════════
+   ADMIN PANEL — Deep Navy Blue | Sharp & Authoritative
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+    --erp-panel-radius: var(--erp-radius-sm);
+}
+
+/* --- Admin: sharp corners for authority --- */
+.fi-btn {
+    border-radius: var(--erp-radius-sm) !important;
+}
+
+.fi-icon-btn {
+    border-radius: var(--erp-radius-sm) !important;
+}
+
+/* --- Admin primary buttons — Deep shadow --- */
+.fi-btn.fi-color-primary {
+    box-shadow: var(--erp-shadow-sm),
+        0 2px 8px rgba(30, 58, 95, 0.2) !important;
+}
+
+.fi-btn.fi-color-primary:hover {
+    box-shadow: var(--erp-shadow-md),
+        0 6px 20px rgba(30, 58, 95, 0.3) !important;
+}
+
+/* --- Admin stats accent --- */
+.fi-wi-stats-overview-stat::before {
+    background: linear-gradient(to right, rgba(30, 58, 95, 0.8), rgba(59, 130, 246, 0.6)) !important;
+}

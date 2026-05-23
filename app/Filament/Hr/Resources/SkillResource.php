@@ -81,4 +81,19 @@ class SkillResource extends Resource
             'edit' => Pages\EditSkill::route('/{record}/edit'),
         ];
     }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.model.skill');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.model.skills');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.nav.skills');
+    }
 }

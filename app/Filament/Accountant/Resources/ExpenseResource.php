@@ -19,42 +19,57 @@ class ExpenseResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.nav.expenses');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.model.expense');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.model.expenses');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('تسجيل مصروف جديد')
+                Forms\Components\Section::make(__('filament.sections.new_expense'))
                     ->schema([
                         Forms\Components\Select::make('user_id')
-                            ->label('المُسجل (المحاسب)')
+                            ->label(__('filament.fields.registered_by'))
                             ->relationship('user', 'name')
-                            ->default(auth()->id()) // يحدد المحاسب الحالي افتراضياً
+                            ->default(auth()->id())
                             ->required(),
                         Forms\Components\TextInput::make('title')
-                            ->label('عنوان المصروف')
+                            ->label(__('filament.fields.expense_title'))
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Select::make('category')
-                            ->label('القسم / التصنيف')
+                            ->label(__('filament.fields.category'))
                             ->options([
-                                'رواتب' => 'رواتب',
-                                'تشغيل' => 'مصاريف تشغيلية',
-                                'أدوات' => 'أدوات وبرمجيات',
-                                'تسويق' => 'تسويق وإعلانات',
-                                'أخرى' => 'أخرى',
+                                'رواتب' => __('filament.expense_category.salaries'),
+                                'تشغيل' => __('filament.expense_category.operations'),
+                                'أدوات' => __('filament.expense_category.tools'),
+                                'تسويق' => __('filament.expense_category.marketing'),
+                                'أخرى' => __('filament.expense_category.other'),
                             ])
                             ->searchable()
                             ->required(),
                         Forms\Components\TextInput::make('amount')
-                            ->label('المبلغ')
+                            ->label(__('filament.fields.amount'))
                             ->numeric()
                             ->prefix('$')
                             ->required(),
                         Forms\Components\DatePicker::make('expense_date')
-                            ->label('تاريخ المصروف')
+                            ->label(__('filament.fields.expense_date'))
                             ->default(now()),
                         Forms\Components\FileUpload::make('receipt_url')
-                            ->label('صورة الإيصال / الفاتورة')
+                            ->label(__('filament.fields.receipt_image'))
                             ->directory('receipts')
                             ->image()
                             ->columnSpanFull(),
@@ -67,22 +82,22 @@ class ExpenseResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->label('البيان')
+                    ->label(__('filament.columns.title'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('category')
-                    ->label('التصنيف')
+                    ->label(__('filament.columns.category'))
                     ->badge()
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->label('المبلغ')
+                    ->label(__('filament.columns.amount'))
                     ->money('usd')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('سُجل بواسطة')
+                    ->label(__('filament.columns.registered_by'))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('expense_date')
-                    ->label('التاريخ')
+                    ->label(__('filament.columns.expense_date'))
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('receipt_url')
@@ -98,13 +113,13 @@ class ExpenseResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('category')
-                    ->label('تصفية بالتصنيف')
+                    ->label(__('filament.filters.filter_by_category'))
                     ->options([
-                        'رواتب' => 'رواتب',
-                        'تشغيل' => 'مصاريف تشغيلية',
-                        'أدوات' => 'أدوات وبرمجيات',
-                        'تسويق' => 'تسويق وإعلانات',
-                        'أخرى' => 'أخرى',
+                        'رواتب' => __('filament.expense_category.salaries'),
+                        'تشغيل' => __('filament.expense_category.operations'),
+                        'أدوات' => __('filament.expense_category.tools'),
+                        'تسويق' => __('filament.expense_category.marketing'),
+                        'أخرى' => __('filament.expense_category.other'),
                     ]),
 
             ])

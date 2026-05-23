@@ -1,37 +1,36 @@
 <div>
-    <div class="text-center mb-8">
-        <h2 class="text-2xl font-bold text-gray-800">تسجيل الدخول</h2>
-        <p class="text-sm text-gray-500 mt-2">أدخل بياناتك للوصول إلى لوحة التحكم</p>
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h2>{{ __('filament.auth.login_title') }}</h2>
+        <p class="subtitle">{{ __('filament.auth.login_subtitle') }}</p>
     </div>
 
-    <form wire:submit.prevent="login" class="space-y-4">
-        <div>
-            <label class="block text-sm font-medium text-gray-700">البريد الإلكتروني</label>
-            <input type="email" wire:model="email" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+    <form wire:submit.prevent="login">
+        <div class="form-group">
+            <label>{{ __('filament.fields.email') }}</label>
+            <input type="email" wire:model="email" placeholder="example@company.com">
+            @error('email') <span class="error-text">{{ $message }}</span> @enderror
         </div>
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700">كلمة المرور</label>
-            <input type="password" wire:model="password" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            @error('password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+        <div class="form-group">
+            <label>{{ __('filament.fields.password') }}</label>
+            <input type="password" wire:model="password" placeholder="••••••••">
+            @error('password') <span class="error-text">{{ $message }}</span> @enderror
         </div>
 
-        <div class="flex items-center justify-between">
-            <label class="flex items-center">
-                <input type="checkbox" wire:model="remember" class="rounded border-gray-300 text-blue-600">
-                <span class="ml-2 text-sm text-gray-600 px-2">تذكرني</span>
+        <div class="form-row">
+            <label class="checkbox-label">
+                <input type="checkbox" wire:model="remember">
+                <span>{{ __('filament.auth.remember_me') }}</span>
             </label>
-
-            <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">نسيت كلمة المرور؟</a>
+            <a href="{{ route('password.request') }}" class="link">{{ __('filament.auth.forgot_password') }}</a>
         </div>
 
-        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">
-            دخول
+        <button type="submit" class="btn-primary">
+            {{ __('filament.auth.login_button') }}
         </button>
     </form>
 
-    <div class="mt-6 text-center text-sm">
-        <p class="text-gray-600">ليس لديك حساب؟ <a href="{{ route('register') }}" class="text-blue-600 font-bold hover:underline">إنشاء حساب جديد</a></p>
+    <div class="footer-text">
+        <p>{{ __('filament.auth.no_account') }} <a href="{{ route('register') }}">{{ __('filament.auth.register_link') }}</a></p>
     </div>
 </div>

@@ -45,7 +45,7 @@ public function login()
 
         // 3. التوجيه الذكي:
         // سيتم توجيهه للرابط الذي كان يقصده قبل الدخول (إن وُجد)، أو للمسار الافتراضي للوحته
-        return redirect()->intended($defaultPath);
+        return redirect($defaultPath);
     }
 
     $this->addError('email', 'بيانات الدخول غير صحيحة.');

@@ -11,6 +11,14 @@ use App\Http\Controllers\JobApplicationController;
 
 Route::redirect('/', '/login');
 
+Route::get('/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['ar', 'en'])) {
+        session()->put('locale', $locale);
+        cookie()->queue(cookie()->forever('filament_language_switch_locale', $locale));
+    }
+    return redirect()->back();
+})->name('switch-language');
+
 Route::get('/forgot-password', ForgotPassword::class)->name('password.request')->middleware('guest');
 
 // مسار إعادة تعيين كلمة المرور (يحتوي على التوكن)
