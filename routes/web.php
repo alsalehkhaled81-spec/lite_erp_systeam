@@ -6,10 +6,9 @@ use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\ResetPassword;
 use App\Http\Controllers\JobApplicationController;
+use App\Http\Controllers\LandingController;
 
-
-
-Route::redirect('/', '/login');
+Route::get('/', [LandingController::class, 'index'])->name('landing');
 
 Route::get('/lang/{locale}', function ($locale) {
     if (in_array($locale, ['ar', 'en'])) {

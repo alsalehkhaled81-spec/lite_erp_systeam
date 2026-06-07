@@ -13,7 +13,8 @@ use Filament\Tables\Table;
 class TaskResource extends Resource
 {
     protected static ?string $model = Task::class;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static ?string $navigationGroup = 'المهام';
 
     public static function form(Form $form): Form
     {
@@ -93,11 +94,15 @@ class TaskResource extends Resource
 
     public static function getRelations(): array { return []; }
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListTasks::route('/'),
-            'create' => Pages\CreateTask::route('/create'),
             'edit' => Pages\EditTask::route('/{record}/edit'),
         ];
     }
@@ -115,5 +120,10 @@ class TaskResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('filament.nav.tasks');
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title'];
     }
 }

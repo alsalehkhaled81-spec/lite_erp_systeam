@@ -1,4 +1,10 @@
 <div>
+    @if(session('success'))
+        <div class="success-alert">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <div style="text-align: center; margin-bottom: 2rem;">
         <h2>{{ __('filament.auth.login_title') }}</h2>
         <p class="subtitle">{{ __('filament.auth.login_subtitle') }}</p>

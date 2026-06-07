@@ -16,6 +16,8 @@ class LeaveResource extends Resource
     protected static ?string $model = Leave::class;
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
+    protected static ?string $navigationGroup = 'الإجازات';
+
     public static function getNavigationLabel(): string
     {
         return __('filament.nav.leave_requests');
@@ -70,6 +72,10 @@ class LeaveResource extends Resource
                 Tables\Columns\TextColumn::make('employee.user.name')
                     ->label(__('filament.columns.employee_name'))
                     ->searchable(),
+                Tables\Columns\TextColumn::make('employee.remaining_leave_balance')
+                    ->label(__('filament.columns.remaining_balance'))
+                    ->badge()
+                    ->color(fn ($state) => $state <= 3 ? 'danger' : ($state <= 10 ? 'warning' : 'success')),
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('filament.columns.type'))
                     ->badge()
@@ -124,7 +130,19 @@ class LeaveResource extends Resource
                     ->icon('heroicon-o-check-circle')
                     ->requiresConfirmation()
                     ->action(function (Leave $record) {
+                        $days = $record->duration_in_days;
+                        $employee = $record->employee;
+                        if ($employee && $employee->remaining_leave_balance < $days) {
+                            \Filament\Notifications\Notification::make()
+                                ->title(__('filament.notifications.insufficient_leave_balance'))
+                                ->danger()
+                                ->send();
+                            return;
+                        }
                         $record->update(['status' => 'approved_by_hr']);
+                        if ($employee) {
+                            $employee->increment('used_leave_days', $days);
+                        }
                         if ($record->employee?->user) {
                             $record->employee->user->notify(new LeaveStatusNotification('approved_by_hr', $record->type));
                         }
@@ -158,5 +176,10 @@ class LeaveResource extends Resource
             'index' => Pages\ListLeaves::route('/'),
             'edit' => Pages\EditLeave::route('/{record}/edit'),
         ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['employee.user.name'];
     }
 }

@@ -19,7 +19,9 @@ class ProjectResource extends Resource
 {
     protected static ?string $model = Project::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-briefcase';
+
+    protected static ?string $navigationGroup = 'المشاريع والمهام';
 
     public static function form(Form $form): Form
     {
@@ -88,6 +90,11 @@ class ProjectResource extends Resource
                         'completed' => 'success',
                         'canceled' => 'danger',
                     }),
+                Tables\Columns\TextColumn::make('completion_percentage')
+                    ->label(__('filament.columns.completion_percentage'))
+                    ->formatStateUsing(fn ($state) => $state . '%')
+                    ->badge()
+                    ->color(fn ($state) => $state >= 100 ? 'success' : ($state >= 50 ? 'warning' : 'danger')),
 
                 Tables\Columns\TextColumn::make('start_date')
                     ->date()
@@ -154,5 +161,10 @@ class ProjectResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('filament.nav.projects');
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name'];
     }
 }

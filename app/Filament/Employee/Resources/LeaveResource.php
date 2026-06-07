@@ -15,6 +15,7 @@ class LeaveResource extends Resource
 {
     protected static ?string $model = Leave::class;
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
+    protected static ?string $navigationGroup = 'الإجازات';
 
     public static function getNavigationLabel(): string
     {
@@ -136,5 +137,10 @@ class LeaveResource extends Resource
             'create' => Pages\CreateLeave::route('/create'),
             'edit' => Pages\EditLeave::route('/{record}/edit'),
         ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['employee.user.name'];
     }
 }

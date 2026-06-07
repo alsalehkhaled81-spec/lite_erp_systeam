@@ -6,6 +6,10 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use App\Filament\Employee\Pages\EmployeeProfile;
+use App\Filament\Employee\Pages\MyAttendance;
+use App\Filament\Employee\Widgets\EmployeeCalendarWidget;
+use App\Filament\Employee\Widgets\EmployeeProgressRing;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -29,14 +33,24 @@ class EmployeePanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Indigo,
             ])
+            ->darkMode(true)
+            ->font('Cairo')
+            ->sidebarCollapsibleOnDesktop()
+            ->spa()
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->maxContentWidth('full')
             ->discoverResources(in: app_path('Filament/Employee/Resources'), for: 'App\\Filament\\Employee\\Resources')
             ->discoverPages(in: app_path('Filament/Employee/Pages'), for: 'App\\Filament\\Employee\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                EmployeeProfile::class,
+                MyAttendance::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Employee/Widgets'), for: 'App\\Filament\\Employee\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
+                EmployeeCalendarWidget::class,
+                EmployeeProgressRing::class,
             ])
             ->middleware([
                 EncryptCookies::class,

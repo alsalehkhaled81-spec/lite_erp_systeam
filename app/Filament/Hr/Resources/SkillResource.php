@@ -17,7 +17,9 @@ class SkillResource extends Resource
 {
     protected static ?string $model = Skill::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
+
+    protected static ?string $navigationGroup = 'إدارة الموظفين';
 
     public static function form(Form $form): Form
     {
@@ -95,5 +97,10 @@ class SkillResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('filament.nav.skills');
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name'];
     }
 }

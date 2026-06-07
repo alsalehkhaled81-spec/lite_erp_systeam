@@ -26,6 +26,8 @@ class TasksRelationManager extends RelationManager
                 ->required(),
             Forms\Components\TextInput::make('title')
                 ->label(__('filament.fields.task_title'))->required(),
+            Forms\Components\DatePicker::make('start_date')
+                ->label(__('filament.fields.start_date')),
             Forms\Components\DatePicker::make('due_date')
                 ->label(__('filament.fields.due_date')),
             Forms\Components\Select::make('status')

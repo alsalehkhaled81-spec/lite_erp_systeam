@@ -16,7 +16,9 @@ class ExpenseResource extends Resource
 {
     protected static ?string $model = Expense::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-receipt-percent';
+
+    protected static ?string $navigationGroup = 'المالية';
 
     public static function form(Form $form): Form
     {
@@ -27,6 +29,9 @@ class ExpenseResource extends Resource
                         Forms\Components\Select::make('user_id')
                             ->label(__('filament.fields.registered_by'))
                             ->relationship('user', 'name')
+                            ->default(fn () => auth()->id())
+                            ->disabled()
+                            ->dehydrated()
                             ->required(),
                         Forms\Components\TextInput::make('title')
                             ->label(__('filament.fields.expense_title'))
@@ -145,5 +150,10 @@ class ExpenseResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('filament.nav.expenses');
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title'];
     }
 }

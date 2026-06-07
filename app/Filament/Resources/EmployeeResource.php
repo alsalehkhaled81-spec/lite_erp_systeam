@@ -17,7 +17,9 @@ class EmployeeResource extends Resource
 {
     protected static ?string $model = Employee::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+
+    protected static ?string $navigationGroup = 'إدارة الموظفين';
 
     public static function form(Form $form): Form
     {
@@ -155,5 +157,10 @@ class EmployeeResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('filament.nav.employees');
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['user.name', 'job_title'];
     }
 }

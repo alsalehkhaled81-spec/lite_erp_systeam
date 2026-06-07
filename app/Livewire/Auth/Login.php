@@ -23,7 +23,14 @@ public function login()
 
         $roleName = Auth::user()->role->name ?? null;
 
-        // 1. تحديد المسار الافتراضي بناءً على الدور
+        if (!Auth::user()->is_approved && $roleName !== 'employee') {
+            Auth::logout();
+            session()->invalidate();
+            session()->regenerateToken();
+            $this->addError('email', 'حسابك في انتظار موافقة الإدارة. يرجى التواصل مع المدير.');
+            return;
+        }
+
         $defaultPath = match ($roleName) {
             'super_admin'     => '/admin',
             'hr_manager'      => '/hr',
@@ -33,11 +40,10 @@ public function login()
             default           => null,
         };
 
-        // 2. إذا لم يكن لديه دور صالح في النظام (نخرجه فوراً حمايةً للنظام)
         if (!$defaultPath) {
             Auth::logout();
-            request()->session()->invalidate();
-            request()->session()->regenerateToken();
+            session()->invalidate();
+            session()->regenerateToken();
 
             $this->addError('email', 'حسابك لا يملك صلاحية للدخول إلى النظام.');
             return;

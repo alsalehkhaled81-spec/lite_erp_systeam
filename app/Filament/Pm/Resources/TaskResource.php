@@ -3,7 +3,9 @@
 namespace App\Filament\Pm\Resources;
 
 use App\Filament\Pm\Resources\TaskResource\Pages;
-use App\Filament\Pm\Resources\TaskResource\RelationManagers;
+use App\Filament\Pm\Resources\TaskResource\RelationManagers\CommentsRelationManager;
+use App\Filament\Pm\Resources\TaskResource\RelationManagers\AttachmentsRelationManager;
+use App\Filament\Pm\Resources\TaskResource\RelationManagers\TimeEntriesRelationManager;
 use App\Models\Task;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -14,7 +16,8 @@ use Filament\Tables\Table;
 class TaskResource extends Resource
 {
     protected static ?string $model = Task::class;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static ?string $navigationGroup = 'المشاريع والمهام';
 
     public static function form(Form $form): Form
     {
@@ -41,6 +44,8 @@ class TaskResource extends Resource
                         Forms\Components\Textarea::make('description')
                             ->label(__('filament.fields.description'))
                             ->columnSpanFull(),
+                        Forms\Components\DatePicker::make('start_date')
+                            ->label(__('filament.fields.start_date')),
                         Forms\Components\DatePicker::make('due_date')
                             ->label(__('filament.fields.due_date')),
                         Forms\Components\Select::make('status')
@@ -51,6 +56,13 @@ class TaskResource extends Resource
                                 'review' => __('filament.status.review'),
                                 'done' => __('filament.status.done'),
                             ])->default('todo'),
+                        Forms\Components\Select::make('priority')
+                            ->label(__('filament.fields.priority'))
+                            ->options([
+                                'low' => __('filament.priority.low'),
+                                'medium' => __('filament.priority.medium'),
+                                'high' => __('filament.priority.high'),
+                            ])->default('medium'),
                     ])->columns(2),
             ]);
     }
@@ -78,6 +90,14 @@ class TaskResource extends Resource
                         'review' => 'info',
                         'done' => 'success',
                     }),
+                Tables\Columns\TextColumn::make('priority')
+                    ->label(__('filament.fields.priority'))
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'low' => 'info',
+                        'medium' => 'warning',
+                        'high' => 'danger',
+                    }),
                 Tables\Columns\TextColumn::make('due_date')
                     ->label(__('filament.columns.due_date'))
                     ->date()
@@ -103,6 +123,16 @@ class TaskResource extends Resource
                         'review' => __('filament.status.review'),
                         'done' => __('filament.status.done'),
                     ]),
+                Tables\Filters\SelectFilter::make('priority')
+                    ->label(__('filament.filters.filter_by_priority'))
+                    ->options([
+                        'low' => __('filament.priority.low'),
+                        'medium' => __('filament.priority.medium'),
+                        'high' => __('filament.priority.high'),
+                    ]),
+                Tables\Filters\SelectFilter::make('employee_id')
+                    ->label(__('filament.filters.filter_by_employee'))
+                    ->relationship('employee.user', 'name'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -114,7 +144,14 @@ class TaskResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array { return []; }
+    public static function getRelations(): array
+    {
+        return [
+            CommentsRelationManager::class,
+            AttachmentsRelationManager::class,
+            TimeEntriesRelationManager::class,
+        ];
+    }
 
     public static function getPages(): array
     {
@@ -138,5 +175,10 @@ class TaskResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('filament.nav.tasks');
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title'];
     }
 }

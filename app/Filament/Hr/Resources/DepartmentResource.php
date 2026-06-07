@@ -16,6 +16,8 @@ class DepartmentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
+    protected static ?string $navigationGroup = 'إدارة الموظفين';
+
     protected static ?string $navigationLabel = 'الأقسام';
 
     protected static ?string $modelLabel = 'قسم';
@@ -101,5 +103,10 @@ class DepartmentResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('filament.nav.departments');
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name'];
     }
 }

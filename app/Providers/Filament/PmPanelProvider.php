@@ -29,6 +29,12 @@ class PmPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->darkMode(true)
+            ->font('Cairo')
+            ->sidebarCollapsibleOnDesktop()
+            ->spa()
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->maxContentWidth('full')
             ->discoverResources(in: app_path('Filament/Pm/Resources'), for: 'App\\Filament\\Pm\\Resources')
             ->discoverPages(in: app_path('Filament/Pm/Pages'), for: 'App\\Filament\\Pm\\Pages')
             ->pages([

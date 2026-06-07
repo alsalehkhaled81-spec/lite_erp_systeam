@@ -26,16 +26,29 @@ class Register extends Component
             'role_id' => 'required|exists:roles,id',
         ]);
 
+        $role = Role::find($this->role_id);
+        $isAdminRole = in_array($role->name, ['hr_manager', 'project_manager', 'accountant']);
+
         $user = User::create([
             'name' => $this->name,
             'email' => $this->email,
-            'password' => \Illuminate\Support\Facades\Hash::make($this->password),
+            'password' => Hash::make($this->password),
             'role_id' => $this->role_id,
+            'is_approved' => !$isAdminRole,
         ]);
 
-        \Illuminate\Support\Facades\Auth::login($user);
+        if ($role->name === 'employee') {
+            Auth::login($user);
+            return redirect()->route('job.apply');
+        }
 
-        return $this->redirectBasedOnRole($user->role->name);
+        if ($isAdminRole) {
+            session()->flash('success', 'تم إنشاء حسابك بنجاح! حسابك في انتظار موافقة المدير العام.');
+            return redirect()->route('login');
+        }
+
+        Auth::login($user);
+        return $this->redirectBasedOnRole($role->name);
     }
 
     private function redirectBasedOnRole($roleName)

@@ -2,11 +2,6 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Panel Brand Names
-    |--------------------------------------------------------------------------
-    */
     'brand' => [
         'admin' => 'Admin Panel',
         'pm' => 'Project Management',
@@ -15,11 +10,6 @@ return [
         'accountant' => 'Accountant Panel',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Navigation & Model Labels
-    |--------------------------------------------------------------------------
-    */
     'nav' => [
         'employees' => 'Employees',
         'departments' => 'Departments',
@@ -39,6 +29,8 @@ return [
         'kanban_board' => 'Kanban Board',
         'my_tasks_kanban' => 'My Tasks',
     ],
+
+    'nav_kanban' => 'Kanban Board',
 
     'model' => [
         'employee' => 'Employee',
@@ -73,11 +65,6 @@ return [
         'resumes' => 'Resumes',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Form Sections
-    |--------------------------------------------------------------------------
-    */
     'sections' => [
         'employee_data' => 'Employment Data',
         'leave_data' => 'Leave Details',
@@ -94,17 +81,20 @@ return [
         'report_data' => 'Report Details',
         'user_data' => 'User Data',
         'role_data' => 'Role Data',
+        'role_data_desc' => 'Manage role name and description',
         'skill_data' => 'Skill',
         'update_task_status' => 'Update Task Status',
         'new_expense' => 'Register New Expense',
         'leave_request' => 'Leave Request',
+        'personal_info' => 'Personal Information',
+        'job_info' => 'Job Information',
+        'change_password' => 'Change Password',
+        'department_data' => 'Department Data',
+        'resume_file' => 'Resume File',
+        'resume_extracted_text' => 'Extracted Text (AI-ATS)',
+        'resume_extracted_text_desc' => 'This text is read by AI for skill matching',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Form Field Labels
-    |--------------------------------------------------------------------------
-    */
     'fields' => [
         'user_account' => 'User Account',
         'department' => 'Department',
@@ -165,22 +155,42 @@ return [
         'role_permission' => 'Role (Permission)',
         'role_name' => 'Role Name',
         'role_description' => 'Description',
+        'skill' => 'Skill',
         'skill_name' => 'Skill Name',
         'statement' => 'Statement',
         'classification' => 'Classification',
         'employees_count' => 'Employees Count',
         'duration_days' => 'Duration (Days)',
         'created_at' => 'Created At',
+        'recorded_by' => 'Recorded By',
+        'project' => 'Project',
+        'priority' => 'Priority',
+        'description' => 'Description',
+        'resume_file' => 'PDF / Word File',
+        'resume_text' => 'Text',
+        'file' => 'File',
+        'job_keywords' => 'Job Keywords',
+        'job_keywords_placeholder' => 'e.g.: PHP, Laravel, MySQL, Project Management, Teamwork...',
+        'ai_score' => 'Score',
+        'ai_recommendation' => 'Recommendation',
+        'ai_summary' => 'Executive Summary',
+        'ai_report' => 'Detailed Report',
+        'ai_strengths' => 'Strengths',
+        'ai_weaknesses' => 'Weaknesses',
+        'role' => 'Role',
+        'profile_photo' => 'Profile Photo',
+        'current_password' => 'Current Password',
+        'new_password' => 'New Password',
+        'confirm_new_password' => 'Confirm New Password',
+        'is_approved' => 'Approved',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Table Column Labels
-    |--------------------------------------------------------------------------
-    */
     'columns' => [
         'employee_name' => 'Employee',
         'department' => 'Department',
+        'department_name' => 'Department',
+        'department_head' => 'Department Head',
+        'employees_count' => 'Employees',
         'job_title' => 'Job Title',
         'salary' => 'Salary',
         'status' => 'Status',
@@ -189,6 +199,7 @@ return [
         'start_date' => 'Start',
         'end_date' => 'End',
         'duration_days' => 'Days',
+        'request_date' => 'Request Date',
         'month' => 'Month',
         'basic_salary' => 'Basic Salary',
         'bonuses' => 'Bonuses',
@@ -200,6 +211,7 @@ return [
         'task' => 'Task',
         'project' => 'Project',
         'due_date' => 'Due Date',
+        'responsible' => 'Responsible',
         'name' => 'Name',
         'company' => 'Company',
         'email' => 'Email',
@@ -208,68 +220,54 @@ return [
         'amount' => 'Amount',
         'issue_date' => 'Issue Date',
         'title' => 'Title',
-        'category' => 'Category',
         'registered_by' => 'Registered By',
         'expense_date' => 'Date',
         'sender' => 'Sender',
         'receiver' => 'Receiver',
-        'report_title' => 'Title',
         'sent_date' => 'Sent Date',
-        'department_name' => 'Department',
-        'department_head' => 'Department Head',
-        'employees_count' => 'Employees',
         'role_name' => 'Role Name',
         'role_description' => 'Description',
+        'role' => 'Role',
+        'skill_name' => 'Skill Name',
+        'category' => 'Category',
+        'statement' => 'Statement',
+        'report_title' => 'Title',
+        'created_at' => 'Created At',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Status Options
-    |--------------------------------------------------------------------------
-    */
     'status' => [
         'active' => 'Active',
         'on_leave' => 'On Leave',
         'terminated' => 'Terminated',
-
         'pending' => 'Pending',
         'approved_by_head' => 'Dept. Head Approved',
         'approved_by_hr' => 'HR Approved',
         'rejected' => 'Rejected',
-
         'paid' => 'Paid',
         'unpaid' => 'Unpaid',
         'overdue' => 'Overdue',
-
         'todo' => 'To Do',
         'in_progress' => 'In Progress',
         'review' => 'Under Review',
         'done' => 'Completed',
-
         'completed' => 'Completed',
         'canceled' => 'Canceled',
-
         'unread' => 'Unread',
         'read' => 'Read',
         'replied' => 'Replied',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Leave Type Options
-    |--------------------------------------------------------------------------
-    */
+    'status_todo' => 'To Do',
+    'status_in_progress' => 'In Progress',
+    'status_review' => 'Under Review',
+    'status_done' => 'Completed',
+
     'leave_type' => [
         'Sick' => 'Sick',
         'Annual' => 'Annual',
         'Emergency' => 'Emergency',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Expense Category Options
-    |--------------------------------------------------------------------------
-    */
     'expense_category' => [
         'salaries' => 'Salaries',
         'operations' => 'Operational Expenses',
@@ -278,16 +276,13 @@ return [
         'other' => 'Other',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Filter Labels
-    |--------------------------------------------------------------------------
-    */
     'filters' => [
         'filter_by_status' => 'Filter by Status',
         'filter_by_project' => 'Filter by Project',
         'filter_by_category' => 'Filter by Category',
         'filter_by_role' => 'Filter by Role',
+        'filter_by_priority' => 'Filter by Priority',
+        'filter_by_employee' => 'Filter by Employee',
         'project_status' => 'Project Status',
         'task_status' => 'Task Status',
         'employee_status' => 'Employee Status',
@@ -296,34 +291,35 @@ return [
         'payroll_status' => 'Payroll Status',
         'invoice_status' => 'Invoice Status',
         'report_status' => 'Report Status',
+        'all' => 'All',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Action Labels
-    |--------------------------------------------------------------------------
-    */
     'actions' => [
         'ai_evaluate' => 'AI Evaluation',
         'ai_evaluate_heading' => 'AI Employee Performance Evaluation',
         'close' => 'Close',
         'approve_final' => 'Final Approval',
+        'final_approval' => 'Final Approval',
         'reject' => 'Reject',
         'download_payslip' => 'Download Payslip',
         'create_invoice' => 'Issue Invoice',
         'add_employee' => 'Add Employee to Project',
+        'add_employee_to_project' => 'Add Employee to Project',
         'remove_from_project' => 'Remove from Project',
         'add_skill' => 'Add Skill to Employee',
+        'add_skill_to_employee' => 'Add Skill to Employee',
         'create_skill' => 'Create New Skill',
+        'create_new_skill' => 'Create New Skill',
         'remove' => 'Remove',
         'new_task' => 'New Task',
+        'ai_analyze_resume' => 'AI Analysis',
+        'ai_analyze_resume_heading' => 'AI Resume Analysis',
+        'ai_analyze_resume_desc' => 'Enter the required job keywords to analyze applicant fit',
+        'start_analysis' => 'Start Analysis',
+        'download_view' => 'Download / View',
+        'export_dashboard_pdf' => 'Export PDF Report',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Widget Labels
-    |--------------------------------------------------------------------------
-    */
     'widgets' => [
         'total_employees' => 'Total Employees',
         'total_employees_desc' => 'Registered in System',
@@ -359,16 +355,133 @@ return [
         'net_profit' => 'Net Profit',
         'excellent_profit' => 'Excellent Profit',
         'loss' => 'Loss',
+        'live_activity' => 'Live Activity Feed',
+        'live_activity_desc' => 'Latest system operations',
+        'employee_heatmap' => 'Employee Activity Heatmap',
+        'employee_heatmap_desc' => 'Activity hours by day of week',
+        'kpi_task_completion' => 'Task Completion Rate',
+        'kpi_avg_project_duration' => 'Avg. Project Duration',
+        'kpi_client_satisfaction' => 'Client Satisfaction',
+        'revenue_vs_expenses' => 'Revenue vs Expenses',
+        'revenue_vs_expenses_desc' => 'Monthly comparison over 12 months',
+        'my_calendar' => 'My Calendar',
+        'my_calendar_desc' => 'Tasks and leaves on calendar',
+        'my_progress' => 'My Completion Rate',
+        'my_progress_desc' => 'Percentage of completed tasks out of total',
+        'my_profile' => 'My Profile',
+        'cashflow' => 'Monthly Cashflow',
+        'cashflow_desc' => 'Income, expenses and net flow per month',
+        'overdue_invoices' => 'Overdue Invoices',
+        'overdue_invoices_desc' => 'Invoices unpaid past due date',
+        'no_overdue_invoices' => 'No Overdue Invoices',
+        'no_overdue_invoices_desc' => 'All invoices are paid on time',
+        'project_budget' => 'Project Budget',
+        'project_budget_vs_spent' => 'Planned vs Spent',
+        'project_budget_desc' => 'Comparison of planned budget with actual spending',
+        'tax_report' => 'Estimated Tax Report',
+        'tax_report_desc' => 'Tax estimate based on revenue and expenses',
+        'tax_rate' => 'Tax Rate',
+        'gross_income' => 'Gross Income',
+        'total_deductions' => 'Total Deductions',
+        'taxable_amount' => 'Taxable Amount',
+        'estimated_tax' => 'Estimated Tax',
+        'net_after_tax' => 'Net Profit After Tax',
+        'days_overdue' => 'Days Overdue',
+        'invoice_overdue_alert' => 'Overdue Invoice Alert',
+        'legend_tasks' => 'Tasks',
+        'legend_leaves' => 'Leaves',
+        'task_todo' => 'To Do',
+        'task_in_progress' => 'In Progress',
+        'task_review' => 'Under Review',
+        'task_done' => 'Completed',
+        'approved_leaves' => 'Approved Leaves',
+        'save_profile' => 'Save Profile',
+        'personal_info' => 'Personal Information',
+        'job_info' => 'Job Information',
+        'change_password' => 'Change Password',
+        'current_password' => 'Current Password',
+        'new_password' => 'New Password',
+        'confirm_new_password' => 'Confirm New Password',
+        'profile_photo' => 'Profile Photo',
+        'profile_updated' => 'Profile updated successfully',
+        'wrong_password' => 'Current password is incorrect',
+        'income' => 'Income',
+        'expenses' => 'Expenses',
+        'net_flow' => 'Net Flow',
+        'planned_budget' => 'Planned Budget',
+        'actual_spent' => 'Actual Spent',
+        'task_completion_rate' => 'Task Completion Rate',
+        'task_completion_rate_desc' => 'Percentage of completed tasks out of total',
+        'avg_project_duration' => 'Avg. Project Duration',
+        'avg_project_duration_desc' => 'Average days to complete a project',
+        'client_satisfaction' => 'Client Satisfaction',
+        'client_satisfaction_desc' => 'Based on paid invoices ratio',
+        'overdue_tasks' => 'Overdue Tasks',
+        'overdue_tasks_desc' => 'Tasks past their due date',
+        'kpi_indicators' => 'KPI Indicators',
+        'days' => 'days',
+        'last_7_days' => 'Last 7 Days',
+        'employee' => 'Employee',
+        'employees' => 'Employees',
+        'tasks_count' => 'Tasks Count',
+        'completion_rate' => 'Completion Rate',
+        'tasks' => 'Tasks',
+        'leaves' => 'Leaves',
+        'no_recent_activity' => 'No recent activity',
+        'no_heatmap_data' => 'Not enough data',
+        'live' => 'Live',
+        'inflow' => 'Inflow',
+        'outflow' => 'Outflow',
+        'monthly_cashflow' => 'Monthly Cashflow',
+        'revenue_label' => 'Revenue',
+        'expenses_label' => 'Expenses',
+        'dashboard_kpi_title' => 'Dashboard KPIs',
+        'report_auto_generated' => 'This report was auto-generated',
+        'personal_calendar' => 'Personal Calendar',
+        'my_completion_rate' => 'My Completion Rate',
+        'completed' => 'Completed',
+        'in_progress' => 'In Progress',
+        'pending' => 'Pending',
+        'activity_project_created' => 'New project',
+        'activity_task_todo' => 'New task in :project',
+        'activity_task_in_progress' => 'Working on task in :project',
+        'activity_task_review' => 'Task under review in :project',
+        'activity_task_done' => 'Task completed in :project',
+        'activity_invoice_paid' => 'Invoice paid ($:amount)',
+        'activity_invoice_unpaid' => 'Invoice unpaid ($:amount)',
+        'activity_leave_pending' => 'Leave request',
+        'activity_leave_approved' => 'Leave approved',
+        'activity_leave_rejected' => 'Leave rejected',
+        'activity_employee_joined' => 'New employee in :department department',
+        'export_dashboard_pdf' => 'Export PDF Report',
+        'save' => 'Save',
+        'revenue_expenses_chart' => 'Revenue vs Expenses Chart',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Kanban Labels
-    |--------------------------------------------------------------------------
-    */
+    'emp_stats_total' => 'My Total Tasks',
+    'emp_stats_total_desc' => 'All assigned tasks',
+    'emp_stats_in_progress' => 'In Progress',
+    'emp_stats_in_progress_desc' => 'Currently running tasks',
+    'emp_stats_done' => 'Completed',
+    'emp_stats_done_desc' => 'Successfully completed tasks',
+
     'kanban' => [
         'no_tasks' => 'No tasks',
         'ai_evaluation' => 'AI Evaluation',
+    ],
+
+    'priority' => [
+        'low' => 'Low',
+        'medium' => 'Medium',
+        'high' => 'High',
+    ],
+
+    'notifications' => [
+        'ai_analysis_complete' => 'Analysis completed successfully',
+        'ai_analysis_error' => 'Analysis Error',
+        'ai_analysis_error_body' => 'AI could not analyze the resume. Please try again later.',
+        'profile_updated' => 'Profile updated successfully',
+        'wrong_password' => 'Current password is incorrect',
     ],
 
     'relation' => [
@@ -378,11 +491,6 @@ return [
         'client_invoices' => 'Client Invoices',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Auth Labels
-    |--------------------------------------------------------------------------
-    */
     'auth' => [
         'login_title' => 'Sign In',
         'login_subtitle' => 'Enter your credentials to access the dashboard',

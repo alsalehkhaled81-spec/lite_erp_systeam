@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5bb6e45cdb5b312f810c5b9d5fb42c44",
+    "content-hash": "31f078697e59e6f2b8635c2a9015e72f",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -70,6 +70,56 @@
                 "source": "https://github.com/AnourValar/eloquent-serialize/tree/1.3.8"
             },
             "time": "2026-05-04T09:18:12+00:00"
+        },
+        {
+            "name": "ar-php/ar-php",
+            "version": "v1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tawfekov/ar-php.git",
+                "reference": "4438469e70970ad059ae7536e1c928e879e40e04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tawfekov/ar-php/zipball/4438469e70970ad059ae7536e1c928e879e40e04",
+                "reference": "4438469e70970ad059ae7536e1c928e879e40e04",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Arphp": "src/"
+                },
+                "classmap": [
+                    "autoload_classmap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Khaled Al-Sham'aa",
+                    "email": "khaled@ar-php.org",
+                    "homepage": "http://www.ar-php.org/"
+                },
+                {
+                    "name": "Tawfek Daghistani",
+                    "email": "tawfekov@gmail.com"
+                }
+            ],
+            "description": "helper library for dealing with arabic language",
+            "homepage": "http://www.ar-php.org/",
+            "support": {
+                "issues": "https://github.com/tawfekov/ar-php/issues",
+                "source": "https://github.com/tawfekov/ar-php/tree/master"
+            },
+            "abandoned": "khaled.alshamaa/ar-php",
+            "time": "2018-06-22T19:02:45+00:00"
         },
         {
             "name": "barryvdh/laravel-dompdf",

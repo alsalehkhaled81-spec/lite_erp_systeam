@@ -13,7 +13,7 @@ class ListTasks extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            // Create action removed as tasks come from top management
         ];
     }
 }

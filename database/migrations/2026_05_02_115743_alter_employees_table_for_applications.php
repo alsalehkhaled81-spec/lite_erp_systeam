@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\DB;
 return new class extends Migration {
     public function up(): void
     {
-        // 1. تعديل حالات الموظف لتشمل قيد المراجعة والمرفوض
-        DB::statement("ALTER TABLE employees MODIFY COLUMN status ENUM('pending', 'active', 'on_leave', 'terminated', 'rejected') DEFAULT 'pending'");
+        $driver = Schema::getConnection()->getDriverName();
 
-        // 2. إضافة حقل سبب الرفض
+        if ($driver === 'mysql') {
+            DB::statement("ALTER TABLE employees MODIFY COLUMN status ENUM('pending', 'active', 'on_leave', 'terminated', 'rejected') DEFAULT 'pending'");
+        }
+
         Schema::table('employees', function (Blueprint $table) {
             $table->text('rejection_reason')->nullable()->after('status');
         });

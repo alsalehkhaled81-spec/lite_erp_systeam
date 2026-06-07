@@ -16,7 +16,9 @@ class InvoiceResource extends Resource
 {
     protected static ?string $model = Invoice::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-currency-dollar';
+
+    protected static ?string $navigationGroup = 'المالية';
 
     public static function form(Form $form): Form
     {
@@ -28,11 +30,16 @@ class InvoiceResource extends Resource
                             ->label(__('filament.fields.client'))
                             ->relationship('client', 'name')
                             ->required()
-                            ->searchable(),
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(fn (Forms\Set $set) => $set('project_id', null)),
                         Forms\Components\Select::make('project_id')
                             ->label(__('filament.fields.project_optional'))
-                            ->relationship('project', 'name')
-                            ->searchable(),
+                            ->relationship('project', 'name', modifyQueryUsing: fn (Builder $query, Forms\Get $get) => 
+                                $query->when($get('client_id'), fn ($q, $client) => $q->where('client_id', $client))
+                            )
+                            ->searchable()
+                            ->preload(),
                     ])->columns(2),
 
                 Forms\Components\Section::make(__('filament.sections.invoice_data'))
@@ -151,5 +158,10 @@ class InvoiceResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('filament.nav.invoices');
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['invoice_number'];
     }
 }

@@ -16,6 +16,8 @@ class LeaveResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
+    protected static ?string $navigationGroup = 'إدارة الموظفين';
+
     public static function getNavigationLabel(): string
     {
         return __('filament.nav.leaves');
@@ -160,5 +162,10 @@ class LeaveResource extends Resource
             'create' => Pages\CreateLeave::route('/create'),
             'edit' => Pages\EditLeave::route('/{record}/edit'),
         ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['employee.user.name'];
     }
 }

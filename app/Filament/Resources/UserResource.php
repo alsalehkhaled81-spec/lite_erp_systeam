@@ -10,12 +10,15 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
+
+    protected static ?string $navigationGroup = 'النظام';
 
     public static function getNavigationLabel(): string
     {
@@ -56,6 +59,8 @@ class UserResource extends Resource
                             ->password()
                             ->required()
                             ->maxLength(255),
+                        Forms\Components\Toggle::make('is_approved')
+                            ->label(__('filament.fields.is_approved')),
                     ])->columns(2),
             ]);
     }
@@ -72,6 +77,13 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('role.name')
                     ->label(__('filament.columns.role')),
+                Tables\Columns\IconColumn::make('is_approved')
+                    ->label(__('filament.fields.is_approved'))
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('role_id')
@@ -79,6 +91,20 @@ class UserResource extends Resource
                     ->relationship('role', 'name'),
             ])
             ->actions([
+                Tables\Actions\Action::make('approve')
+                    ->label(__('filament.actions.approve'))
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn (User $record) => !$record->is_approved)
+                    ->action(fn (User $record) => $record->update(['is_approved' => true]))
+                    ->requiresConfirmation(),
+                Tables\Actions\Action::make('deactivate')
+                    ->label(__('filament.actions.deactivate'))
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn (User $record) => $record->is_approved)
+                    ->action(fn (User $record) => $record->update(['is_approved' => false]))
+                    ->requiresConfirmation(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -102,5 +128,10 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email'];
     }
 }

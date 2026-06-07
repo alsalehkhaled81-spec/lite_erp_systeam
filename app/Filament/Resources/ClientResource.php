@@ -18,7 +18,9 @@ class ClientResource extends Resource
 {
     protected static ?string $model = Client::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+
+    protected static ?string $navigationGroup = 'المالية';
 
     public static function form(Form $form): Form
     {
@@ -43,7 +45,8 @@ class ClientResource extends Resource
                             ->unique(ignoreRecord: true),
                         Forms\Components\TextInput::make('phone')
                             ->label(__('filament.fields.phone'))
-                            ->tel(),
+                            ->tel()
+                            ->numeric(),
                         Forms\Components\Textarea::make('address')
                             ->label(__('filament.fields.address'))
                             ->columnSpanFull(),
@@ -119,5 +122,10 @@ class ClientResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('filament.nav.clients');
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email'];
     }
 }

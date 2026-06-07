@@ -15,7 +15,9 @@ class SkillResource extends Resource
 {
     protected static ?string $model = Skill::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
+
+    protected static ?string $navigationGroup = 'إدارة الموظفين';
 
     public static function getNavigationLabel(): string
     {
@@ -81,5 +83,10 @@ class SkillResource extends Resource
             'create' => Pages\CreateSkill::route('/create'),
             'edit' => Pages\EditSkill::route('/{record}/edit'),
         ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name'];
     }
 }

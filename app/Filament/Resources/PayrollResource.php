@@ -17,6 +17,8 @@ class PayrollResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
+    protected static ?string $navigationGroup = 'المالية';
+
     public static function getNavigationLabel(): string
     {
         return __('filament.model.payrolls');
@@ -53,7 +55,7 @@ class PayrollResource extends Resource
                             }),
                         Forms\Components\TextInput::make('month_year')
                             ->label(__('filament.fields.month'))
-                            ->placeholder(__('filament.fields.month_example'))
+                            ->type('month')
                             ->required(),
                         Forms\Components\TextInput::make('basic_salary')
                             ->label(__('filament.fields.basic_salary'))
@@ -168,5 +170,10 @@ class PayrollResource extends Resource
             'create' => Pages\CreatePayroll::route('/create'),
             'edit' => Pages\EditPayroll::route('/{record}/edit'),
         ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['month_year'];
     }
 }

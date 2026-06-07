@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,7 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Employee extends Model
 {
-    protected $fillable = ['user_id', 'department_id', 'job_title', 'salary', 'status', 'hire_date'];
+    use HasFactory;
+    protected $fillable = ['user_id', 'department_id', 'job_title', 'salary', 'status', 'hire_date', 'annual_leave_balance', 'used_leave_days'];
 
     protected $casts = [
         'hire_date' => 'date',
@@ -68,5 +71,32 @@ class Employee extends Model
     public function receivedReports(): HasMany
     {
         return $this->hasMany(Report::class, 'receiver_id');
+    }
+
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
+    public function careerPlans(): HasMany
+    {
+        return $this->hasMany(CareerPlan::class);
+    }
+
+    public function trainings(): BelongsToMany
+    {
+        return $this->belongsToMany(Training::class, 'employee_training')
+            ->withPivot(['status', 'certificate_url', 'completion_date'])
+            ->withTimestamps();
+    }
+
+    public function getRemainingLeaveBalanceAttribute(): int
+    {
+        return $this->annual_leave_balance - $this->used_leave_days;
     }
 }

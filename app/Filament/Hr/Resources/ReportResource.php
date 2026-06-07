@@ -14,7 +14,9 @@ class ReportResource extends Resource
 {
     protected static ?string $model = Report::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-o-document-chart-bar';
+
+    protected static ?string $navigationGroup = 'التقارير';
 
     protected static ?string $navigationLabel = 'التقارير الواردة';
 
@@ -129,5 +131,10 @@ class ReportResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('filament.nav.reports');
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title'];
     }
 }
