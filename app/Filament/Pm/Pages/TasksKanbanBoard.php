@@ -52,14 +52,41 @@ class TasksKanbanBoard extends Page
             $query->where('employee_id', $this->filterEmployeeId);
         }
 
-        return $query->orderBy('priority', 'desc')->get();
+        return $query->orderBy('sort_order', 'asc')->orderBy('id', 'asc')->get();
     }
 
-    public function updateTaskStatus(int $taskId, string $newStatus): void
+    public function updateTaskStatus(int $taskId, string $newStatus, int $targetIndex = 0): void
     {
         $task = Task::find($taskId);
-        if ($task && in_array($newStatus, ['todo', 'in_progress', 'review', 'done'])) {
-            $task->update(['status' => $newStatus]);
+        if (!$task || !in_array($newStatus, ['todo', 'in_progress', 'review', 'done'])) {
+            return;
+        }
+
+        $oldStatus = $task->status;
+        $task->update(['status' => $newStatus]);
+
+        $siblings = Task::where('status', $newStatus)
+            ->where('id', '!=', $taskId)
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $targetIndex = max(0, min($targetIndex, $siblings->count()));
+
+        $ordered = $siblings->slice(0, $targetIndex)
+            ->push($task)
+            ->concat($siblings->slice($targetIndex));
+
+        $ordered->values()->each(function ($t, $i) {
+            if ($t->sort_order !== $i) {
+                Task::where('id', $t->id)->update(['sort_order' => $i]);
+            }
+        });
+
+        if ($oldStatus !== $newStatus) {
+            Task::where('status', $oldStatus)
+                ->where('sort_order', '>', $task->getOriginal('sort_order'))
+                ->decrement('sort_order');
         }
     }
 

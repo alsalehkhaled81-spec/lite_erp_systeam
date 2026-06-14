@@ -16,36 +16,30 @@ class ReportResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-chart-bar';
 
-    protected static ?string $navigationGroup = 'التقارير';
-
-    protected static ?string $navigationLabel = 'التقارير الواردة';
-
-    protected static ?string $modelLabel = 'تقرير';
-
-    protected static ?string $pluralModelLabel = 'التقارير الواردة';
+    protected static ?string $navigationGroup = null;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('التقرير')
+                Forms\Components\Section::make(__('filament.sections.report_data'))
                     ->schema([
                         Forms\Components\TextInput::make('title')
-                            ->label('عنوان التقرير')
+                            ->label(__('filament.fields.report_title'))
                             ->disabled(),
                         Forms\Components\Textarea::make('content')
-                            ->label('المحتوى')
+                            ->label(__('filament.fields.content'))
                             ->disabled()
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make('feedback')
-                            ->label('الرد')
+                            ->label(__('filament.fields.feedback'))
                             ->columnSpanFull(),
                         Forms\Components\Select::make('status')
-                            ->label('الحالة')
+                            ->label(__('filament.fields.status'))
                             ->options([
-                                'unread' => 'غير مقروء',
-                                'read' => 'مقروء',
-                                'replied' => 'تم الرد',
+                                'unread' => __('filament.status.unread'),
+                                'read' => __('filament.status.read'),
+                                'replied' => __('filament.status.replied'),
                             ])
                             ->required(),
                     ])->columns(2),
@@ -57,14 +51,14 @@ class ReportResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->label('العنوان')
+                    ->label(__('filament.columns.report_title'))
                     ->searchable()
                     ->limit(30),
                 Tables\Columns\TextColumn::make('sender.user.name')
-                    ->label('المرسل')
+                    ->label(__('filament.columns.sender'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('الحالة')
+                    ->label(__('filament.columns.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'unread' => 'warning',
@@ -73,28 +67,28 @@ class ReportResource extends Resource
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'unread' => 'غير مقروء',
-                        'read' => 'مقروء',
-                        'replied' => 'تم الرد',
+                        'unread' => __('filament.status.unread'),
+                        'read' => __('filament.status.read'),
+                        'replied' => __('filament.status.replied'),
                         default => $state,
                     }),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('تاريخ الإرسال')
+                    ->label(__('filament.columns.sent_date'))
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->label('الحالة')
+                    ->label(__('filament.filters.report_status'))
                     ->options([
-                        'unread' => 'غير مقروء',
-                        'read' => 'مقروء',
-                        'replied' => 'تم الرد',
+                        'unread' => __('filament.status.unread'),
+                        'read' => __('filament.status.read'),
+                        'replied' => __('filament.status.replied'),
                     ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->label('عرض/رد'),
+                    ->label(__('filament.actions.view_reply')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -127,6 +121,11 @@ class ReportResource extends Resource
     {
         return __('filament.model.reports');
     }
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.reports');
+    }
+
 
     public static function getNavigationLabel(): string
     {

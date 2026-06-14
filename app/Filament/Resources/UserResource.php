@@ -18,7 +18,12 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static ?string $navigationGroup = 'النظام';
+    protected static ?string $navigationGroup = null;
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.system');
+    }
+
 
     public static function getNavigationLabel(): string
     {

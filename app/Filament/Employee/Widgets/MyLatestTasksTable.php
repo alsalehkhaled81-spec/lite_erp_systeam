@@ -9,7 +9,6 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class MyLatestTasksTable extends BaseWidget
 {
-    protected static ?string $heading = 'آخر المهام المسندة إليّ';
     protected int | string | array $columnSpan = 'full';
 
     public function table(Table $table): Table
@@ -25,16 +24,16 @@ class MyLatestTasksTable extends BaseWidget
                     ->limit(5)
             )
             ->columns([
-                Tables\Columns\TextColumn::make('title')->label('المهمة'),
-                Tables\Columns\TextColumn::make('project.name')->label('المشروع'),
-                Tables\Columns\TextColumn::make('due_date')->label('تاريخ التسليم')->date(),
+                Tables\Columns\TextColumn::make('title')->label(__('filament.columns.task')),
+                Tables\Columns\TextColumn::make('project.name')->label(__('filament.columns.project')),
+                Tables\Columns\TextColumn::make('due_date')->label(__('filament.columns.due_date'))->date(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('الحالة')
+                    ->label(__('filament.columns.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'todo' => 'gray', 'in_progress' => 'warning', 'review' => 'info', 'done' => 'success', default => 'gray'
                     }),
             ])
-            ->paginated(false); // إخفاء ترقيم الصفحات لأنها Dashboard
+            ->paginated(false);
     }
 }

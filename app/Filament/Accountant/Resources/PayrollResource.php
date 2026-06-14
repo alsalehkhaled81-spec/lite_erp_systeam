@@ -18,7 +18,12 @@ class PayrollResource extends Resource
     protected static ?string $model = Payroll::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
-    protected static ?string $navigationGroup = 'المالية';
+    protected static ?string $navigationGroup = null;
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.finance');
+    }
+
 
     public static function getNavigationLabel(): string
     {

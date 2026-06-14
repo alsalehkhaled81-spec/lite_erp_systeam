@@ -13,6 +13,8 @@ class AdminKpiIndicators extends BaseWidget
 {
     protected static ?int $sort = 3;
 
+    protected static ?string $pollingInterval = null;
+
     public function getHeading(): string
     {
         return __('filament.widgets.kpi_indicators');
@@ -20,62 +22,107 @@ class AdminKpiIndicators extends BaseWidget
 
     protected function getStats(): array
     {
-        $totalTasks = Task::count();
-        $completedTasks = Task::where('status', 'done')->count();
-        $taskCompletionRate = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100, 1) : 0;
-
-        $completedProjects = Project::where('status', 'completed')->get();
-        $avgProjectDuration = $completedProjects->filter(fn ($p) => $p->start_date && $p->end_date)
-            ->map(fn ($p) => Carbon::parse($p->start_date)->diffInDays(Carbon::parse($p->end_date)))
-            ->average() ?? 0;
-        $avgProjectDuration = round($avgProjectDuration, 1);
-
-        $paidInvoices = Invoice::where('status', 'paid')->count();
-        $totalInvoices = Invoice::count();
-        $clientSatisfactionRate = $totalInvoices > 0 ? round(($paidInvoices / $totalInvoices) * 100, 1) : 0;
-
+        [$taskRate, $taskTrend] = $this->computeTaskCompletion();
+        [$avgDuration, $durationTrend, $completedCount] = $this->computeProjectDuration();
+        [$satisfactionRate, $satisfactionTrend] = $this->computeClientSatisfaction();
         $overdueTasks = Task::where('due_date', '<', now())->where('status', '!=', 'done')->count();
 
-        $inProgressTasks = Task::where('status', 'in_progress')->count();
-        $reviewTasks = Task::where('status', 'review')->count();
-
-        $chartData = [
-            $taskCompletionRate >= 70 ? 8 : 4,
-            min($clientSatisfactionRate, 100) >= 70 ? 8 : 4,
-            $avgProjectDuration > 0 ? 7 : 3,
-            $overdueTasks == 0 ? 9 : 3,
-        ];
-
         return [
-            Stat::make(__('filament.widgets.task_completion_rate'), $taskCompletionRate . '%')
+            Stat::make(__('filament.widgets.task_completion_rate'), $taskRate . '%')
                 ->description(__('filament.widgets.task_completion_rate_desc'))
-                ->descriptionIcon($taskCompletionRate >= 70 ? 'heroicon-m-check-circle' : 'heroicon-m-exclamation-triangle')
-                ->chart($this->generateMiniChart($taskCompletionRate))
-                ->color($taskCompletionRate >= 70 ? 'success' : ($taskCompletionRate >= 40 ? 'warning' : 'danger')),
+                ->descriptionIcon($taskRate >= 70 ? 'heroicon-m-check-circle' : 'heroicon-m-exclamation-triangle')
+                ->chart($taskTrend)
+                ->color($taskRate >= 70 ? 'success' : ($taskRate >= 40 ? 'warning' : 'danger')),
 
-            Stat::make(__('filament.widgets.avg_project_duration'), $avgProjectDuration . ' ' . __('filament.widgets.days'))
-                ->description(__('filament.widgets.avg_project_duration_desc'))
+            Stat::make(__('filament.widgets.avg_project_duration'), $avgDuration > 0 ? $avgDuration . ' ' . __('filament.widgets.days') : '—')
+                ->description($completedCount > 0 ? __('filament.widgets.avg_project_duration_desc') : __('filament.widgets.no_data'))
                 ->descriptionIcon('heroicon-m-clock')
-                ->chart($this->generateMiniChart(50))
+                ->chart($durationTrend)
                 ->color('info'),
 
-            Stat::make(__('filament.widgets.client_satisfaction'), $clientSatisfactionRate . '%')
+            Stat::make(__('filament.widgets.client_satisfaction'), $satisfactionRate . '%')
                 ->description(__('filament.widgets.client_satisfaction_desc'))
-                ->descriptionIcon($clientSatisfactionRate >= 70 ? 'heroicon-m-face-smile' : 'heroicon-m-face-frown')
-                ->chart($this->generateMiniChart($clientSatisfactionRate))
-                ->color($clientSatisfactionRate >= 70 ? 'success' : 'warning'),
+                ->descriptionIcon($satisfactionRate >= 70 ? 'heroicon-m-face-smile' : 'heroicon-m-face-frown')
+                ->chart($satisfactionTrend)
+                ->color($satisfactionRate >= 70 ? 'success' : ($satisfactionRate >= 40 ? 'warning' : 'danger')),
 
             Stat::make(__('filament.widgets.overdue_tasks'), $overdueTasks)
                 ->description(__('filament.widgets.overdue_tasks_desc'))
-                ->descriptionIcon('heroicon-m-exclamation-circle')
+                ->descriptionIcon($overdueTasks > 0 ? 'heroicon-m-exclamation-circle' : 'heroicon-m-check-circle')
                 ->color($overdueTasks > 0 ? 'danger' : 'success'),
         ];
     }
 
-    private function generateMiniChart(float $percentage): array
+    private function computeTaskCompletion(): array
     {
-        $base = collect(range(1, 7))->map(fn () => rand(max(1, $percentage - 15), min(100, $percentage + 15)))->toArray();
-        $base[] = $percentage;
-        return $base;
+        $total = Task::count();
+        $completed = Task::where('status', 'done')->count();
+        $rate = $total > 0 ? round(($completed / $total) * 100, 1) : 0;
+
+        $months = collect(range(5, 0))->map(function ($offset) {
+            $date = now()->subMonths($offset);
+            $monthTotal = Task::whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->count();
+            $monthDone = Task::where('status', 'done')
+                ->whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->count();
+            return $monthTotal > 0 ? round(($monthDone / $monthTotal) * 100) : 0;
+        })->values();
+
+        return [$rate, $months->all()];
+    }
+
+    private function computeProjectDuration(): array
+    {
+        $projects = Project::whereNotNull('start_date')
+            ->whereNotNull('end_date')
+            ->get();
+
+        if ($projects->isEmpty()) {
+            return [0, [0, 0, 0, 0, 0, 0], 0];
+        }
+
+        $completed = Project::where('status', 'completed')
+            ->whereNotNull('start_date')
+            ->whereNotNull('end_date')
+            ->get();
+
+        $avgDuration = 0;
+        if ($completed->isNotEmpty()) {
+            $avgDuration = round($completed->map(fn ($p) => Carbon::parse($p->start_date)->startOfDay()->diffInDays(Carbon::parse($p->end_date)->startOfDay()))->average());
+        }
+
+        $trend = $projects->sortBy('end_date')->take(6)->map(function ($p) {
+            return (int) Carbon::parse($p->start_date)->startOfDay()->diffInDays(Carbon::parse($p->end_date)->startOfDay());
+        })->values()->all();
+
+        if (empty($trend)) {
+            $trend = [0, 0, 0, 0, 0, 0];
+        }
+
+        return [$avgDuration, $trend, $completed->count()];
+    }
+
+    private function computeClientSatisfaction(): array
+    {
+        $total = Invoice::count();
+        $paid = Invoice::where('status', 'paid')->count();
+        $rate = $total > 0 ? round(($paid / $total) * 100, 1) : 0;
+
+        $months = collect(range(5, 0))->map(function ($offset) {
+            $date = now()->subMonths($offset);
+            $monthTotal = Invoice::whereYear('issue_date', $date->year)
+                ->whereMonth('issue_date', $date->month)
+                ->count();
+            $monthPaid = Invoice::where('status', 'paid')
+                ->whereYear('issue_date', $date->year)
+                ->whereMonth('issue_date', $date->month)
+                ->count();
+            return $monthTotal > 0 ? round(($monthPaid / $monthTotal) * 100) : 0;
+        })->values();
+
+        return [$rate, $months->all()];
     }
 }

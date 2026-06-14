@@ -18,7 +18,7 @@ class ExpenseResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-receipt-percent';
 
-    protected static ?string $navigationGroup = 'المالية';
+    protected static ?string $navigationGroup = null;
 
     public static function form(Form $form): Form
     {
@@ -146,6 +146,11 @@ class ExpenseResource extends Resource
     {
         return __('filament.model.expenses');
     }
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.finance');
+    }
+
 
     public static function getNavigationLabel(): string
     {

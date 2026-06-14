@@ -19,27 +19,38 @@ class GanttChart extends Page
 
     public static function getNavigationGroup(): string
     {
-        return 'المشاريع والمهام';
+        return __('filament.group.projects_tasks');
     }
 
     public function getViewData(): array
     {
-        $tasks = Task::with(['project', 'employee.user'])->get()->map(function ($task) {
-            $startDate = $task->start_date ?? $task->created_at?->toDateString();
-            $endDate = $task->due_date ?? ($task->start_date ? \Carbon\Carbon::parse($task->start_date)->addDays(7)->toDateString() : now()->addDays(7)->toDateString());
+        $statusColors = [
+            'todo' => '#6b7280',
+            'in_progress' => '#f59e0b',
+            'review' => '#3b82f6',
+            'done' => '#10b981',
+        ];
 
-            $statusColors = [
-                'todo' => '#6b7280',
-                'in_progress' => '#f59e0b',
-                'review' => '#3b82f6',
-                'done' => '#10b981',
-            ];
+        $tasks = Task::with(['project', 'employee.user'])->get()->map(function ($task) use ($statusColors) {
+            $start = $task->start_date
+                ? \Carbon\Carbon::parse($task->start_date)
+                : ($task->created_at ?? now());
+
+            $end = $task->due_date
+                ? \Carbon\Carbon::parse($task->due_date)
+                : $start->copy()->addDays(7);
+
+            // frappe-gantt requires the end date to be strictly after the start
+            // date, otherwise the whole chart fails to render.
+            if ($end <= $start) {
+                $end = $start->copy()->addDay();
+            }
 
             return [
                 'id' => (string) $task->id,
                 'name' => $task->title,
-                'start' => $startDate,
-                'end' => $endDate,
+                'start' => $start->toDateString(),
+                'end' => $end->toDateString(),
                 'progress' => $task->status === 'done' ? 100 : ($task->status === 'in_progress' ? 50 : ($task->status === 'review' ? 80 : 0)),
                 'dependencies' => '',
                 'project' => $task->project?->name ?? '',
@@ -49,10 +60,10 @@ class GanttChart extends Page
                 'color' => $statusColors[$task->status] ?? '#6b7280',
                 'url' => \App\Filament\Pm\Resources\TaskResource::getUrl('edit', ['record' => $task->id]),
             ];
-        });
+        })->values();
 
         return [
-            'tasksJson' => $tasks->toJson(),
+            'tasks' => $tasks,
             'projects' => Project::pluck('name', 'id'),
         ];
     }

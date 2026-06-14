@@ -14,7 +14,7 @@ class TaskResource extends Resource
 {
     protected static ?string $model = Task::class;
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
-    protected static ?string $navigationGroup = 'المهام';
+    protected static ?string $navigationGroup = null;
 
     public static function form(Form $form): Form
     {
@@ -116,6 +116,11 @@ class TaskResource extends Resource
     {
         return __('filament.model.tasks');
     }
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.tasks');
+    }
+
 
     public static function getNavigationLabel(): string
     {

@@ -16,7 +16,12 @@ class LeaveResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
-    protected static ?string $navigationGroup = 'إدارة الموظفين';
+    protected static ?string $navigationGroup = null;
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.employee_management');
+    }
+
 
     public static function getNavigationLabel(): string
     {

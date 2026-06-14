@@ -19,7 +19,7 @@ class ProjectTemplateResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-duplicate';
 
-    protected static ?string $navigationGroup = 'المشاريع والمهام';
+    protected static ?string $navigationGroup = null;
 
     public static function form(Form $form): Form
     {
@@ -133,6 +133,11 @@ class ProjectTemplateResource extends Resource
     {
         return __('filament.model.project_templates');
     }
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.projects_tasks');
+    }
+
 
     public static function getNavigationLabel(): string
     {

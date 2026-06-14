@@ -16,7 +16,12 @@ class ExpenseResource extends Resource
     protected static ?string $model = Expense::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-receipt-percent';
-    protected static ?string $navigationGroup = 'المالية';
+    protected static ?string $navigationGroup = null;
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.finance');
+    }
+
 
     public static function getNavigationLabel(): string
     {
@@ -57,13 +62,7 @@ class ExpenseResource extends Resource
                             ->maxLength(255),
                         Forms\Components\Select::make('category')
                             ->label(__('filament.fields.category'))
-                            ->options([
-                                'رواتب' => __('filament.expense_category.salaries'),
-                                'تشغيل' => __('filament.expense_category.operations'),
-                                'أدوات' => __('filament.expense_category.tools'),
-                                'تسويق' => __('filament.expense_category.marketing'),
-                                'أخرى' => __('filament.expense_category.other'),
-                            ])
+                            ->options(__('filament.expense_category'))
                             ->searchable()
                             ->required(),
                         Forms\Components\TextInput::make('amount')
@@ -130,13 +129,7 @@ class ExpenseResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('category')
                     ->label(__('filament.filters.filter_by_category'))
-                    ->options([
-                        'رواتب' => __('filament.expense_category.salaries'),
-                        'تشغيل' => __('filament.expense_category.operations'),
-                        'أدوات' => __('filament.expense_category.tools'),
-                        'تسويق' => __('filament.expense_category.marketing'),
-                        'أخرى' => __('filament.expense_category.other'),
-                    ]),
+                    ->options(__('filament.expense_category')),
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('filament.filters.expense_status'))
                     ->options([

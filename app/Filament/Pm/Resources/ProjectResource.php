@@ -15,7 +15,7 @@ class ProjectResource extends Resource
 {
     protected static ?string $model = Project::class;
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
-    protected static ?string $navigationGroup = 'المشاريع والمهام';
+    protected static ?string $navigationGroup = null;
 
     public static function form(Form $form): Form
     {
@@ -136,6 +136,11 @@ class ProjectResource extends Resource
     {
         return __('filament.model.projects');
     }
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.projects_tasks');
+    }
+
 
     public static function getNavigationLabel(): string
     {

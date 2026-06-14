@@ -1,48 +1,67 @@
 <?php
 
-namespace App\Filament\Employee\Pages;
+namespace App\Filament\Pages;
 
 use App\Models\Task;
+use App\Models\Project;
+use App\Models\Employee;
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
 
-class MyTasksKanban extends Page
+class TasksKanbanBoard extends Page
 {
+    protected static ?string $model = Task::class;
     protected static ?string $navigationIcon = 'heroicon-o-view-columns';
-    protected static ?string $navigationLabel;
-    protected static ?string $slug = 'my-tasks-kanban';
-    protected static string $view = 'filament.pages.my-tasks-kanban';
+    protected static string $view = 'filament.pages.admin-tasks-kanban';
+    protected static ?string $slug = 'tasks-kanban';
+
+    public ?int $filterProjectId = null;
+    public ?int $filterEmployeeId = null;
 
     public static function getNavigationLabel(): string
     {
-        return __('filament.nav_kanban');
+        return __('filament.nav.kanban_board');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.projects_tasks');
+    }
+
+    public function mount(): void
+    {
+        $this->filterProjectId = request()->get('project') ? (int) request()->get('project') : null;
+        $this->filterEmployeeId = request()->get('employee') ? (int) request()->get('employee') : null;
     }
 
     protected function getStatuses(): array
     {
         return [
-            ['id' => 'todo', 'title' => __('filament.status_todo')],
-            ['id' => 'in_progress', 'title' => __('filament.status_in_progress')],
-            ['id' => 'review', 'title' => __('filament.status_review')],
-            ['id' => 'done', 'title' => __('filament.status_done')],
+            ['id' => 'todo', 'title' => __('filament.status.todo')],
+            ['id' => 'in_progress', 'title' => __('filament.status.in_progress')],
+            ['id' => 'review', 'title' => __('filament.status.review')],
+            ['id' => 'done', 'title' => __('filament.status.done')],
         ];
     }
 
     protected function getRecords(): Collection
     {
-        return Task::with(['project', 'employee.user'])
-            ->whereHas('employee', fn ($q) => $q->where('user_id', auth()->id()))
-            ->orderBy('sort_order', 'asc')
-            ->orderBy('id', 'asc')
-            ->get();
+        $query = Task::with(['project', 'employee.user']);
+
+        if ($this->filterProjectId) {
+            $query->where('project_id', $this->filterProjectId);
+        }
+
+        if ($this->filterEmployeeId) {
+            $query->where('employee_id', $this->filterEmployeeId);
+        }
+
+        return $query->orderBy('sort_order', 'asc')->orderBy('id', 'asc')->get();
     }
 
     public function updateTaskStatus(int $taskId, string $newStatus, int $targetIndex = 0): void
     {
-        $task = Task::where('id', $taskId)
-            ->whereHas('employee', fn ($q) => $q->where('user_id', auth()->id()))
-            ->first();
-
+        $task = Task::find($taskId);
         if (!$task || !in_array($newStatus, ['todo', 'in_progress', 'review', 'done'])) {
             return;
         }
@@ -75,6 +94,11 @@ class MyTasksKanban extends Page
         }
     }
 
+    public function applyFilters(): void
+    {
+        $this->getViewData();
+    }
+
     public function getViewData(): array
     {
         $statuses = collect($this->getStatuses())->map(function ($status) {
@@ -84,6 +108,8 @@ class MyTasksKanban extends Page
 
         return [
             'statuses' => $statuses,
+            'projects' => Project::pluck('name', 'id'),
+            'employees' => Employee::with('user')->get()->pluck('user.name', 'id'),
         ];
     }
 }

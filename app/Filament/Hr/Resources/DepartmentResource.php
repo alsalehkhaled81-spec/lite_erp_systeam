@@ -16,26 +16,20 @@ class DepartmentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?string $navigationGroup = 'إدارة الموظفين';
-
-    protected static ?string $navigationLabel = 'الأقسام';
-
-    protected static ?string $modelLabel = 'قسم';
-
-    protected static ?string $pluralModelLabel = 'الأقسام';
+    protected static ?string $navigationGroup = null;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('بيانات القسم')
+                Forms\Components\Section::make(__('filament.sections.department_data'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
-                            ->label('اسم القسم')
+                            ->label(__('filament.fields.department_name'))
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Select::make('head_id')
-                            ->label('رئيس القسم')
+                            ->label(__('filament.fields.department_head'))
                             ->relationship('head', 'job_title')
                             ->searchable()
                             ->nullable()
@@ -49,15 +43,15 @@ class DepartmentResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('اسم القسم')
+                    ->label(__('filament.columns.department_name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('head.user.name')
-                    ->label('رئيس القسم')
+                    ->label(__('filament.columns.department_head'))
                     ->searchable()
                     ->default('—'),
                 Tables\Columns\TextColumn::make('employees_count')
-                    ->label('عدد الموظفين')
+                    ->label(__('filament.columns.employees_count'))
                     ->counts('employees')
                     ->sortable(),
             ])
@@ -99,6 +93,11 @@ class DepartmentResource extends Resource
     {
         return __('filament.model.departments');
     }
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.employee_management');
+    }
+
 
     public static function getNavigationLabel(): string
     {

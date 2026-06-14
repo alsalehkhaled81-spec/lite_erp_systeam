@@ -12,8 +12,13 @@ class MyAttendance extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-clock';
     protected static string $view = 'filament.pages.my-attendance';
-    protected static ?string $navigationGroup = 'الحضور';
+    protected static ?string $navigationGroup = null;
     protected static ?string $slug = 'my-attendance';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.attendance');
+    }
+
 
     public static function getNavigationLabel(): string
     {

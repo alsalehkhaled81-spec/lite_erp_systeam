@@ -20,7 +20,7 @@ class ClientResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?string $navigationGroup = 'المالية';
+    protected static ?string $navigationGroup = null;
 
     public static function form(Form $form): Form
     {
@@ -118,6 +118,11 @@ class ClientResource extends Resource
     {
         return __('filament.model.clients');
     }
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.finance');
+    }
+
 
     public static function getNavigationLabel(): string
     {

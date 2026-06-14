@@ -15,7 +15,12 @@ class TrainingResource extends Resource
 {
     protected static ?string $model = Training::class;
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
-    protected static ?string $navigationGroup = 'التدريب والتطوير';
+    protected static ?string $navigationGroup = null;
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.training_development');
+    }
+
 
     public static function getNavigationLabel(): string { return __('filament.nav.trainings'); }
     public static function getModelLabel(): string { return __('filament.model.training'); }

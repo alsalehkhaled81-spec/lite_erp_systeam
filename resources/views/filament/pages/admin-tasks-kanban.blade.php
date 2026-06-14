@@ -106,7 +106,7 @@
                                      document.querySelectorAll('.drop-indicator').forEach(function(el){el.remove();});
                                  ">
                                 <div class="flex flex-col items-center gap-1.5 mb-1.5">
-                                    <a href="{{ \App\Filament\Pm\Resources\TaskResource::getUrl('edit', ['record' => $task->id]) }}"
+                                    <a href="{{ \App\Filament\Resources\TaskResource::getUrl('edit', ['record' => $task->id]) }}"
                                        class="font-semibold text-sm text-gray-800 dark:text-gray-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors hover:underline">
                                         {{ $task->title }}
                                     </a>

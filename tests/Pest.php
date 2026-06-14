@@ -45,3 +45,33 @@ function something()
 {
     // ..
 }
+
+function pmUser(): \App\Models\User
+{
+    $role = \App\Models\Role::factory()->create(['name' => 'project_manager']);
+
+    return \App\Models\User::factory()->create([
+        'role_id' => $role->id,
+        'is_approved' => true,
+    ]);
+}
+
+function hrUser(): \App\Models\User
+{
+    $role = \App\Models\Role::factory()->create(['name' => 'hr_manager']);
+
+    return \App\Models\User::factory()->create([
+        'role_id' => $role->id,
+        'is_approved' => true,
+    ]);
+}
+
+function superAdminUser(): \App\Models\User
+{
+    $role = \App\Models\Role::firstOrCreate(['name' => 'super_admin'], ['description' => 'Super Admin']);
+
+    return \App\Models\User::factory()->create([
+        'role_id' => $role->id,
+        'is_approved' => true,
+    ]);
+}

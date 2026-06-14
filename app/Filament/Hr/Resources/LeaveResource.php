@@ -16,7 +16,12 @@ class LeaveResource extends Resource
     protected static ?string $model = Leave::class;
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
-    protected static ?string $navigationGroup = 'الإجازات';
+    protected static ?string $navigationGroup = null;
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.leaves');
+    }
+
 
     public static function getNavigationLabel(): string
     {

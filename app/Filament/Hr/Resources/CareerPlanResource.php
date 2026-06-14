@@ -15,7 +15,12 @@ class CareerPlanResource extends Resource
 {
     protected static ?string $model = CareerPlan::class;
     protected static ?string $navigationIcon = 'heroicon-o-rocket-launch';
-    protected static ?string $navigationGroup = 'التدريب والتطوير';
+    protected static ?string $navigationGroup = null;
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.training_development');
+    }
+
 
     public static function getNavigationLabel(): string { return __('filament.nav.career_plans'); }
     public static function getModelLabel(): string { return __('filament.model.career_plan'); }

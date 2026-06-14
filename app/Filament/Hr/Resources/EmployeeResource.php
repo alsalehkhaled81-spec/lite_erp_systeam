@@ -20,14 +20,14 @@ class EmployeeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'إدارة الموظفين';
+    protected static ?string $navigationGroup = null;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('user_id')
-                    ->label('حساب المستخدم')
+                    ->label(__('filament.fields.user_account'))
                     ->relationship(
                         name: 'user',
                         titleAttribute: 'name',
@@ -47,9 +47,9 @@ class EmployeeResource extends Resource
                     ->unique(ignoreRecord: true)
                     ->searchable()
                     ->createOptionForm([
-                        Forms\Components\TextInput::make('name')->label('الاسم الكامل')->required(),
-                        Forms\Components\TextInput::make('email')->label('البريد الإلكتروني')->email()->required()->unique('users', 'email'),
-                        Forms\Components\TextInput::make('password')->label('كلمة المرور')->password()->required(),
+                        Forms\Components\TextInput::make('name')->label(__('filament.fields.full_name'))->required(),
+                        Forms\Components\TextInput::make('email')->label(__('filament.fields.email'))->email()->required()->unique('users', 'email'),
+                        Forms\Components\TextInput::make('password')->label(__('filament.fields.password'))->password()->required(),
                     ])
                     ->createOptionUsing(function (array $data) {
                         $role = \App\Models\Role::where('name', 'employee')->first();
@@ -62,28 +62,28 @@ class EmployeeResource extends Resource
                         return $user->id;
                     }),
                 Forms\Components\Select::make('department_id')
-                    ->label('القسم')
+                    ->label(__('filament.fields.department'))
                     ->relationship('department', 'name')
                     ->searchable()
                     ->nullable(),
                 Forms\Components\TextInput::make('job_title')
-                    ->label('المسمى الوظيفي')
+                    ->label(__('filament.fields.job_title'))
                     ->maxLength(255),
                 Forms\Components\TextInput::make('salary')
-                    ->label('الراتب')
+                    ->label(__('filament.fields.salary'))
                     ->numeric()
                     ->prefix('$'),
                 Forms\Components\Select::make('status')
-                    ->label('حالة الموظف')
+                    ->label(__('filament.fields.employee_status'))
                     ->options([
-                        'active' => 'على رأس العمل',
-                        'on_leave' => 'في إجازة',
-                        'terminated' => 'مفصول',
+                        'active' => __('filament.status.active'),
+                        'on_leave' => __('filament.status.on_leave'),
+                        'terminated' => __('filament.status.terminated'),
                     ])
                     ->default('active')
                     ->required(),
                 Forms\Components\DatePicker::make('hire_date')
-                    ->label('تاريخ التعيين'),
+                    ->label(__('filament.fields.hire_date')),
             ])->columns(2);
     }
 
@@ -92,29 +92,29 @@ class EmployeeResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('اسم الموظف')
+                    ->label(__('filament.columns.employee_name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('department.name')
-                    ->label('القسم')
+                    ->label(__('filament.columns.department'))
                     ->searchable()
                     ->default('—'),
                 Tables\Columns\TextColumn::make('job_title')
-                    ->label('المسمى الوظيفي')
+                    ->label(__('filament.columns.job_title'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('salary')
-                    ->label('الراتب')
+                    ->label(__('filament.columns.salary'))
                     ->money('usd')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('الحالة')
+                    ->label(__('filament.columns.status'))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'pending' => 'قيد المراجعة',
-                        'active' => 'على رأس العمل',
-                        'on_leave' => 'في إجازة',
-                        'terminated' => 'مفصول',
-                        'rejected' => 'مرفوض طلب التوظيف',
+                        'pending' => __('filament.status.under_review'),
+                        'active' => __('filament.status.active'),
+                        'on_leave' => __('filament.status.on_leave'),
+                        'terminated' => __('filament.status.terminated'),
+                        'rejected' => __('filament.status.rejected_application'),
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {
@@ -126,26 +126,25 @@ class EmployeeResource extends Resource
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('hire_date')
-                    ->label('تاريخ التعيين')
+                    ->label(__('filament.columns.hire_date'))
                     ->date()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->label('تصفية حسب الحالة')
+                    ->label(__('filament.filters.filter_by_status'))
                     ->options([
-                        'pending' => 'قيد المراجعة',
-                        'active' => 'على رأس العمل',
-                        'on_leave' => 'في إجازة',
-                        'terminated' => 'مفصول',
+                        'pending' => __('filament.status.under_review'),
+                        'active' => __('filament.status.active'),
+                        'on_leave' => __('filament.status.on_leave'),
+                        'terminated' => __('filament.status.terminated'),
                     ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
 
-                // زر القبول (يظهر فقط لمن حالتهم pending)
                 Tables\Actions\Action::make('accept')
-                    ->label('قبول وتوظيف')
+                    ->label(__('filament.actions.accept_employment'))
                     ->color('success')
                     ->icon('heroicon-o-check-circle')
                     ->requiresConfirmation()
@@ -155,21 +154,19 @@ class EmployeeResource extends Resource
                             'hire_date' => now(),
                         ]);
 
-                        // إرسال إشعار للموظف
                         if ($record->user) {
                             $record->user->notify(new JobApplicationStatusNotification('active', $record->user->name));
                         }
                     })
                     ->visible(fn (Employee $record) => $record->status === 'pending'),
 
-                // زر الرفض
                 Tables\Actions\Action::make('reject')
-                    ->label('رفض الطلب')
+                    ->label(__('filament.actions.reject_request'))
                     ->color('danger')
                     ->icon('heroicon-o-x-circle')
                     ->form([
                         Forms\Components\Textarea::make('rejection_reason')
-                            ->label('سبب الرفض (سيتم عرضه للمتقدم)')
+                            ->label(__('filament.actions.rejection_reason') . ' (' . __('filament.actions.rejection_reason_desc') . ')')
                             ->required()
                     ])
                     ->action(function (Employee $record, array $data) {
@@ -178,7 +175,6 @@ class EmployeeResource extends Resource
                             'rejection_reason' => $data['rejection_reason'],
                         ]);
 
-                        // إرسال إشعار للموظف
                         if ($record->user) {
                             $record->user->notify(new JobApplicationStatusNotification('rejected', $record->user->name));
                         }
@@ -218,6 +214,11 @@ class EmployeeResource extends Resource
     public static function getPluralModelLabel(): string
     {
         return __('filament.model.employees');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.employee_management');
     }
 
     public static function getNavigationLabel(): string

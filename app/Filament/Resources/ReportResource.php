@@ -16,7 +16,12 @@ class ReportResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-chart-bar';
 
-    protected static ?string $navigationGroup = 'التقارير';
+    protected static ?string $navigationGroup = null;
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.reports');
+    }
+
 
     public static function getNavigationLabel(): string
     {

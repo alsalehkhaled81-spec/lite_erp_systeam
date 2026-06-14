@@ -19,16 +19,16 @@ class SkillResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationGroup = 'إدارة الموظفين';
+    protected static ?string $navigationGroup = null;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('إضافة مهارة جديدة')
+                Forms\Components\Section::make(__('filament.actions.create_skill'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
-                            ->label('اسم المهارة (مثال: PHP, Laravel)')
+                            ->label(__('filament.fields.skill_name'))
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
@@ -41,7 +41,7 @@ class SkillResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('اسم المهارة')
+                    ->label(__('filament.columns.skill_name'))
                     ->searchable()
                     ->sortable()
                     ->badge()
@@ -93,6 +93,11 @@ class SkillResource extends Resource
     {
         return __('filament.model.skills');
     }
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.employee_management');
+    }
+
 
     public static function getNavigationLabel(): string
     {

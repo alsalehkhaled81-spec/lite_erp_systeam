@@ -19,7 +19,7 @@ class EmployeeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'إدارة الموظفين';
+    protected static ?string $navigationGroup = null;
 
     public static function form(Form $form): Form
     {
@@ -153,6 +153,11 @@ class EmployeeResource extends Resource
     {
         return __('filament.model.employees');
     }
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.employee_management');
+    }
+
 
     public static function getNavigationLabel(): string
     {

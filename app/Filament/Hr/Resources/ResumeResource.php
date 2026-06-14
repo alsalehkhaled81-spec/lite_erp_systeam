@@ -21,7 +21,7 @@ class ResumeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationGroup = 'السير الذاتية';
+    protected static ?string $navigationGroup = null;
 
     public static function form(Form $form): Form
     {
@@ -208,6 +208,11 @@ class ResumeResource extends Resource
     {
         return __('filament.model.resumes');
     }
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.resumes');
+    }
+
 
     public static function getNavigationLabel(): string
     {

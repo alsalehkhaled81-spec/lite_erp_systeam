@@ -16,7 +16,12 @@ class DepartmentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?string $navigationGroup = 'إدارة الموظفين';
+    protected static ?string $navigationGroup = null;
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.employee_management');
+    }
+
 
     public static function getNavigationLabel(): string
     {

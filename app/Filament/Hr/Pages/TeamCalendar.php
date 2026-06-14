@@ -10,8 +10,13 @@ class TeamCalendar extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
     protected static string $view = 'filament.pages.team-calendar';
-    protected static ?string $navigationGroup = 'الإجازات';
+    protected static ?string $navigationGroup = null;
     protected static ?string $slug = 'team-calendar';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.leaves');
+    }
+
 
     public static function getNavigationLabel(): string
     {
@@ -22,10 +27,7 @@ class TeamCalendar extends Page
     {
         $approvedLeaves = Leave::with('employee.user')
             ->whereIn('status', ['approved_by_head', 'approved_by_hr'])
-            ->where(function ($q) {
-                $q->whereMonth('start_date', '>=', now()->subMonth()->month)
-                  ->orWhereMonth('end_date', '>=', now()->month);
-            })
+            ->orderBy('start_date')
             ->get()
             ->map(function ($leave) {
                 $typeColors = [
