@@ -22,7 +22,12 @@ class TasksRelationManager extends RelationManager
         return $form->schema([
             Forms\Components\Select::make('employee_id')
                 ->label(__('filament.fields.responsible_employee'))
-                ->relationship('employee.user', 'name')
+                ->relationship(
+                    name: 'employee.user',
+                    titleAttribute: 'name',
+                    modifyQueryUsing: fn (\Illuminate\Database\Eloquent\Builder $query) => 
+                        $query->whereHas('employee.projects', fn ($q) => $q->where('projects.id', $this->getOwnerRecord()->id))
+                )
                 ->required(),
             Forms\Components\TextInput::make('title')
                 ->label(__('filament.fields.task_title'))->required(),

@@ -31,14 +31,34 @@ class TaskResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('project_id')
                             ->label(__('filament.fields.project'))
-                            ->relationship('project', 'name')
+                            ->relationship(
+                                name: 'project',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: function (Builder $query, Forms\Get $get) {
+                                    if ($employeeId = $get('employee_id')) {
+                                        $query->whereHas('employees', fn ($q) => $q->where('employees.id', $employeeId));
+                                    }
+                                }
+                            )
                             ->required()
-                            ->searchable(),
+                            ->searchable()
+                            ->preload()
+                            ->live(),
                         Forms\Components\Select::make('employee_id')
                             ->label(__('filament.fields.responsible_employee'))
-                            ->relationship('employee.user', 'name')
+                            ->relationship(
+                                name: 'employee.user',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: function (Builder $query, Forms\Get $get) {
+                                    if ($projectId = $get('project_id')) {
+                                        $query->whereHas('employee.projects', fn ($q) => $q->where('projects.id', $projectId));
+                                    }
+                                }
+                            )
                             ->required()
-                            ->searchable(),
+                            ->searchable()
+                            ->preload()
+                            ->live(),
                     ])->columns(2),
 
                 Forms\Components\Section::make(__('filament.sections.task_details'))

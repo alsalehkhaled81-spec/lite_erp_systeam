@@ -330,6 +330,7 @@ return [
         'housing_allowance' => 'Housing Allowance',
         'absence_days' => 'Absence Days',
         'absence_deduction' => 'Absence Deduction',
+        'tasks_count' => 'Tasks Count',
     ],
 
     'status_todo' => 'To Do',

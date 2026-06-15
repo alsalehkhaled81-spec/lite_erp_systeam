@@ -330,6 +330,7 @@ return [
         'housing_allowance' => 'بدل السكن',
         'absence_days' => 'أيام الغياب',
         'absence_deduction' => 'خصم الغياب',
+        'tasks_count' => 'عدد المهام',
     ],
 
     'status_todo' => 'مطلوبة',

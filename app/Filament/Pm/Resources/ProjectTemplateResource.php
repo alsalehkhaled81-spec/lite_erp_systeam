@@ -60,7 +60,7 @@ class ProjectTemplateResource extends Resource
                 Tables\Columns\TextColumn::make('estimated_days')
                     ->label(__('filament.fields.estimated_days'))
                     ->suffix(' ' . __('filament.fields.days_unit')),
-                Tables\Columns\TextColumn::make('taskTemplates_count')
+                Tables\Columns\TextColumn::make('task_templates_count')
                     ->label(__('filament.columns.tasks_count'))
                     ->counts('taskTemplates')
                     ->badge(),
