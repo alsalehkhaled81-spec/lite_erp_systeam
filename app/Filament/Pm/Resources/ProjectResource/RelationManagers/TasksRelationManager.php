@@ -32,9 +32,15 @@ class TasksRelationManager extends RelationManager
             Forms\Components\TextInput::make('title')
                 ->label(__('filament.fields.task_title'))->required(),
             Forms\Components\DatePicker::make('start_date')
-                ->label(__('filament.fields.start_date')),
+                ->label(__('filament.fields.start_date'))
+                ->live(),
             Forms\Components\DatePicker::make('due_date')
-                ->label(__('filament.fields.due_date')),
+                ->label(__('filament.fields.due_date'))
+                ->minDate(fn (\Filament\Forms\Get $get): ?string => $get('start_date') ?: null)
+                ->rule('after_or_equal:start_date')
+                ->validationMessages([
+                    'after_or_equal' => __('filament.validation.due_date_after_start', ['attribute' => __('filament.fields.due_date')]),
+                ]),
             Forms\Components\Select::make('status')
                 ->label(__('filament.fields.status'))
                 ->options([

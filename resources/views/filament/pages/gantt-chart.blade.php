@@ -38,8 +38,8 @@
     @script
     <script>
         (function () {
-            const FRAPPE_CSS = 'https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.css';
-            const FRAPPE_JS = 'https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js';
+            const FRAPPE_CSS = '{{ asset('vendor/frappe-gantt/frappe-gantt.min.css') }}';
+            const FRAPPE_JS = '{{ asset('vendor/frappe-gantt/frappe-gantt.min.js') }}';
 
             // Tasks are injected from PHP directly as a JS array (no manual parsing needed).
             const allTasks = @js($tasks);

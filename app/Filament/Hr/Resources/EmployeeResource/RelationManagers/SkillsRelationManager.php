@@ -20,7 +20,9 @@ class SkillsRelationManager extends RelationManager
     public function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('name')->label(__('filament.fields.skill'))->required(),
+            Forms\Components\TextInput::make('name')
+                ->label(__('filament.fields.skill'))
+                ->required(),
         ]);
     }
 
@@ -32,8 +34,36 @@ class SkillsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('name')->label(__('filament.columns.skill_name'))->badge(),
             ])
             ->headerActions([
-                Tables\Actions\AttachAction::make()->label(__('filament.actions.add_skill_to_employee'))->preloadRecordSelect(),
-                Tables\Actions\CreateAction::make()->label(__('filament.actions.create_new_skill')),
+                Tables\Actions\AttachAction::make()
+                    ->label(__('filament.actions.add_skill_to_employee'))
+                    ->preloadRecordSelect()
+                    ->recordSelect(
+                        fn (Forms\Components\Select $select) => $select->createOptionForm([
+                            Forms\Components\TextInput::make('name')
+                                ->label(__('filament.fields.skill'))
+                                ->required()
+                                ->unique('skills', 'name'),
+                        ])->createOptionUsing(function (array $data) {
+                            $skill = \App\Models\Skill::create($data);
+                            return $skill->id;
+                        })
+                    ),
+                Tables\Actions\CreateAction::make()
+                    ->label(__('filament.actions.create_new_skill'))
+                    ->using(function (array $data, string $model): \Illuminate\Database\Eloquent\Model {
+                        return $model::firstOrCreate(['name' => $data['name']]);
+                    })
+                    ->action(function (array $arguments, Forms\Form $form, Tables\Actions\CreateAction $action) {
+                        $data = $form->getState();
+                        $record = $action->getModel()::firstOrCreate(['name' => $data['name']]);
+                        
+                        $ownerRecord = $action->getLivewire()->getOwnerRecord();
+                        if (! $ownerRecord->skills()->where('skills.id', $record->id)->exists()) {
+                            $ownerRecord->skills()->attach($record);
+                        }
+                        
+                        $action->success();
+                    }),
             ])
             ->actions([
                 Tables\Actions\DetachAction::make()->label(__('filament.actions.remove')),

@@ -70,9 +70,15 @@ class TaskResource extends Resource
                             ->label(__('filament.fields.description'))
                             ->columnSpanFull(),
                         Forms\Components\DatePicker::make('start_date')
-                            ->label(__('filament.fields.start_date')),
+                            ->label(__('filament.fields.start_date'))
+                            ->live(),
                         Forms\Components\DatePicker::make('due_date')
-                            ->label(__('filament.fields.due_date')),
+                            ->label(__('filament.fields.due_date'))
+                            ->minDate(fn (Forms\Get $get): ?string => $get('start_date') ?: null)
+                            ->rule('after_or_equal:start_date')
+                            ->validationMessages([
+                                'after_or_equal' => __('filament.validation.due_date_after_start', ['attribute' => __('filament.fields.due_date')]),
+                            ]),
                         Forms\Components\Select::make('status')
                             ->label(__('filament.fields.task_status'))
                             ->options([

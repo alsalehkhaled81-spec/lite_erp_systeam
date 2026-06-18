@@ -17,25 +17,52 @@ class PayrollsRelationManager extends RelationManager
         return __('filament.relation.employee_payrolls');
     }
 
+    public static function updateNetSalary(Forms\Get $get, Forms\Set $set): void
+    {
+        $basic = (float) ($get('basic_salary') ?? 0);
+        $bonuses = (float) ($get('bonuses') ?? 0);
+        $deductions = (float) ($get('deductions') ?? 0);
+
+        $set('net_salary', $basic + $bonuses - $deductions);
+    }
+
     public function form(Form $form): Form
     {
         return $form->schema([
             Forms\Components\TextInput::make('month_year')
                 ->label(__('filament.fields.month'))
                 ->type('month')
-                ->required(),
+                ->required()
+                ->unique(
+                    table: 'payrolls',
+                    column: 'month_year',
+                    ignoreRecord: true,
+                    modifyRuleUsing: fn (\Illuminate\Validation\Rules\Unique $rule, RelationManager $livewire) => $rule->where('employee_id', $livewire->getOwnerRecord()->id)
+                )
+                ->validationMessages([
+                    'unique' => __('filament.validation.payroll_month_exists', ['attribute' => __('filament.fields.month')] ?? 'This employee already has a payroll record for this month.'),
+                ]),
             Forms\Components\TextInput::make('basic_salary')
                 ->label(__('filament.fields.basic_salary'))
-                ->numeric()->prefix('$')->required(),
+                ->numeric()->prefix('$')->minValue(0)->required()
+                ->default(fn (RelationManager $livewire) => $livewire->getOwnerRecord()->salary)
+                ->live(onBlur: true)
+                ->afterStateUpdated(fn (Forms\Get $get, Forms\Set $set) => self::updateNetSalary($get, $set)),
             Forms\Components\TextInput::make('bonuses')
                 ->label(__('filament.fields.bonuses'))
-                ->numeric()->prefix('$')->default(0),
+                ->numeric()->prefix('$')->minValue(0)->default(0)
+                ->live(onBlur: true)
+                ->afterStateUpdated(fn (Forms\Get $get, Forms\Set $set) => self::updateNetSalary($get, $set)),
             Forms\Components\TextInput::make('deductions')
                 ->label(__('filament.fields.deductions'))
-                ->numeric()->prefix('$')->default(0),
+                ->numeric()->prefix('$')->minValue(0)->default(0)
+                ->live(onBlur: true)
+                ->afterStateUpdated(fn (Forms\Get $get, Forms\Set $set) => self::updateNetSalary($get, $set)),
             Forms\Components\TextInput::make('net_salary')
                 ->label(__('filament.fields.net_salary'))
-                ->numeric()->prefix('$')->required(),
+                ->numeric()->prefix('$')->minValue(0)->required()
+                ->readOnly()
+                ->default(fn (RelationManager $livewire) => $livewire->getOwnerRecord()->salary),
         ]);
     }
 

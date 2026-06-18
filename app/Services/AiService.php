@@ -23,7 +23,7 @@ class AiService
             $response = Http::withHeaders([
                 'x-litellm-api-key' => $key,
                 'Content-Type' => 'application/json',
-            ])->post($url, [
+            ])->timeout(120)->post($url, [
                 'model' => $model,
                 'messages' => $messages,
                 'max_tokens' => config('ai.max_tokens', 4096),

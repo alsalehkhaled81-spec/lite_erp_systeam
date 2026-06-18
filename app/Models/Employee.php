@@ -99,4 +99,15 @@ class Employee extends Model
     {
         return $this->annual_leave_balance - $this->used_leave_days;
     }
+
+    public function scopeEligibleDepartmentHead($query, ?int $currentHeadId = null)
+    {
+        return $query
+            ->with('user')
+            ->whereDoesntHave('user.role', fn ($q) => $q->where('name', 'super_admin'))
+            ->where(function ($q) use ($currentHeadId) {
+                $q->whereDoesntHave('headOfDepartment')
+                    ->when($currentHeadId, fn ($q2) => $q2->orWhere('employees.id', $currentHeadId));
+            });
+    }
 }

@@ -10,6 +10,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -35,6 +36,11 @@ class PmPanelProvider extends PanelProvider
             ->spa()
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->maxContentWidth('full')
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): string => '<link rel="stylesheet" href="' . asset('vendor/frappe-gantt/frappe-gantt.min.css') . '" data-navigate-track>'
+                    . '<script src="' . asset('vendor/frappe-gantt/frappe-gantt.min.js') . '" data-navigate-track></script>'
+            )
             ->discoverResources(in: app_path('Filament/Pm/Resources'), for: 'App\\Filament\\Pm\\Resources')
             ->discoverPages(in: app_path('Filament/Pm/Pages'), for: 'App\\Filament\\Pm\\Pages')
             ->pages([

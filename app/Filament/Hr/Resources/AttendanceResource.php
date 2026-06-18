@@ -46,15 +46,52 @@ class AttendanceResource extends Resource
                         ->label(__('filament.fields.employee'))
                         ->options(Employee::with('user')->get()->pluck('user.name', 'id'))
                         ->searchable()
-                        ->required(),
+                        ->required()
+                        ->live(),
                     Forms\Components\DatePicker::make('date')
                         ->label(__('filament.fields.date'))
                         ->required()
-                        ->default(now()),
-                    Forms\Components\DateTimePicker::make('check_in')
-                        ->label(__('filament.fields.check_in')),
-                    Forms\Components\DateTimePicker::make('check_out')
-                        ->label(__('filament.fields.check_out')),
+                        ->default(now())
+                        ->live(),
+                    Forms\Components\TimePicker::make('check_in')
+                        ->label(__('filament.fields.check_in_time'))
+                        ->seconds(false)
+                        ->live()
+                        ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
+                            $in = $get('check_in');
+                            $out = $get('check_out');
+                            if ($in && $out) {
+                                $set('hours_worked', Attendance::calculateHoursFromTimes($in, $out));
+                            }
+                        }),
+                    Forms\Components\TimePicker::make('check_out')
+                        ->label(__('filament.fields.check_out_time'))
+                        ->seconds(false)
+                        ->live()
+                        ->rule(function (Forms\Get $get) {
+                            return function (string $attribute, $value, \Closure $fail) use ($get) {
+                                $checkIn = $get('check_in');
+                                if ($checkIn && $value) {
+                                    if (strtotime($value) < strtotime($checkIn)) {
+                                        $fail(__('filament.validation.checkout_after_checkin'));
+                                    }
+                                }
+                            };
+                        })
+                        ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
+                            $in = $get('check_in');
+                            $out = $get('check_out');
+                            if ($in && $out) {
+                                $set('hours_worked', Attendance::calculateHoursFromTimes($in, $out));
+                            }
+                        }),
+                    Forms\Components\TextInput::make('hours_worked')
+                        ->label(__('filament.fields.hours_worked'))
+                        ->numeric()
+                        ->readOnly()
+                        ->suffix(__('filament.fields.hours_unit'))
+                        ->helperText(__('filament.fields.hours_worked_auto'))
+                        ->default(0),
                     Forms\Components\Select::make('status')
                         ->label(__('filament.fields.status'))
                         ->options([
@@ -124,8 +161,13 @@ class AttendanceResource extends Resource
                 Tables\Filters\Filter::make('date')
                     ->label(__('filament.fields.date'))
                     ->form([
-                        Forms\Components\DatePicker::make('date_from')->label(__('filament.fields.date_from')),
-                        Forms\Components\DatePicker::make('date_to')->label(__('filament.fields.date_to')),
+                        Forms\Components\DatePicker::make('date_from')->label(__('filament.fields.date_from'))->live(),
+                        Forms\Components\DatePicker::make('date_to')->label(__('filament.fields.date_to'))
+                            ->minDate(fn (Forms\Get $get): ?string => $get('date_from') ?: null)
+                            ->rule('after_or_equal:date_from')
+                            ->validationMessages([
+                                'after_or_equal' => __('filament.validation.end_date_after_start', ['attribute' => __('filament.fields.date_to')]),
+                            ]),
                     ])
                     ->query(function ($query, array $data) {
                         return $query

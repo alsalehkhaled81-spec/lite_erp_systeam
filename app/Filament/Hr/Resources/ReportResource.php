@@ -24,12 +24,22 @@ class ReportResource extends Resource
             ->schema([
                 Forms\Components\Section::make(__('filament.sections.report_data'))
                     ->schema([
+                        Forms\Components\Hidden::make('sender_id')
+                            ->default(fn () => auth()->user()?->employee?->id),
+                        Forms\Components\Select::make('receiver_id')
+                            ->label(__('filament.fields.receiver') ?? 'المستلم')
+                            ->options(\App\Models\Employee::with('user')->get()->pluck('user.name', 'id'))
+                            ->searchable()
+                            ->required()
+                            ->disabledOn('edit'),
                         Forms\Components\TextInput::make('title')
                             ->label(__('filament.fields.report_title'))
-                            ->disabled(),
+                            ->required()
+                            ->disabledOn('edit'),
                         Forms\Components\Textarea::make('content')
                             ->label(__('filament.fields.content'))
-                            ->disabled()
+                            ->required()
+                            ->disabledOn('edit')
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make('feedback')
                             ->label(__('filament.fields.feedback'))

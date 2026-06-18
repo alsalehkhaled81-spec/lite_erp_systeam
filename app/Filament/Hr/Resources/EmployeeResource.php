@@ -32,10 +32,7 @@ class EmployeeResource extends Resource
                         name: 'user',
                         titleAttribute: 'name',
                         modifyQueryUsing: function (Builder $query, ?Employee $record) {
-                            $query->whereHas('role', function ($q) {
-                                $q->where('name', 'employee');
-                            })
-                            ->where(function ($q) use ($record) {
+                            $query->where(function ($q) use ($record) {
                                 $q->doesntHave('employee');
                                 if ($record) {
                                     $q->orWhere('id', $record->user_id);
@@ -72,6 +69,7 @@ class EmployeeResource extends Resource
                 Forms\Components\TextInput::make('salary')
                     ->label(__('filament.fields.salary'))
                     ->numeric()
+                    ->minValue(0)
                     ->prefix('$'),
                 Forms\Components\Select::make('status')
                     ->label(__('filament.fields.employee_status'))

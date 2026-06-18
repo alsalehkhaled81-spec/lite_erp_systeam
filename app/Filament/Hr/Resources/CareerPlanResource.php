@@ -33,7 +33,12 @@ class CareerPlanResource extends Resource
                 ->schema([
                     Forms\Components\Select::make('employee_id')
                         ->label(__('filament.fields.employee'))
-                        ->options(Employee::with('user')->get()->pluck('user.name', 'id'))
+                        ->options(
+                            Employee::with('user')
+                                ->whereDoesntHave('user.role', fn ($query) => $query->where('name', 'super_admin'))
+                                ->get()
+                                ->pluck('user.name', 'id')
+                        )
                         ->searchable()
                         ->required(),
                     Forms\Components\TextInput::make('current_role')
@@ -45,6 +50,7 @@ class CareerPlanResource extends Resource
                     Forms\Components\TextInput::make('timeline_months')
                         ->label(__('filament.fields.timeline_months'))
                         ->numeric()
+                        ->minValue(0)
                         ->required()
                         ->suffix(__('filament.fields.months_unit')),
                     Forms\Components\Textarea::make('required_skills')

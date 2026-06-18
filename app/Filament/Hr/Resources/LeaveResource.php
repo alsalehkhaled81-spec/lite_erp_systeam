@@ -44,18 +44,39 @@ class LeaveResource extends Resource
             ->schema([
                 Forms\Components\Section::make(__('filament.sections.leave_data'))
                     ->schema([
-                        Forms\Components\TextInput::make('type')
+                        Forms\Components\Select::make('employee_id')
+                            ->label(__('filament.fields.employee'))
+                            ->options(\App\Models\Employee::with('user')->get()->pluck('user.name', 'id'))
+                            ->searchable()
+                            ->required()
+                            ->visibleOn('create'),
+                        Forms\Components\Select::make('type')
                             ->label(__('filament.fields.leave_type'))
-                            ->disabled(),
+                            ->options([
+                                'Sick' => __('filament.leave_type.Sick'),
+                                'Annual' => __('filament.leave_type.Annual'),
+                                'Emergency' => __('filament.leave_type.Emergency'),
+                            ])
+                            ->required()
+                            ->disabledOn('edit'),
                         Forms\Components\DatePicker::make('start_date')
                             ->label(__('filament.fields.start_date'))
-                            ->disabled(),
+                            ->required()
+                            ->disabledOn('edit')
+                            ->live(),
                         Forms\Components\DatePicker::make('end_date')
                             ->label(__('filament.fields.end_date'))
-                            ->disabled(),
+                            ->required()
+                            ->disabledOn('edit')
+                            ->minDate(fn (Forms\Get $get): ?string => $get('start_date') ?: null)
+                            ->rule('after_or_equal:start_date')
+                            ->validationMessages([
+                                'after_or_equal' => __('filament.validation.end_date_after_start', ['attribute' => __('filament.fields.end_date')]),
+                            ]),
                         Forms\Components\Textarea::make('reason')
                             ->label(__('filament.fields.reason'))
-                            ->disabled()
+                            ->required()
+                            ->disabledOn('edit')
                             ->columnSpanFull(),
                         Forms\Components\Select::make('status')
                             ->label(__('filament.fields.status'))
@@ -179,6 +200,7 @@ class LeaveResource extends Resource
     {
         return [
             'index' => Pages\ListLeaves::route('/'),
+            'create' => Pages\CreateLeave::route('/create'),
             'edit' => Pages\EditLeave::route('/{record}/edit'),
         ];
     }

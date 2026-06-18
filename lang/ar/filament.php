@@ -238,7 +238,10 @@ return [
         'file_size' => 'حجم الملف',
         'check_in' => 'تسجيل حضور',
         'check_out' => 'تسجيل انصراف',
+        'check_in_time' => 'وقت الحضور',
+        'check_out_time' => 'وقت الانصراف',
         'hours_worked' => 'ساعات العمل',
+        'hours_worked_auto' => 'يُحسب تلقائياً من وقت الحضور والانصراف',
         'notes' => 'ملاحظات',
         'training_title' => 'عنوان التدريب',
         'trainer' => 'المدرب/الجهة',
@@ -383,6 +386,16 @@ return [
         'tools' => 'أدوات وبرمجيات',
         'marketing' => 'تسويق وإعلانات',
         'other' => 'أخرى',
+    ],
+
+    'validation' => [
+        'budget_must_be_positive' => 'يجب أن تكون قيمة :attribute صفر أو رقم موجب.',
+        'end_date_after_start' => 'يجب أن يكون :attribute مساوياً أو بعد تاريخ البداية.',
+        'checkout_after_checkin' => 'يجب أن يكون وقت الانصراف بعد وقت الحضور.',
+        'checkout_required_with_checkin' => 'يجب إدخال وقت الانصراف عند إدخال وقت الحضور.',
+        'due_date_after_start' => 'يجب أن يكون :attribute مساوياً أو بعد تاريخ البداية.',
+        'due_date_after_issue' => 'يجب أن يكون :attribute مساوياً أو بعد تاريخ الإصدار.',
+        'expiry_after_issue' => 'يجب أن يكون :attribute مساوياً أو بعد تاريخ الإصدار.',
     ],
 
     'filters' => [
@@ -669,6 +682,13 @@ return [
         'loading' => 'جاري تحميل مخطط جانت...',
         'no_tasks' => 'لا توجد مهام لعرضها',
         'view_task' => 'عرض المهمة',
+    ],
+
+    'calendar' => [
+        'loading' => 'جاري تحميل التقويم...',
+        'load_error' => 'تعذّر تحميل مكتبة التقويم. يرجى تحديث الصفحة.',
+        'render_error' => 'تعذّر عرض التقويم. تحقق من وحدة التحكم (Console) للتفاصيل.',
+        'no_events' => 'لا توجد إجازات معتمدة لعرضها',
     ],
 
     'relation' => [

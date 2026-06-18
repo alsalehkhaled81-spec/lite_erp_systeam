@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DepartmentResource\Pages;
 use App\Models\Department;
+use App\Models\Employee;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -17,11 +18,11 @@ class DepartmentResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
     protected static ?string $navigationGroup = null;
+
     public static function getNavigationGroup(): ?string
     {
         return __('filament.group.employee_management');
     }
-
 
     public static function getNavigationLabel(): string
     {
@@ -50,11 +51,25 @@ class DepartmentResource extends Resource
                             ->maxLength(255),
                         Forms\Components\Select::make('head_id')
                             ->label(__('filament.fields.department_head'))
-                            ->relationship('head', 'id')
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->user?->name . ' - ' . $record->job_title)
                             ->searchable()
                             ->nullable()
-                            ->getSearchResultsUsing(fn (string $search) => \App\Models\Employee::where('job_title', 'like', "%{$search}%")->orWhereHas('user', fn ($q) => $q->where('name', 'like', "%{$search}%"))->limit(20)->get()->mapWithKeys(fn ($e) => [$e->id => $e->user?->name . ' - ' . $e->job_title])),
+                            ->getSearchResultsUsing(function (string $search, $livewire) {
+                                $currentHeadId = null;
+                                $record = $livewire->getRecord();
+                                if ($record) {
+                                    $currentHeadId = $record->head_id;
+                                }
+
+                                return Employee::eligibleDepartmentHead($currentHeadId)
+                                    ->where(function ($q) use ($search) {
+                                        $q->where('job_title', 'like', "%{$search}%")
+                                            ->orWhereHas('user', fn ($q2) => $q2->where('name', 'like', "%{$search}%"));
+                                    })
+                                    ->limit(20)
+                                    ->get()
+                                    ->mapWithKeys(fn ($e) => [$e->id => ($e->user?->name ?? '—') . ' - ' . $e->job_title]);
+                            })
+                            ->getOptionLabelFromRecordUsing(fn ($record) => ($record->user?->name ?? '—') . ' - ' . $record->job_title),
                     ])->columns(2),
             ]);
     }

@@ -238,7 +238,10 @@ return [
         'file_size' => 'File Size',
         'check_in' => 'Check In',
         'check_out' => 'Check Out',
+        'check_in_time' => 'Check In Time',
+        'check_out_time' => 'Check Out Time',
         'hours_worked' => 'Hours Worked',
+        'hours_worked_auto' => 'Automatically calculated from check-in and check-out times',
         'notes' => 'Notes',
         'training_title' => 'Training Title',
         'trainer' => 'Trainer/Provider',
@@ -383,6 +386,16 @@ return [
         'tools' => 'Tools & Software',
         'marketing' => 'Marketing & Advertising',
         'other' => 'Other',
+    ],
+
+    'validation' => [
+        'budget_must_be_positive' => 'The :attribute must be zero or a positive number.',
+        'end_date_after_start' => 'The :attribute must be on or after the start date.',
+        'checkout_after_checkin' => 'The check-out time must be after the check-in time.',
+        'checkout_required_with_checkin' => 'The check-out time is required when a check-in time is set.',
+        'due_date_after_start' => 'The :attribute must be on or after the start date.',
+        'due_date_after_issue' => 'The :attribute must be on or after the issue date.',
+        'expiry_after_issue' => 'The :attribute must be on or after the issue date.',
     ],
 
     'filters' => [
@@ -669,6 +682,13 @@ return [
         'loading' => 'Loading Gantt chart...',
         'no_tasks' => 'No tasks to display',
         'view_task' => 'View Task',
+    ],
+
+    'calendar' => [
+        'loading' => 'Loading calendar...',
+        'load_error' => 'Failed to load the calendar library. Please refresh the page.',
+        'render_error' => 'Failed to render the calendar. Check the browser console for details.',
+        'no_events' => 'No approved leaves to display',
     ],
 
     'relation' => [

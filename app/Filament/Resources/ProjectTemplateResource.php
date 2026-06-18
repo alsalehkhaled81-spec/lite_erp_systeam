@@ -36,10 +36,12 @@ class ProjectTemplateResource extends Resource
                     Forms\Components\TextInput::make('budget')
                         ->label(__('filament.fields.budget'))
                         ->numeric()
+                        ->minValue(0)
                         ->prefix('$'),
                     Forms\Components\TextInput::make('estimated_days')
                         ->label(__('filament.fields.estimated_days'))
                         ->numeric()
+                        ->minValue(0)
                         ->suffix(__('filament.fields.days_unit')),
                 ])->columns(2),
         ]);

@@ -10,6 +10,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -35,6 +36,11 @@ class HrPanelProvider extends PanelProvider
             ->spa()
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->maxContentWidth('full')
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): string => '<script src="' . asset('vendor/fullcalendar/index.global.min.js') . '" data-navigate-track></script>'
+                    . '<script src="' . asset('vendor/fullcalendar/ar.global.min.js') . '" data-navigate-track></script>'
+            )
             ->discoverResources(in: app_path('Filament/Hr/Resources'), for: 'App\\Filament\\Hr\\Resources')
             ->discoverPages(in: app_path('Filament/Hr/Pages'), for: 'App\\Filament\\Hr\\Pages')
             ->pages([

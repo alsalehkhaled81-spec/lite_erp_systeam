@@ -39,7 +39,15 @@ class InvoiceResource extends Resource
                                 $query->when($get('client_id'), fn ($q, $client) => $q->where('client_id', $client))
                             )
                             ->searchable()
-                            ->preload(),
+                            ->createOptionForm([
+                                Forms\Components\Hidden::make('client_id')
+                                    ->default(fn (Forms\Get $get) => $get('client_id')),
+                                Forms\Components\TextInput::make('name')
+                                    ->label(__('filament.fields.project_name'))
+                                    ->required(),
+                                Forms\Components\Textarea::make('description')
+                                    ->label(__('filament.fields.description')),
+                            ]),
                     ])->columns(2),
 
                 Forms\Components\Section::make(__('filament.sections.invoice_data'))
@@ -62,9 +70,15 @@ class InvoiceResource extends Resource
                                 'overdue' => __('filament.status.overdue'),
                             ])->default('unpaid'),
                         Forms\Components\DatePicker::make('issue_date')
-                            ->label(__('filament.fields.issue_date')),
+                            ->label(__('filament.fields.issue_date'))
+                            ->live(),
                         Forms\Components\DatePicker::make('due_date')
-                            ->label(__('filament.fields.due_date_invoice')),
+                            ->label(__('filament.fields.due_date_invoice'))
+                            ->minDate(fn (Forms\Get $get): ?string => $get('issue_date') ?: null)
+                            ->rule('after_or_equal:issue_date')
+                            ->validationMessages([
+                                'after_or_equal' => __('filament.validation.due_date_after_issue', ['attribute' => __('filament.fields.due_date_invoice')]),
+                            ]),
                     ])->columns(3),
             ]);
     }

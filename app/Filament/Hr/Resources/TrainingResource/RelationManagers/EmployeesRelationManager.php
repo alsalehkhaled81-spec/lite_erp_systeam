@@ -59,6 +59,26 @@ class EmployeesRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\AttachAction::make()
                     ->label(__('filament.actions.enroll_employee'))
+                    ->recordSelect(fn (Forms\Components\Select $select) => $select
+                        ->options(
+                            \App\Models\Employee::with('user')
+                                ->whereDoesntHave('user.role', fn ($q) => $q->where('name', 'super_admin'))
+                                ->get()
+                                ->pluck('user.name', 'id')
+                        )
+                        ->searchable()
+                        ->getSearchResultsUsing(fn (string $search) => 
+                            \App\Models\Employee::with('user')
+                                ->whereDoesntHave('user.role', fn ($q) => $q->where('name', 'super_admin'))
+                                ->whereHas('user', fn ($q) => $q->where('name', 'like', "%{$search}%"))
+                                ->get()
+                                ->pluck('user.name', 'id')
+                                ->toArray()
+                        )
+                        ->getOptionLabelUsing(fn ($value) => 
+                            \App\Models\Employee::with('user')->find($value)?->user->name ?? 'Unknown'
+                        )
+                    )
                     ->form(fn (Tables\Actions\AttachAction $action): array => [
                         $action->getRecordSelect(),
                         Forms\Components\Select::make('status')

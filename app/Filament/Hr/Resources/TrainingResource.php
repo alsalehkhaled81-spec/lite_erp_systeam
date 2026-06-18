@@ -43,10 +43,16 @@ class TrainingResource extends Resource
                         ->maxLength(255),
                     Forms\Components\DatePicker::make('start_date')
                         ->label(__('filament.fields.start_date'))
-                        ->required(),
+                        ->required()
+                        ->live(),
                     Forms\Components\DatePicker::make('end_date')
                         ->label(__('filament.fields.end_date'))
-                        ->required(),
+                        ->required()
+                        ->minDate(fn (Forms\Get $get): ?string => $get('start_date') ?: null)
+                        ->rule('after_or_equal:start_date')
+                        ->validationMessages([
+                            'after_or_equal' => __('filament.validation.end_date_after_start', ['attribute' => __('filament.fields.end_date')]),
+                        ]),
                     Forms\Components\Select::make('status')
                         ->label(__('filament.fields.status'))
                         ->options([

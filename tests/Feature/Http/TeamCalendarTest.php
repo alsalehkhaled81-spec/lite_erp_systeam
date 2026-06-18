@@ -34,6 +34,39 @@ describe('Team Calendar', function () {
             ->not->toContain('<script src="https://cdn.jsdelivr.net/npm/fullcalendar');
     });
 
+    test('page loads the calendar from local bundled assets', function () {
+        $response = $this->actingAs(hrUser())->get('/hr/team-calendar');
+
+        $response->assertStatus(200);
+        expect($response->content())
+            ->toContain('index.global.min.js')
+            ->not->toContain('cdn.jsdelivr.net');
+    });
+
+    test('page includes FullCalendar scripts with data-navigate-track in head', function () {
+        $response = $this->actingAs(hrUser())->get('/hr/team-calendar');
+
+        $response->assertStatus(200);
+        $html = $response->content();
+        $headEnd = strpos($html, '</head>');
+        expect($headEnd)->not->toBeFalse();
+
+        $head = substr($html, 0, $headEnd);
+        expect($head)
+            ->toContain('data-navigate-track')
+            ->toContain('index.global.min.js');
+    });
+
+    test('page shows the calendar loading text instead of gantt text', function () {
+        app()->setLocale('ar');
+        $response = $this->actingAs(hrUser())->get('/hr/team-calendar');
+
+        $response->assertStatus(200);
+        expect($response->content())
+            ->toContain('جاري تحميل التقويم')
+            ->not->toContain('مخطط جانت');
+    });
+
     test('events JSON is injected properly with approved leave data', function () {
         $employeeUser = User::factory()->create(['name' => 'Ahmed Calendar Tester']);
         $employee = Employee::factory()->create(['user_id' => $employeeUser->id]);

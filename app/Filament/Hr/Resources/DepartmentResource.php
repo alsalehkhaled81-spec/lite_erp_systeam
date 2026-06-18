@@ -4,6 +4,7 @@ namespace App\Filament\Hr\Resources;
 
 use App\Filament\Hr\Resources\DepartmentResource\Pages;
 use App\Models\Department;
+use App\Models\Employee;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -30,10 +31,28 @@ class DepartmentResource extends Resource
                             ->maxLength(255),
                         Forms\Components\Select::make('head_id')
                             ->label(__('filament.fields.department_head'))
-                            ->relationship('head', 'job_title')
                             ->searchable()
                             ->nullable()
-                            ->getSearchResultsUsing(fn (string $search) => \App\Models\Employee::where('job_title', 'like', "%{$search}%")->orWhereHas('user', fn ($q) => $q->where('name', 'like', "%{$search}%"))->limit(20)->get()->mapWithKeys(fn ($e) => [$e->id => $e->user?->name . ' - ' . $e->job_title])),
+                            ->getSearchResultsUsing(function (string $search, $livewire) {
+                                $currentHeadId = null;
+                                $record = $livewire->getRecord();
+                                if ($record) {
+                                    $currentHeadId = $record->head_id;
+                                }
+
+                                return Employee::eligibleDepartmentHead($currentHeadId)
+                                    ->where(function ($q) use ($search) {
+                                        $q->where('job_title', 'like', "%{$search}%")
+                                            ->orWhereHas('user', fn ($q2) => $q2->where('name', 'like', "%{$search}%"));
+                                    })
+                                    ->limit(20)
+                                    ->get()
+                                    ->mapWithKeys(fn ($e) => [$e->id => ($e->user?->name ?? '—') . ' - ' . $e->job_title]);
+                            })
+                            ->getOptionLabelUsing(function ($value) {
+                                $employee = \App\Models\Employee::with('user')->find($value);
+                                return $employee ? ($employee->user?->name ?? '—') . ' - ' . $employee->job_title : null;
+                            }),
                     ])->columns(2),
             ]);
     }
@@ -60,6 +79,7 @@ class DepartmentResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

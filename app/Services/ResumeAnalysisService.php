@@ -6,8 +6,9 @@ class ResumeAnalysisService
 {
     public function __construct(private AiService $aiService) {}
 
-    public function analyzeResume(array $resumeData, string $keywords): ?array
+    public function analyzeResume(array $resumeData, string $keywords, string $targetJob = ''): ?array
     {
+        set_time_limit(180);
         $employeeName = $resumeData['employee_name'] ?? 'غير محدد';
         $jobTitle = $resumeData['job_title'] ?? 'غير محدد';
         $department = $resumeData['department'] ?? 'غير محدد';
@@ -19,17 +20,18 @@ class ResumeAnalysisService
         $messages = [
             [
                 'role' => 'system',
-                'content' => 'أنت خبير في الموارد البشرية وتحليل السير الذاتية. مهمتك هي تحليل السيرة الذاتية للمتقدم ومطابقتها مع متطلبات الوظيفة المحددة. أجب دائماً باللغة العربية. أجب بصيغة JSON فقط بدون أي نص إضافي.'
+                'content' => 'أنت خبير في الموارد البشرية وتحليل السير الذاتية. مهمتك هي تحليل السيرة الذاتية للمتقدم ومطابقتها مع متطلبات الوظيفة المستهدفة. أجب دائماً باللغة العربية. أجب بصيغة JSON فقط بدون أي نص إضافي.'
             ],
             [
                 'role' => 'user',
                 'content' => <<<PROMPT
-قم بتحليل السيرة الذاتية التالية للمتقدم لشغل وظيفة، وقم بتقييم مدى مطابقة المتقدم لمتطلبات الوظيفة.
+قم بتحليل السيرة الذاتية التالية وتقييم مدى مطابقة المتقدم لشغل الوظيفة المستهدفة.
 
 ## بيانات المتقدم:
 - الاسم: {$employeeName}
-- المسمى الوظيفي المتقدم له: {$jobTitle}
-- القسم: {$department}
+- المسمى الوظيفي المستهدف (المراد التقييم عليه): {$targetJob}
+- المسمى الوظيفي الحالي: {$jobTitle}
+- القسم الحالي: {$department}
 - الحالة: {$status}
 - الراتب المتوقع: {$salary}
 

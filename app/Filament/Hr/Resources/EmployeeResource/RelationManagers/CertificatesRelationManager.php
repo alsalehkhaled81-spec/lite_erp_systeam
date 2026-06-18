@@ -28,9 +28,15 @@ class CertificatesRelationManager extends RelationManager
                 ->required(),
             Forms\Components\DatePicker::make('issue_date')
                 ->label(__('filament.fields.issue_date'))
-                ->required(),
+                ->required()
+                ->live(),
             Forms\Components\DatePicker::make('expiry_date')
-                ->label(__('filament.fields.expiry_date')),
+                ->label(__('filament.fields.expiry_date'))
+                ->minDate(fn (\Filament\Forms\Get $get): ?string => $get('issue_date') ?: null)
+                ->rule('after_or_equal:issue_date')
+                ->validationMessages([
+                    'after_or_equal' => __('filament.validation.expiry_after_issue', ['attribute' => __('filament.fields.expiry_date')]),
+                ]),
             Forms\Components\FileUpload::make('certificate_url')
                 ->label(__('filament.fields.certificate_file'))
                 ->directory('certificates')

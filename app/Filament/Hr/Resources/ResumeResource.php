@@ -102,6 +102,11 @@ class ResumeResource extends Resource
                     ->modalDescription(__('filament.actions.ai_analyze_resume_desc'))
                     ->modalSubmitActionLabel(__('filament.actions.start_analysis'))
                     ->form([
+                        Forms\Components\TextInput::make('target_job_title')
+                            ->label('المسمى الوظيفي المستهدف')
+                            ->placeholder('مثال: مطور PHP')
+                            ->required()
+                            ->columnSpanFull(),
                         Forms\Components\Textarea::make('job_keywords')
                             ->label(__('filament.fields.job_keywords'))
                             ->placeholder(__('filament.fields.job_keywords_placeholder'))
@@ -126,7 +131,7 @@ class ResumeResource extends Resource
                         ];
 
                         $service = app(ResumeAnalysisService::class);
-                        $result = $service->analyzeResume($resumeData, $data['job_keywords']);
+                        $result = $service->analyzeResume($resumeData, $data['job_keywords'], $data['target_job_title']);
 
                         if (!$result) {
                             Notification::make()
@@ -172,7 +177,7 @@ class ResumeResource extends Resource
 
                         Notification::make()
                             ->title(__('filament.notifications.ai_analysis_complete') . " ({$score}/100)")
-                            ->body(implode("\n", $reportLines))
+                            ->body(new \Illuminate\Support\HtmlString(\Illuminate\Support\Str::markdown(implode("\n", $reportLines))))
                             ->{$color}()
                             ->persistent()
                             ->send();

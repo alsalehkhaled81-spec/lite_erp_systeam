@@ -75,9 +75,15 @@ class InvoiceResource extends Resource
                                 'overdue' => __('filament.status.overdue'),
                             ])->default('unpaid'),
                         Forms\Components\DatePicker::make('issue_date')
-                            ->label(__('filament.fields.issue_date')),
+                            ->label(__('filament.fields.issue_date'))
+                            ->live(),
                         Forms\Components\DatePicker::make('due_date')
-                            ->label(__('filament.fields.due_date_invoice')),
+                            ->label(__('filament.fields.due_date_invoice'))
+                            ->minDate(fn (Forms\Get $get): ?string => $get('issue_date') ?: null)
+                            ->rule('after_or_equal:issue_date')
+                            ->validationMessages([
+                                'after_or_equal' => __('filament.validation.due_date_after_issue', ['attribute' => __('filament.fields.due_date_invoice')]),
+                            ]),
                     ])->columns(2),
 
                 Forms\Components\Section::make(__('filament.sections.invoice_items'))
@@ -135,6 +141,8 @@ class InvoiceResource extends Resource
                             ->label(__('filament.fields.vat_rate'))
                             ->numeric()
                             ->suffix('%')
+                            ->minValue(0)
+                            ->maxValue(100)
                             ->default(0)
                             ->live(debounce: 500)
                             ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {

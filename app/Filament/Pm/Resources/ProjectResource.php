@@ -26,7 +26,10 @@ class ProjectResource extends Resource
                         Forms\Components\Select::make('client_id')
                             ->label(__('filament.fields.client'))
                             ->relationship('client', 'name')
-                            ->searchable(),
+                            ->getOptionLabelUsing(fn ($record): string => $record?->name . ($record?->company_name ? ' — ' . $record->company_name : ''))
+                            ->searchable()
+                            ->preload()
+                            ->required(),
                         Forms\Components\TextInput::make('name')
                             ->label(__('filament.fields.project_name'))
                             ->required()
@@ -40,6 +43,10 @@ class ProjectResource extends Resource
                         Forms\Components\TextInput::make('budget')
                             ->label(__('filament.fields.budget'))
                             ->numeric()
+                            ->minValue(0)
+                            ->validationMessages([
+                                'min' => __('filament.validation.budget_must_be_positive', ['attribute' => __('filament.fields.budget')]),
+                            ])
                             ->prefix('$'),
                         Forms\Components\Select::make('status')
                             ->label(__('filament.fields.project_status'))
@@ -50,9 +57,15 @@ class ProjectResource extends Resource
                                 'canceled' => __('filament.status.canceled'),
                             ])->default('pending'),
                         Forms\Components\DatePicker::make('start_date')
-                            ->label(__('filament.fields.start_date')),
+                            ->label(__('filament.fields.start_date'))
+                            ->live(),
                         Forms\Components\DatePicker::make('end_date')
-                            ->label(__('filament.fields.end_date')),
+                            ->label(__('filament.fields.end_date'))
+                            ->minDate(fn (Forms\Get $get): ?string => $get('start_date') ?: null)
+                            ->rule('after_or_equal:start_date')
+                            ->validationMessages([
+                                'after_or_equal' => __('filament.validation.end_date_after_start', ['attribute' => __('filament.fields.end_date')]),
+                            ]),
                     ])->columns(2),
             ]);
     }
