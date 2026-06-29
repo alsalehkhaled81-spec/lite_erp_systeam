@@ -13,8 +13,6 @@ class DashboardExportService
 {
     public function generatePdf(): mixed
     {
-        $arabic = new \Arphp\Glyphs();
-
         $totalEmployees = Employee::count();
         $activeEmployees = Employee::where('status', 'active')->count();
         $totalProjects = Project::count();
@@ -28,23 +26,23 @@ class DashboardExportService
 
         $kpis = [
             [
-                'label' => $arabic->utf8Glyphs(__('filament.widgets.total_employees')),
+                'label' => __('filament.widgets.total_employees'),
                 'value' => $totalEmployees,
             ],
             [
-                'label' => $arabic->utf8Glyphs(__('filament.widgets.total_projects')),
+                'label' => __('filament.widgets.total_projects'),
                 'value' => $totalProjects,
             ],
             [
-                'label' => $arabic->utf8Glyphs(__('filament.widgets.total_tasks')),
+                'label' => __('filament.widgets.total_tasks'),
                 'value' => $totalTasks,
-                'trend' => $taskRate, // Using rate as trend just to show it
+                'trend' => $taskRate,
             ],
             [
-                'label' => $arabic->utf8Glyphs(__('filament.widgets.net_profit')),
+                'label' => __('filament.widgets.net_profit'),
                 'value' => '$' . number_format($netProfit, 2),
                 'trend' => $netProfit >= 0 ? 5 : -5,
-            ]
+            ],
         ];
 
         $monthlyData = [];
@@ -57,38 +55,38 @@ class DashboardExportService
             $exp = (float) Expense::whereYear('expense_date', $month->year)
                 ->whereMonth('expense_date', $month->month)
                 ->sum('amount');
-            
+
             $monthlyData[] = [
-                'month' => $arabic->utf8Glyphs($month->translatedFormat('M Y')),
+                'month' => $month->translatedFormat('M Y'),
                 'revenue' => $rev,
                 'expense' => $exp,
                 'net' => $rev - $exp,
             ];
         }
 
-        $activities = collect(Task::latest()->take(15)->get())->map(function($task) use ($arabic) {
+        $activities = collect(Task::latest()->take(15)->get())->map(function ($task) {
             return [
                 'color' => 'badge-info',
                 'icon' => 'T',
-                'description' => $arabic->utf8Glyphs($task->title), 
-                'time' => $arabic->utf8Glyphs($task->created_at->diffForHumans()),
+                'description' => $task->title,
+                'time' => $task->created_at->diffForHumans(),
             ];
         });
 
         $employeeStats = Employee::with('user')->withCount(['tasks', 'tasks as done_tasks' => function ($query) {
             $query->where('status', 'done');
-        }])->take(10)->get()->map(function($emp, $index) use ($arabic) {
+        }])->take(10)->get()->map(function ($emp) {
             return [
-                'name' => $arabic->utf8Glyphs($emp->user->name), 
+                'name' => $emp->user->name,
                 'tasks' => $emp->tasks_count,
                 'rate' => $emp->tasks_count > 0 ? round(($emp->done_tasks / $emp->tasks_count) * 100) : 0,
             ];
         });
 
         $data = [
-            'company' => $arabic->utf8Glyphs(config('app.name', 'ERP System')),
-            'title' => $arabic->utf8Glyphs(__('filament.actions.export_dashboard_pdf')),
-            'generatedAt' => $arabic->utf8Glyphs(now()->translatedFormat('Y-m-d H:i')),
+            'company' => config('app.name', 'ERP System'),
+            'title' => __('filament.actions.export_dashboard_pdf'),
+            'generatedAt' => now()->translatedFormat('Y-m-d H:i'),
             'kpis' => $kpis,
             'monthlyData' => $monthlyData,
             'activities' => $activities,

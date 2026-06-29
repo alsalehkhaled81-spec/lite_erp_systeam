@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Employee extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'department_id', 'job_title', 'salary', 'status', 'hire_date', 'annual_leave_balance', 'used_leave_days'];
+    protected $fillable = ['user_id', 'department_id', 'vacancy_id', 'job_title', 'salary', 'status', 'hire_date', 'annual_leave_balance', 'used_leave_days'];
 
     protected $casts = [
         'hire_date' => 'date',
@@ -26,6 +26,11 @@ class Employee extends Model
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function vacancy(): BelongsTo
+    {
+        return $this->belongsTo(Vacancy::class);
     }
 
     public function headOfDepartment(): HasOne

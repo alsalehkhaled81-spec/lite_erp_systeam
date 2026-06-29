@@ -6,6 +6,7 @@ use App\Models\Employee;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\Client;
+use App\Models\Vacancy;
 
 class LandingController extends Controller
 {
@@ -18,6 +19,22 @@ class LandingController extends Controller
             'clients' => Client::count(),
         ];
 
-        return view('landing', compact('stats'));
+        $vacancies = Vacancy::withCount('applicants')
+            ->where('status', 'open') // or 'active', we'll keep 'open' as it was
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('landing', compact('stats', 'vacancies'));
+    }
+
+    public function vacancies()
+    {
+        $vacancies = Vacancy::withCount('applicants')
+            ->where('status', 'open')
+            ->latest()
+            ->paginate(12);
+
+        return view('vacancies', compact('vacancies'));
     }
 }

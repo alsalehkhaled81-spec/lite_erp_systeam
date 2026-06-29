@@ -6,6 +6,8 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use App\Filament\Pm\Pages\MyAttendance;
+use App\Filament\Pm\Pages\Profile;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -34,6 +36,8 @@ class PmPanelProvider extends PanelProvider
             ->font('Cairo')
             ->sidebarCollapsibleOnDesktop()
             ->spa()
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('30s')
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->maxContentWidth('full')
             ->renderHook(
@@ -44,7 +48,9 @@ class PmPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Pm/Resources'), for: 'App\\Filament\\Pm\\Resources')
             ->discoverPages(in: app_path('Filament/Pm/Pages'), for: 'App\\Filament\\Pm\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                \App\Filament\Pm\Pages\Dashboard::class,
+                Profile::class,
+                MyAttendance::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Pm/Widgets'), for: 'App\\Filament\\Pm\\Widgets')
             ->widgets([

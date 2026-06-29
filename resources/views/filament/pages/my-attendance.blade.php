@@ -33,8 +33,12 @@
                     <p class="font-semibold">{{ $todayRecord->hours_worked }} {{ __('filament.fields.hours_unit') }}</p>
                 </div>
                 <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('filament.fields.overtime_hours') }}</p>
+                    <p class="font-semibold text-primary-600">{{ $todayRecord->overtime_hours > 0 ? $todayRecord->overtime_hours . ' ' . __('filament.fields.hours_unit') : '-' }}</p>
+                </div>
+                <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('filament.columns.status') }}</p>
-                    <x-filament::badge color="{{ $todayRecord->status === 'present' ? 'success' : ($todayRecord->status === 'late' ? 'warning' : 'danger') }}">
+                    <x-filament::badge color="{{ match($todayRecord->status) { 'present' => 'success', 'late' => 'warning', 'absent' => 'danger', 'half_day' => 'info', 'over_time' => 'primary', default => 'gray' } }}">
                         {{ __('filament.attendance.' . $todayRecord->status) }}
                     </x-filament::badge>
                 </div>
@@ -50,6 +54,7 @@
                     <th class="text-start py-2 px-3">{{ __('filament.fields.check_in') }}</th>
                     <th class="text-start py-2 px-3">{{ __('filament.fields.check_out') }}</th>
                     <th class="text-start py-2 px-3">{{ __('filament.fields.hours_worked') }}</th>
+                    <th class="text-start py-2 px-3">{{ __('filament.fields.overtime_hours') }}</th>
                     <th class="text-start py-2 px-3">{{ __('filament.columns.status') }}</th>
                 </tr>
             </thead>
@@ -60,15 +65,16 @@
                         <td class="py-2 px-3">{{ $record->check_in ? $record->check_in->format('H:i') : '-' }}</td>
                         <td class="py-2 px-3">{{ $record->check_out ? $record->check_out->format('H:i') : '-' }}</td>
                         <td class="py-2 px-3">{{ $record->hours_worked }} {{ __('filament.fields.hours_unit') }}</td>
+                        <td class="py-2 px-3 text-primary-600">{{ $record->overtime_hours > 0 ? $record->overtime_hours . ' ' . __('filament.fields.hours_unit') : '-' }}</td>
                         <td class="py-2 px-3">
-                            <x-filament::badge color="{{ $record->status === 'present' ? 'success' : ($record->status === 'late' ? 'warning' : 'danger') }}">
+                            <x-filament::badge color="{{ match($record->status) { 'present' => 'success', 'late' => 'warning', 'absent' => 'danger', 'half_day' => 'info', 'over_time' => 'primary', default => 'gray' } }}">
                                 {{ __('filament.attendance.' . $record->status) }}
                             </x-filament::badge>
                         </td>
                     </tr>
                 @endforeach
                 @if($monthlyRecords->isEmpty())
-                    <tr><td colspan="5" class="py-4 text-center text-gray-400">{{ __('filament.attendance.no_records') }}</td></tr>
+                    <tr><td colspan="6" class="py-4 text-center text-gray-400">{{ __('filament.attendance.no_records') }}</td></tr>
                 @endif
             </tbody>
         </table>

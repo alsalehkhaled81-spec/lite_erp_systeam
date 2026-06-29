@@ -69,7 +69,7 @@ class DepartmentResource extends Resource
                                     ->get()
                                     ->mapWithKeys(fn ($e) => [$e->id => ($e->user?->name ?? '—') . ' - ' . $e->job_title]);
                             })
-                            ->getOptionLabelFromRecordUsing(fn ($record) => ($record->user?->name ?? '—') . ' - ' . $record->job_title),
+                            ->getOptionLabelUsing(fn ($value): ?string => Employee::with('user')->find($value)?->user?->name),
                     ])->columns(2),
             ]);
     }
@@ -85,7 +85,8 @@ class DepartmentResource extends Resource
                 Tables\Columns\TextColumn::make('head.user.name')
                     ->label(__('filament.fields.department_head'))
                     ->searchable()
-                    ->default('—'),
+                    ->default('—')
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('employees_count')
                     ->label(__('filament.fields.employees_count'))
                     ->counts('employees')

@@ -6,13 +6,15 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
-use Filament\Panel;
-use Filament\PanelProvider;
+use App\Filament\Accountant\Pages\MyAttendance;
+use App\Filament\Accountant\Pages\Profile;
 use App\Filament\Accountant\Widgets\CashflowChart;
 use App\Filament\Accountant\Widgets\OverdueInvoicesAlert;
 use App\Filament\Accountant\Widgets\ProjectBudgetChart;
 use App\Filament\Accountant\Widgets\TaxReportWidget;
+use Filament\Pages;
+use Filament\Panel;
+use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -37,12 +39,16 @@ class AccountantPanelProvider extends PanelProvider
             ->font('Cairo')
             ->sidebarCollapsibleOnDesktop()
             ->spa()
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('30s')
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->maxContentWidth('full')
             ->discoverResources(in: app_path('Filament/Accountant/Resources'), for: 'App\\Filament\\Accountant\\Resources')
             ->discoverPages(in: app_path('Filament/Accountant/Pages'), for: 'App\\Filament\\Accountant\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                Profile::class,
+                MyAttendance::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Accountant/Widgets'), for: 'App\\Filament\\Accountant\\Widgets')
             ->widgets([

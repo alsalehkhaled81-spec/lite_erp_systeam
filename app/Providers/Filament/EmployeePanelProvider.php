@@ -37,6 +37,8 @@ class EmployeePanelProvider extends PanelProvider
             ->font('Cairo')
             ->sidebarCollapsibleOnDesktop()
             ->spa()
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('30s')
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->maxContentWidth('full')
             ->discoverResources(in: app_path('Filament/Employee/Resources'), for: 'App\\Filament\\Employee\\Resources')

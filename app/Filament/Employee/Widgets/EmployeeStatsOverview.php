@@ -22,33 +22,31 @@ class EmployeeStatsOverview extends BaseWidget
         $inProgress = Task::where('employee_id', $employeeId)->where('status', 'in_progress')->count();
         $done = Task::where('employee_id', $employeeId)->where('status', 'done')->count();
 
+        $employee = auth()->user()->employee;
+        $remainingLeaves = $employee ? $employee->remaining_leave_balance : 0;
+        $totalProjects = $employee ? $employee->projects()->count() : 0;
+
         return[
             Stat::make(__('filament.emp_stats_total'), $total)
                 ->description(__('filament.emp_stats_total_desc'))
                 ->descriptionIcon('heroicon-m-clipboard-document-list')
                 ->chart([3, 5, 4, 6, 5, $total])
                 ->color('primary')
-                ->extraAttributes([
-                    'class' => 'cursor-pointer transition-all duration-300',
-                ]),
+                ->extraAttributes(['class' => 'cursor-pointer transition-all duration-300']),
 
-            Stat::make(__('filament.emp_stats_in_progress'), $inProgress)
-                ->description(__('filament.emp_stats_in_progress_desc'))
-                ->descriptionIcon('heroicon-m-clock')
-                ->chart([2, 3, 4, 3, 5, $inProgress])
-                ->color('warning')
-                ->extraAttributes([
-                    'class' => 'cursor-pointer transition-all duration-300',
-                ]),
-
-            Stat::make(__('filament.emp_stats_done'), $done)
-                ->description(__('filament.emp_stats_done_desc'))
-                ->descriptionIcon('heroicon-m-check-circle')
-                ->chart([1, 2, 3, 4, 5, $done])
+            Stat::make(__('الرصيد المتبقي للإجازات'), $remainingLeaves . ' ' . __('يوم'))
+                ->description(__('من أصل') . ' ' . ($employee ? $employee->annual_leave_balance : 0) . ' ' . __('يوم'))
+                ->descriptionIcon('heroicon-m-calendar-days')
+                ->chart([2, 4, 3, 5, 4, $remainingLeaves])
                 ->color('success')
-                ->extraAttributes([
-                    'class' => 'cursor-pointer transition-all duration-300',
-                ]),
+                ->extraAttributes(['class' => 'cursor-pointer transition-all duration-300']),
+
+            Stat::make(__('المشاريع النشطة'), $totalProjects)
+                ->description(__('إجمالي المشاريع الموكلة إليك'))
+                ->descriptionIcon('heroicon-m-briefcase')
+                ->chart([1, 2, 3, 4, 5, $totalProjects])
+                ->color('warning')
+                ->extraAttributes(['class' => 'cursor-pointer transition-all duration-300']),
         ];
     }
 }

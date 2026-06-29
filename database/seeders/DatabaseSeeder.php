@@ -24,6 +24,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Expense;
 use App\Models\Department;
+use App\Models\Vacancy;
 use App\Models\Report;
 use App\Models\Leave;
 use App\Models\Payroll;
@@ -36,7 +37,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $faker = Faker::create('ar_SA');
+        $faker = Faker::create('ar_SY');
 
         Schema::disableForeignKeyConstraints();
 
@@ -99,17 +100,17 @@ class DatabaseSeeder extends Seeder
         $defaultPassword = Hash::make('password');
 
         $keyUsers = [
-            ['name' => 'محمد عبدالله', 'email' => 'ceo@techcompany.com', 'role' => 'super_admin', 'job' => 'المدير التنفيذي', 'salary' => 25000, 'dept' => 0],
-            ['name' => 'ريم الفاسي', 'email' => 'hr@techcompany.com', 'role' => 'hr_manager', 'job' => 'مدير الموارد البشرية', 'salary' => 12000, 'dept' => 3],
-            ['name' => 'طارق النجار', 'email' => 'pm@techcompany.com', 'role' => 'project_manager', 'job' => 'مدير المشاريع', 'salary' => 15000, 'dept' => 1],
-            ['name' => 'وليد السعيد', 'email' => 'finance@techcompany.com', 'role' => 'accountant', 'job' => 'رئيس الحسابات', 'salary' => 11000, 'dept' => 4],
-            ['name' => 'سارة الخالدي', 'email' => 'sara@techcompany.com', 'role' => 'employee', 'job' => 'Senior Laravel Developer', 'salary' => 9500, 'dept' => 1],
-            ['name' => 'عمر الفاروق', 'email' => 'omar@techcompany.com', 'role' => 'employee', 'job' => 'Frontend Vue.js Developer', 'salary' => 7500, 'dept' => 1],
-            ['name' => 'نور حسن', 'email' => 'nour@techcompany.com', 'role' => 'employee', 'job' => 'Mobile App Developer (Flutter)', 'salary' => 8500, 'dept' => 2],
-            ['name' => 'أحمد كمال', 'email' => 'ahmed@techcompany.com', 'role' => 'employee', 'job' => 'UI/UX Designer', 'salary' => 7000, 'dept' => 1],
-            ['name' => 'ندى يوسف', 'email' => 'nada@techcompany.com', 'role' => 'employee', 'job' => 'QA Engineer', 'salary' => 6500, 'dept' => 6],
-            ['name' => 'محمود زيدان', 'email' => 'mahmoud@techcompany.com', 'role' => 'employee', 'job' => 'DevOps Engineer', 'salary' => 10500, 'dept' => 7],
-            ['name' => 'خالد منصور', 'email' => 'khaled@techcompany.com', 'role' => 'employee', 'job' => 'Digital Marketing Specialist', 'salary' => 6000, 'dept' => 5],
+            ['name' => 'عماد الدين الحلبي', 'email' => 'ceo@techcompany.com', 'role' => 'super_admin', 'job' => 'المدير التنفيذي', 'salary' => 25000, 'dept' => 0],
+            ['name' => 'لمى ديوب', 'email' => 'hr@techcompany.com', 'role' => 'hr_manager', 'job' => 'مدير الموارد البشرية', 'salary' => 12000, 'dept' => 3],
+            ['name' => 'باسل الخطيب', 'email' => 'pm@techcompany.com', 'role' => 'project_manager', 'job' => 'مدير المشاريع', 'salary' => 15000, 'dept' => 1],
+            ['name' => 'غسان العلي', 'email' => 'finance@techcompany.com', 'role' => 'accountant', 'job' => 'رئيس الحسابات', 'salary' => 11000, 'dept' => 4],
+            ['name' => 'رنا قدور', 'email' => 'rana@techcompany.com', 'role' => 'employee', 'job' => 'Senior Laravel Developer', 'salary' => 9500, 'dept' => 1],
+            ['name' => 'كنان الشريف', 'email' => 'kinan@techcompany.com', 'role' => 'employee', 'job' => 'Frontend Vue.js Developer', 'salary' => 7500, 'dept' => 1],
+            ['name' => 'آية منصور', 'email' => 'aya@techcompany.com', 'role' => 'employee', 'job' => 'Mobile App Developer (Flutter)', 'salary' => 8500, 'dept' => 2],
+            ['name' => 'تامر جبّول', 'email' => 'tamer@techcompany.com', 'role' => 'employee', 'job' => 'UI/UX Designer', 'salary' => 7000, 'dept' => 1],
+            ['name' => 'ميس الحسن', 'email' => 'mays@techcompany.com', 'role' => 'employee', 'job' => 'QA Engineer', 'salary' => 6500, 'dept' => 6],
+            ['name' => 'سلطان دندش', 'email' => 'sultan@techcompany.com', 'role' => 'employee', 'job' => 'DevOps Engineer', 'salary' => 10500, 'dept' => 7],
+            ['name' => 'ربيع الأطرش', 'email' => 'rabie@techcompany.com', 'role' => 'employee', 'job' => 'Digital Marketing Specialist', 'salary' => 6000, 'dept' => 5],
         ];
 
         $employeeIds = [];
@@ -145,6 +146,159 @@ class DatabaseSeeder extends Seeder
             $employee->skills()->attach($allSkills->random(rand(3, 6))->pluck('id'));
         }
 
+
+        // ==========================================
+        // 3أ. إنشاء الوظائف الشاغرة (Vacancies)
+        // ==========================================
+        $vacanciesData = [
+            [
+                'title' => 'مطور Backend Laravel',
+                'description' => 'نبحث عن مطور Backend محترف للعمل على أنظمة ERP واسعة النطاق باستخدام Laravel و MySQL.',
+                'requirements' => 'PHP, Laravel, MySQL, REST API, Git, Redis, Queue Jobs',
+                'department' => 1,
+                'type' => 'full_time',
+                'salary_min' => 8000,
+                'salary_max' => 14000,
+                'positions' => 2,
+                'status' => 'open',
+            ],
+            [
+                'title' => 'مطور Frontend React',
+                'description' => 'مطلوب مطور واجهات أمامية متمكن في React و TypeScript لبناء لوحات تحكم تفاعلية.',
+                'requirements' => 'React, TypeScript, JavaScript, HTML5, CSS3, Tailwind CSS, REST API',
+                'department' => 1,
+                'type' => 'full_time',
+                'salary_min' => 7000,
+                'salary_max' => 12000,
+                'positions' => 1,
+                'status' => 'open',
+            ],
+            [
+                'title' => 'مطور تطبيقات جوال Flutter',
+                'description' => 'بحث عن مطور Flutter لتطوير تطبيقات iOS و Android لعملائنا في قطاعات التجارة الإلكترونية والخدمات.',
+                'requirements' => 'Flutter, Dart, Firebase, REST API, Mobile UI/UX, Push Notifications',
+                'department' => 2,
+                'type' => 'full_time',
+                'salary_min' => 7500,
+                'salary_max' => 13000,
+                'positions' => 1,
+                'status' => 'open',
+            ],
+            [
+                'title' => 'مهندس DevOps',
+                'description' => 'نحتاج مهندس DevOps لإدارة البنية التحتية السحابية وتطوير خطوط CI/CD.',
+                'requirements' => 'Linux, Docker, Kubernetes, AWS, CI/CD, Terraform, Ansible, Monitoring',
+                'department' => 7,
+                'type' => 'full_time',
+                'salary_min' => 10000,
+                'salary_max' => 16000,
+                'positions' => 1,
+                'status' => 'open',
+            ],
+            [
+                'title' => 'مصمم UI/UX',
+                'description' => 'مطلوب مصمم UI/UX مبدع لتصميم واجهات تطبيقات ويب وجوال جذابة وسهلة الاستخدام.',
+                'requirements' => 'Figma, Adobe XD, UI Design, UX Research, Prototyping, Design Systems',
+                'department' => 1,
+                'type' => 'full_time',
+                'salary_min' => 6000,
+                'salary_max' => 10000,
+                'positions' => 1,
+                'status' => 'open',
+            ],
+            [
+                'title' => 'مهندس اختبار برمجيات QA',
+                'description' => 'بحث عن مهندس QA لضمان جودة المنتجات الرقمية من خلال الاختبار اليدوي والآلي.',
+                'requirements' => 'Selenium, Automated Testing, Manual Testing, API Testing, Jira, Test Cases',
+                'department' => 6,
+                'type' => 'full_time',
+                'salary_min' => 5500,
+                'salary_max' => 9000,
+                'positions' => 2,
+                'status' => 'open',
+            ],
+            [
+                'title' => 'أخصائي تسويق رقمي',
+                'description' => 'مطلوب أخصائي تسويق رقمي لإدارة الحملات الإعلانية وتحسين محركات البحث.',
+                'requirements' => 'SEO, SEM, Google Ads, Social Media Marketing, Google Analytics, Content Marketing',
+                'department' => 5,
+                'type' => 'part_time',
+                'salary_min' => 4000,
+                'salary_max' => 7000,
+                'positions' => 1,
+                'status' => 'open',
+            ],
+            [
+                'title' => 'متدرب تطوير ويب (Web Development Intern)',
+                'description' => 'فرصة تدريب عملي للمبتدئين في تطوير الويب باستخدام Laravel و Vue.js مع إرشاد من مطورين محترفين.',
+                'requirements' => 'HTML, CSS, JavaScript, PHP Basics, Git, Eagerness to Learn',
+                'department' => 1,
+                'type' => 'internship',
+                'salary_min' => 2000,
+                'salary_max' => 3500,
+                'positions' => 3,
+                'status' => 'open',
+            ],
+        ];
+
+        foreach ($vacanciesData as $vacData) {
+            Vacancy::create([
+                'title' => $vacData['title'],
+                'description' => $vacData['description'],
+                'requirements' => $vacData['requirements'],
+                'location' => 'دمشق، الجمهورية العربية السورية',
+                'employment_type' => $vacData['type'],
+                'salary_min' => $vacData['salary_min'],
+                'salary_max' => $vacData['salary_max'],
+                'department_id' => $departments[$vacData['department']]->id,
+                'status' => $vacData['status'],
+                'positions_count' => $vacData['positions'],
+                'created_by' => $employeeIds[0],
+            ]);
+        }
+
+        // ==========================================
+        // 4أ. إنشاء متقدمين على الوظائف الشاغرة (Applicants)
+        // ==========================================
+        $openVacancies = Vacancy::where('status', 'open')->get();
+        $applicantNames = [
+            'فراس العبيد', 'دلال الخطيب', 'معن الخوري', 'ربى حمادة',
+            'يزن الصباغ', 'براءة ناصر', 'وسيم السمان', 'إباء عثمان',
+            'نديم بيضون', 'ألين حلو', 'ثائر كجك', 'ديالا مردم',
+        ];
+
+        $applicantIdx = 0;
+        foreach ($openVacancies as $vIdx => $vacancy) {
+            $numApplicants = rand(0, 4);
+            for ($a = 0; $a < $numApplicants; $a++) {
+                $applicantName = $applicantNames[$applicantIdx % count($applicantNames)];
+                $applicantIdx++;
+
+                $applicantUser = User::create([
+                    'role_id' => $roles['employee']->id,
+                    'name' => $applicantName,
+                    'email' => 'applicant_' . $applicantIdx . '_' . $vIdx . '@techcompany.com',
+                    'password' => $defaultPassword,
+                    'is_approved' => false,
+                ]);
+
+                $applicantEmployee = Employee::create([
+                    'user_id' => $applicantUser->id,
+                    'vacancy_id' => $vacancy->id,
+                    'job_title' => $vacancy->title,
+                    'salary' => rand($vacancy->salary_min, $vacancy->salary_max),
+                    'status' => 'pending',
+                    'hire_date' => null,
+                ]);
+
+                Resume::create([
+                    'employee_id' => $applicantEmployee->id,
+                    'file_path' => 'resumes/cv_applicant_' . $applicantEmployee->id . '.pdf',
+                    'resume_text' => "معلومات مهنية: خبرة في مجال {$vacancy->title}. مهارات تقنية قوية وقدرة على العمل ضمن فريق.",
+                ]);
+            }
+        }
+
         // ==========================================
         // 5. تعيين رؤساء الأقسام (Department Heads)
         // ==========================================
@@ -158,21 +312,23 @@ class DatabaseSeeder extends Seeder
         // 6. إنشاء العملاء (Clients)
         // ==========================================
         $realClients = [
-            ['name' => 'ياسر القحطاني', 'company' => 'شركة التقنية المتقدمة', 'domain' => 'advancedtech.sa'],
-            ['name' => 'فهد الدوسري', 'company' => 'مؤسسة التجارة السريعة', 'domain' => 'fasttrade.com'],
-            ['name' => 'عبدالرحمن السالم', 'company' => 'منصة التعليم الذكي', 'domain' => 'smartedu.net'],
-            ['name' => 'د. خالد الياس', 'company' => 'مستشفى الحياة', 'domain' => 'alhayathospital.com'],
-            ['name' => 'سليمان الراجحي', 'company' => 'شركة النقل اللوجستي', 'domain' => 'logistics-trans.com'],
+            ['name' => 'نبيل قطان', 'company' => 'شركة الشام للتقنية', 'domain' => 'shamtech.sy'],
+            ['name' => 'مها عرابي', 'company' => 'مؤسسة الفرات للتجارة', 'domain' => 'furattrade.com'],
+            ['name' => 'غسان حداد', 'company' => 'منصة التعليم الإلكتروني السورية', 'domain' => 'syriaedu.net'],
+            ['name' => 'د. سامر زين', 'company' => 'مستشفى المواساة الجامعي', 'domain' => 'mowasat-hospital.com'],
+            ['name' => 'وليد نعيسة', 'company' => 'شركة المشرق للنقل واللوجستيات', 'domain' => 'mashriq-logistics.com'],
         ];
 
         $clients = [];
+        $syrianCities = ['دمشق', 'حلب', 'اللاذقية', 'حمص', 'طرطوس', 'حماة', 'دير الزور'];
         foreach ($realClients as $clientData) {
+            $city = $faker->randomElement($syrianCities);
             $clients[] = Client::create([
                 'name' => $clientData['name'],
                 'company_name' => $clientData['company'],
                 'email' => 'info@' . $clientData['domain'],
-                'phone' => '05' . rand(10000000, 99999999),
-                'address' => 'المملكة العربية السعودية، الرياض، ' . $faker->streetName,
+                'phone' => '+963 9' . rand(3000000, 9999999),
+                'address' => 'الجمهورية العربية السورية، ' . $city . '، ' . $faker->streetName,
             ]);
         }
 
@@ -506,7 +662,7 @@ class DatabaseSeeder extends Seeder
             ['title' => 'نثريات وضيافة للمكتب', 'category' => 'ضيافة', 'amount' => 1200, 'project' => null, 'status' => 'pending'],
             ['title' => 'رسوم استشارات قانونية', 'category' => 'استشارات', 'amount' => 4000, 'project' => null, 'status' => 'approved'],
             ['title' => 'مصاريف سفر لزيارة عميل مشروع التوصيل', 'category' => 'سفر وانتقالات', 'amount' => 3500, 'project' => 1, 'status' => 'approved'],
-            ['title' => 'شراء域名 وأجهزة شبكية لمشروع التعليم', 'category' => 'أصول ومعدات', 'amount' => 6000, 'project' => 2, 'status' => 'pending'],
+            ['title' => 'شراء أجهزة شبكية لمشروع التعليم', 'category' => 'أصول ومعدات', 'amount' => 6000, 'project' => 2, 'status' => 'pending'],
             ['title' => 'تكاليف استضافة سحابية لمشروع المستشفى', 'category' => 'تراخيص برامج وسيرفرات', 'amount' => 2800, 'project' => 3, 'status' => 'rejected'],
         ];
 
@@ -641,27 +797,50 @@ class DatabaseSeeder extends Seeder
                     continue;
                 }
 
-                $status = $faker->randomElement(['present', 'present', 'present', 'late', 'absent', 'half_day']);
+                $status = $faker->randomElement(['present', 'present', 'late', 'absent', 'half_day', 'over_time']);
 
                 $checkIn = null;
                 $checkOut = null;
-                $hoursWorked = 0;
                 $notes = null;
 
                 if ($status === 'present') {
-                    $checkIn = $date->copy()->setTime(8, rand(0, 30), 0);
-                    $checkOut = $date->copy()->setTime(17, rand(0, 30), 0);
-                    $hoursWorked = round($checkIn->diffInMinutes($checkOut) / 60, 2);
+                    $checkIn = $date->copy()->setTime(9, rand(0, 14), 0);
+                    $checkOut = $date->copy()->setTime(17, rand(0, 59), 0);
                 } elseif ($status === 'late') {
-                    $checkIn = $date->copy()->setTime(9, rand(20, 59), 0);
+                    $checkIn = $date->copy()->setTime(9, rand(16, 59), 0);
                     $checkOut = $date->copy()->setTime(17, rand(0, 30), 0);
-                    $hoursWorked = round($checkIn->diffInMinutes($checkOut) / 60, 2);
                     $notes = 'تأخير في الحضور';
                 } elseif ($status === 'half_day') {
-                    $checkIn = $date->copy()->setTime(8, rand(0, 30), 0);
-                    $checkOut = $date->copy()->setTime(13, rand(0, 0), 0);
-                    $hoursWorked = round($checkIn->diffInMinutes($checkOut) / 60, 2);
+                    $checkIn = $date->copy()->setTime(9, rand(0, 14), 0);
+                    $checkOut = $date->copy()->setTime(13, rand(0, 30), 0);
                     $notes = 'دوام نصف يوم';
+                } elseif ($status === 'absent') {
+                    $checkIn = $date->copy()->setTime(9, rand(0, 14), 0);
+                    $checkOut = $date->copy()->setTime(11, rand(0, 30), 0);
+                    $notes = 'مغادرة مبكرة جداً';
+                } elseif ($status === 'over_time') {
+                    $checkIn = $date->copy()->setTime(8, rand(0, 59), 0);
+                    $checkOut = $date->copy()->setTime(18, rand(0, 59), 0);
+                    $notes = 'عمل إضافي';
+                }
+
+                $hoursWorked = \App\Models\Attendance::calculateHoursWorked($checkIn, $checkOut);
+                $overtimeHours = max(0, $hoursWorked - 8);
+
+                // Recalculate status based on rules to be perfectly consistent
+                $checkInTime = $checkIn->format('H:i');
+                $checkOutTime = $checkOut->format('H:i');
+                
+                if ($hoursWorked < 4) {
+                    $status = 'absent';
+                } elseif ($hoursWorked < 7) {
+                    $status = 'half_day';
+                } elseif ($checkInTime < '09:00' || ($checkOutTime >= '17:00' && $hoursWorked > 8)) {
+                    $status = 'over_time';
+                } elseif ($checkInTime > '09:15') {
+                    $status = 'late';
+                } else {
+                    $status = 'present';
                 }
 
                 Attendance::create([
@@ -670,6 +849,7 @@ class DatabaseSeeder extends Seeder
                     'check_in' => $checkIn,
                     'check_out' => $checkOut,
                     'hours_worked' => $hoursWorked,
+                    'overtime_hours' => $overtimeHours,
                     'status' => $status,
                     'notes' => $notes,
                 ]);
@@ -683,17 +863,17 @@ class DatabaseSeeder extends Seeder
             [
                 'title' => 'تطوير تطبيقات الويب باستخدام Laravel المتقدم',
                 'description' => 'دورة تدريبية متقدمة في إطار عمل Laravel تشمل تصميم الـ API، إدارة الطوابير، والأنماط المتقدمة.',
-                'trainer' => 'م. عبدالرحمن الشمري',
+                'trainer' => 'م. رامي طعمة',
                 'start_date' => Carbon::now()->subDays(10),
                 'end_date' => Carbon::now()->addDays(5),
                 'status' => 'ongoing',
-                'location' => 'قاعة التدريب الرئيسية - الرياض',
+                'location' => 'قاعة التدريب الرئيسية - دمشق',
                 'max_participants' => 15,
             ],
             [
                 'title' => 'أساسيات DevOps و Docker',
                 'description' => 'دورة شاملة لتعلم أساسيات DevOps وإنشاء بيئات تطوير معزولة باستخدام Docker و Kubernetes.',
-                'trainer' => 'م. فهد العتيبي',
+                'trainer' => 'م. يامن رستم',
                 'start_date' => Carbon::now()->subDays(30),
                 'end_date' => Carbon::now()->subDays(15),
                 'status' => 'completed',
@@ -703,31 +883,31 @@ class DatabaseSeeder extends Seeder
             [
                 'title' => 'تصميم واجهات المستخدم UX/UI',
                 'description' => 'دورة في تصميم تجربة وواجهة المستخدم باستخدام Figma مع مشاريع عملية.',
-                'trainer' => 'أ. نورة الحربي',
+                'trainer' => 'أ. شيرين إدلبي',
                 'start_date' => Carbon::now()->addDays(10),
                 'end_date' => Carbon::now()->addDays(25),
                 'status' => 'upcoming',
-                'location' => 'قاعة الابتكار - جدة',
+                'location' => 'قاعة الابتكار - حلب',
                 'max_participants' => 12,
             ],
             [
                 'title' => 'إدارة المشاريع الاحترافية PMP',
                 'description' => 'دورة تحضيرية لشهادة PMP تشمل إطار عمل إدارة المشاريع وأساليب Agile و Waterfall.',
-                'trainer' => 'د. محمد القحطاني',
+                'trainer' => 'د. مازن صالحية',
                 'start_date' => Carbon::now()->addDays(20),
                 'end_date' => Carbon::now()->addDays(40),
                 'status' => 'upcoming',
-                'location' => 'فندق الريتز كارلتون - الرياض',
+                'location' => 'فندق الشام - دمشق',
                 'max_participants' => 25,
             ],
             [
                 'title' => 'اختبار البرمجيات الآلي Selenium',
                 'description' => 'دورة عملية في الاختبار الآلي باستخدام Selenium WebDriver مع Java.',
-                'trainer' => 'م. سلطان الدوسري',
+                'trainer' => 'م. لؤي درويش',
                 'start_date' => Carbon::now()->subDays(45),
                 'end_date' => Carbon::now()->subDays(30),
                 'status' => 'completed',
-                'location' => 'مركز التدريب التقني - الدمام',
+                'location' => 'مركز التدريب التقني - اللاذقية',
                 'max_participants' => 10,
             ],
         ];

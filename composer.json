@@ -15,7 +15,8 @@
         "laravel/tinker": "^2.10.1",
         "mokhosh/filament-kanban": "*",
         "openai-php/laravel": "*",
-        "parsedown/laravel": "*"
+        "parsedown/laravel": "*",
+        "smalot/pdfparser": "^2.12"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

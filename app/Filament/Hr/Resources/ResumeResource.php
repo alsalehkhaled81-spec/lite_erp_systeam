@@ -45,9 +45,23 @@ class ResumeResource extends Resource
                             ->unique(ignoreRecord: true),
                         Forms\Components\FileUpload::make('file_path')
                             ->label(__('filament.fields.resume_file'))
+                            ->disk('public')
                             ->directory('resumes')
                             ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
-                            ->preserveFilenames(),
+                            ->preserveFilenames()
+                            ->live()
+                            ->afterStateUpdated(function (Forms\Set $set, $state) {
+                                if ($state) {
+                                    $path = $state->getRealPath();
+                                    $mime = $state->getMimeType();
+                                    $parser = new \App\Services\ResumeParserService();
+                                    $text = $parser->parse($path, $mime);
+                                    if (empty(trim($text))) {
+                                        $text = 'تعذر استخراج النص تلقائياً من الملف المرفق. قد يكون الملف عبارة عن صور ممسوحة ضوئياً (Scanned).';
+                                    }
+                                    $set('resume_text', $text);
+                                }
+                            }),
                     ])->columns(2),
 
                 Forms\Components\Section::make(__('filament.sections.resume_extracted_text'))
@@ -58,6 +72,30 @@ class ResumeResource extends Resource
                             ->rows(8)
                             ->columnSpanFull(),
                     ]),
+
+                Forms\Components\Section::make(__('filament.sections.ai_analysis_results'))
+                    ->schema([
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('ai_score')
+                                ->label(__('filament.fields.ai_score'))
+                                ->disabled(),
+                            Forms\Components\TextInput::make('ai_recommendation')
+                                ->label(__('filament.fields.ai_recommendation'))
+                                ->disabled(),
+                        ]),
+                        Forms\Components\Textarea::make('ai_summary')
+                            ->label(__('filament.fields.ai_summary'))
+                            ->rows(2)
+                            ->disabled()
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make('ai_report')
+                            ->label(__('filament.fields.ai_report'))
+                            ->rows(5)
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible()
+                    ->collapsed(fn (?Resume $record) => $record?->analyzed_at === null),
             ]);
     }
 
@@ -69,6 +107,28 @@ class ResumeResource extends Resource
                     ->label(__('filament.columns.employee_name'))
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('employee.vacancy.title')
+                    ->label(__('filament.fields.vacancy_title'))
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('employee.status')
+                    ->label(__('filament.fields.application_status'))
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'active' => 'success',
+                        'rejected' => 'danger',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => __('filament.status.application_' . $state))
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('ai_score')
+                    ->label(__('filament.fields.ai_score'))
+                    ->badge()
+                    ->color(fn ($state): string => $state === null ? 'gray' : ($state >= 70 ? 'success' : ($state >= 40 ? 'warning' : 'danger')))
+                    ->placeholder('—')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('file_path')
                     ->label(__('filament.fields.file'))
                     ->url(fn ($record) => $record->file_path ? asset('storage/' . $record->file_path) : null)
@@ -77,7 +137,7 @@ class ResumeResource extends Resource
                     ->color('info')
                     ->formatStateUsing(fn () => __('filament.actions.download_view')),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('filament.columns.created_at'))
+                    ->label(__('filament.columns.application_date'))
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('employee.id')
@@ -90,7 +150,20 @@ class ResumeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('application_status')
+                    ->label(__('filament.fields.application_status'))
+                    ->options([
+                        'pending' => __('filament.status.application_pending'),
+                        'active' => __('filament.status.application_active'),
+                        'rejected' => __('filament.status.application_rejected'),
+                        'on_leave' => __('filament.status.application_on_leave'),
+                        'terminated' => __('filament.status.application_terminated'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query->when(
+                        $data['value'] ?? null,
+                        fn (Builder $q, $value) => $q->whereHas('employee', fn ($q2) => $q2->where('status', $value))
+                    ))
+                    ->default('pending'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -101,13 +174,17 @@ class ResumeResource extends Resource
                     ->modalHeading(__('filament.actions.ai_analyze_resume_heading'))
                     ->modalDescription(__('filament.actions.ai_analyze_resume_desc'))
                     ->modalSubmitActionLabel(__('filament.actions.start_analysis'))
+                    ->fillForm(fn (Resume $record): array => [
+                        'target_job_title' => $record->employee?->vacancy?->title ?? $record->employee?->job_title ?? '',
+                        'job_keywords' => $record->employee?->vacancy?->requirements ?? '',
+                    ])
                     ->form([
-                        Forms\Components\TextInput::make('target_job_title')
+                        \Filament\Forms\Components\TextInput::make('target_job_title')
                             ->label('المسمى الوظيفي المستهدف')
                             ->placeholder('مثال: مطور PHP')
                             ->required()
                             ->columnSpanFull(),
-                        Forms\Components\Textarea::make('job_keywords')
+                        \Filament\Forms\Components\Textarea::make('job_keywords')
                             ->label(__('filament.fields.job_keywords'))
                             ->placeholder(__('filament.fields.job_keywords_placeholder'))
                             ->rows(4)
@@ -116,25 +193,29 @@ class ResumeResource extends Resource
                     ])
                     ->action(function (Resume $record, array $data) {
                         $employee = $record->employee;
-                        $employee->load(['user', 'department', 'skills']);
+                        if ($employee) {
+                            $employee->load(['user', 'department', 'skills']);
+                            $skillsList = $employee->skills->pluck('name')->implode(', ');
+                            $resumeData = [
+                                'employee_name' => $employee->user?->name ?? 'غير محدد',
+                                'job_title' => $employee->job_title ?? 'غير محدد',
+                                'department' => $employee->department?->name ?? 'غير محدد',
+                                'salary' => $employee->salary ?? 'غير محدد',
+                                'status' => $employee->status ?? 'غير محدد',
+                                'skills' => $skillsList ?: 'لا توجد مهارات مسجلة',
+                                'resume_text' => $record->resume_text ?? 'لا يوجد نص للسيرة الذاتية',
+                            ];
+                        } else {
+                            $resumeData = [
+                                'resume_text' => $record->resume_text ?? 'لا يوجد نص للسيرة الذاتية',
+                            ];
+                        }
 
-                        $skillsList = $employee->skills->pluck('name')->implode(', ');
-
-                        $resumeData = [
-                            'employee_name' => $employee->user?->name ?? 'غير محدد',
-                            'job_title' => $employee->job_title ?? 'غير محدد',
-                            'department' => $employee->department?->name ?? 'غير محدد',
-                            'salary' => $employee->salary ?? 'غير محدد',
-                            'status' => $employee->status ?? 'غير محدد',
-                            'skills' => $skillsList ?: 'لا توجد مهارات مسجلة',
-                            'resume_text' => $record->resume_text ?? 'لا يوجد نص للسيرة الذاتية',
-                        ];
-
-                        $service = app(ResumeAnalysisService::class);
+                        $service = app(\App\Services\ResumeAnalysisService::class);
                         $result = $service->analyzeResume($resumeData, $data['job_keywords'], $data['target_job_title']);
 
                         if (!$result) {
-                            Notification::make()
+                            \Filament\Notifications\Notification::make()
                                 ->title(__('filament.notifications.ai_analysis_error'))
                                 ->body(__('filament.notifications.ai_analysis_error_body'))
                                 ->danger()
@@ -144,44 +225,46 @@ class ResumeResource extends Resource
                         }
 
                         $score = $result['score'] ?? 0;
-                        $recommendation = $result['recommendation'] ?? 'غير محدد';
-                        $color = $score >= 70 ? 'success' : ($score >= 40 ? 'warning' : 'danger');
 
-                        $reportLines = [
-                            "**" . __('filament.fields.ai_score') . ": {$score}/100**",
-                            "",
-                            "**" . __('filament.fields.ai_recommendation') . ": {$recommendation}**",
-                            "",
-                            "**" . __('filament.fields.ai_summary') . ":**",
-                            $result['summary'] ?? '',
-                            "",
-                            "**" . __('filament.fields.ai_report') . ":**",
-                            $result['report'] ?? '',
-                        ];
+                        $record->update([
+                            'ai_score' => $result['score'] ?? null,
+                            'ai_summary' => $result['summary'] ?? null,
+                            'ai_report' => $result['report'] ?? null,
+                            'ai_recommendation' => $result['recommendation'] ?? null,
+                            'analyzed_at' => now(),
+                        ]);
 
-                        if (!empty($result['strengths'])) {
-                            $reportLines[] = "";
-                            $reportLines[] = "**" . __('filament.fields.ai_strengths') . ":**";
-                            foreach ($result['strengths'] as $s) {
-                                $reportLines[] = "- {$s}";
-                            }
-                        }
-
-                        if (!empty($result['weaknesses'])) {
-                            $reportLines[] = "";
-                            $reportLines[] = "**" . __('filament.fields.ai_weaknesses') . ":**";
-                            foreach ($result['weaknesses'] as $w) {
-                                $reportLines[] = "- {$w}";
-                            }
-                        }
-
-                        Notification::make()
+                        \Filament\Notifications\Notification::make()
                             ->title(__('filament.notifications.ai_analysis_complete') . " ({$score}/100)")
-                            ->body(new \Illuminate\Support\HtmlString(\Illuminate\Support\Str::markdown(implode("\n", $reportLines))))
-                            ->{$color}()
+                            ->body('تم التقييم والتخزين بنجاح. اضغط على "عرض التحليل" لمشاهدة التقرير المفصل.')
+                            ->success()
                             ->persistent()
                             ->send();
                     }),
+                Tables\Actions\Action::make('view_analysis')
+                    ->label('عرض التحليل')
+                    ->icon('heroicon-o-eye')
+                    ->color('success')
+                    ->modalHeading('نتيجة تقييم السيرة الذاتية')
+                    ->modalWidth(\Filament\Support\Enums\MaxWidth::SevenExtraLarge)
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('إغلاق')
+                    ->modalContent(function (Resume $record) {
+                        $reportLines = [
+                            "**" . __('filament.fields.ai_score') . ": {$record->ai_score}/100**",
+                            "",
+                            "**" . __('filament.fields.ai_recommendation') . ": {$record->ai_recommendation}**",
+                            "",
+                            "**" . __('filament.fields.ai_summary') . ":**",
+                            $record->ai_summary ?? '',
+                            "",
+                            "**" . __('filament.fields.ai_report') . ":**",
+                            $record->ai_report ?? '',
+                        ];
+                        
+                        return new \Illuminate\Support\HtmlString('<div class="prose max-w-none dark:prose-invert" style="max-height: 70vh; overflow-y: auto; padding: 1rem;">' . \Illuminate\Support\Str::markdown(implode("\n", $reportLines)) . '</div>');
+                    })
+                    ->visible(fn (Resume $record) => $record->analyzed_at !== null),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

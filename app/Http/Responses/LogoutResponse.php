@@ -9,7 +9,10 @@ class LogoutResponse implements LogoutResponseContract
 {
     public function toResponse($request): RedirectResponse
     {
-        // التوجيه إلى صفحة الدخول المركزية الخاصة بنا
+        if ($request->is('client/*')) {
+            return redirect()->to('/client/login');
+        }
+
         return redirect()->route('login');
     }
 }

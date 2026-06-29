@@ -35,17 +35,17 @@
 </head>
 <body>
     <div class="header">
-        <h1>{{ $company }}</h1>
-        <p>{{ $title }} - {{ $generatedAt }}</p>
+        <h1>@ar($company)</h1>
+        <p>@ar($title) - @ar($generatedAt)</p>
     </div>
 
     <div class="section">
-        <div class="section-title">{{ __('filament.widgets.dashboard_kpi_title') }}</div>
+        <div class="section-title">@ar(__('filament.widgets.dashboard_kpi_title'))</div>
         <div class="kpi-grid">
             @foreach($kpis as $kpi)
             <div class="kpi-card">
                 <div class="value">{{ $kpi['value'] }}</div>
-                <div class="label">{{ $kpi['label'] }}</div>
+                <div class="label">@ar($kpi['label'])</div>
                 @if(isset($kpi['trend']))
                 <div class="trend {{ $kpi['trend'] >= 0 ? 'up' : 'down' }}">
                     {{ $kpi['trend'] >= 0 ? '↑' : '↓' }} {{ abs($kpi['trend']) }}%
@@ -57,20 +57,20 @@
     </div>
 
     <div class="section">
-        <div class="section-title">{{ __('filament.widgets.revenue_vs_expenses') }}</div>
+        <div class="section-title">@ar(__('filament.widgets.revenue_vs_expenses'))</div>
         <table>
             <thead>
                 <tr>
-                    <th>{{ __('filament.columns.month') }}</th>
-                    <th>{{ __('filament.widgets.revenue_label') }}</th>
-                    <th>{{ __('filament.widgets.expenses_label') }}</th>
-                    <th>{{ __('filament.widgets.net_profit') }}</th>
+                    <th>@ar(__('filament.columns.month'))</th>
+                    <th>@ar(__('filament.widgets.revenue_label'))</th>
+                    <th>@ar(__('filament.widgets.expenses_label'))</th>
+                    <th>@ar(__('filament.widgets.net_profit'))</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($monthlyData as $month)
                 <tr>
-                    <td>{{ $month['month'] }}</td>
+                    <td>@ar($month['month'])</td>
                     <td>${{ number_format($month['revenue'], 2) }}</td>
                     <td>${{ number_format($month['expense'], 2) }}</td>
                     <td style="color: {{ $month['net'] >= 0 ? '#16a34a' : '#dc2626' }}">
@@ -84,15 +84,15 @@
 
     <div class="two-col">
         <div class="section">
-            <div class="section-title">{{ __('filament.widgets.live_activity') }}</div>
+            <div class="section-title">@ar(__('filament.widgets.live_activity'))</div>
             <table>
-                <thead><tr><th>{{ __('filament.columns.type') }}</th><th>{{ __('filament.columns.description') }}</th><th>{{ __('filament.columns.date') }}</th></tr></thead>
+                <thead><tr><th>@ar(__('filament.columns.type'))</th><th>@ar(__('filament.columns.description'))</th><th>@ar(__('filament.columns.date'))</th></tr></thead>
                 <tbody>
                     @foreach($activities->take(15) as $activity)
                     <tr>
                         <td><span class="badge {{ $activity['color'] }}">{{ $activity['icon'] }}</span></td>
-                        <td>{{ $activity['description'] }}</td>
-                        <td>{{ $activity['time'] }}</td>
+                        <td>@ar($activity['description'])</td>
+                        <td>@ar($activity['time'])</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -100,13 +100,13 @@
         </div>
 
         <div class="section">
-            <div class="section-title">{{ __('filament.widgets.employee_heatmap') }}</div>
+            <div class="section-title">@ar(__('filament.widgets.employee_heatmap'))</div>
             <table>
-                <thead><tr><th>{{ __('filament.columns.employee_name') }}</th><th>{{ __('filament.widgets.tasks_count') }}</th><th>{{ __('filament.widgets.completion_rate') }}</th></tr></thead>
+                <thead><tr><th>@ar(__('filament.columns.employee_name'))</th><th>@ar(__('filament.widgets.tasks_count'))</th><th>@ar(__('filament.widgets.completion_rate'))</th></tr></thead>
                 <tbody>
                     @foreach($employeeStats as $stat)
                     <tr>
-                        <td>{{ $stat['name'] }}</td>
+                        <td>@ar($stat['name'])</td>
                         <td>{{ $stat['tasks'] }}</td>
                         <td>{{ $stat['rate'] }}%</td>
                     </tr>
@@ -117,7 +117,7 @@
     </div>
 
     <div class="footer">
-        {{ $company }} &bull; {{ __('filament.widgets.report_auto_generated') }}
+        @ar($company) &bull; @ar(__('filament.widgets.report_auto_generated'))
     </div>
 </body>
 </html>

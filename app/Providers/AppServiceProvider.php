@@ -28,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
                     'filament.hr.auth.login',
                     'filament.employee.auth.login',
                     'filament.accountant.auth.login',
+                    'filament.client.auth.login',
                 ])
                 ->labels([
                     'ar' => 'العربية',
@@ -41,6 +42,10 @@ class AppServiceProvider extends ServiceProvider
 
         Blade::directive('langDir', function () {
             return "<?php echo app()->getLocale() === 'ar' ? 'dir=\"rtl\" lang=\"ar\"' : 'dir=\"ltr\" lang=\"en\"'; ?>";
+        });
+
+        Blade::directive('ar', function ($expression) {
+            return "<?php echo e(\App\Support\Arabic::shape((string) ($expression))); ?>";
         });
 
     }

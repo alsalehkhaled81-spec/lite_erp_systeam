@@ -4,19 +4,13 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
+use App\Models\Report;
 
 class ReportReceivedNotification extends Notification
 {
     use Queueable;
 
-    protected $reportTitle;
-    protected $senderName;
-
-    public function __construct(string $reportTitle, string $senderName)
-    {
-        $this->reportTitle = $reportTitle;
-        $this->senderName = $senderName;
-    }
+    public function __construct(public Report $report) {}
 
     public function via(object $notifiable): array
     {
@@ -25,10 +19,23 @@ class ReportReceivedNotification extends Notification
 
     public function toDatabase(object $notifiable): array
     {
+        $senderName = $this->report->sender?->user?->name ?? __('filament.reports.unknown_sender');
+
         return [
-            'title' => 'تقرير جديد',
-            'body' => "استلمت تقريراً جديداً من {$this->senderName}: {$this->reportTitle}",
+            'title' => __('filament.reports.notification_title'),
+            'body' => __('filament.reports.notification_body', [
+                'sender' => $senderName,
+                'title' => $this->report->title,
+            ]),
             'icon' => 'heroicon-o-document-text',
+            'iconColor' => 'info',
+            'actions' => [
+                [
+                    'label' => __('filament.reports.view_report'),
+                    'url' => $this->report->viewUrl(),
+                    'shouldMarkAsRead' => true,
+                ],
+            ],
         ];
     }
 }

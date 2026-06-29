@@ -8,54 +8,76 @@ use Livewire\Component;
 class Login extends Component
 {
     public $email;
+
     public $password;
+
     public $remember = false;
 
-public function login()
-{
-    $this->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+    public function login()
+    {
+        $this->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-    if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
-        session()->regenerate();
+        if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+            session()->regenerate();
 
-        $roleName = Auth::user()->role->name ?? null;
+            $roleName = Auth::user()->role->name ?? null;
 
-        if (!Auth::user()->is_approved && $roleName !== 'employee') {
-            Auth::logout();
-            session()->invalidate();
-            session()->regenerateToken();
-            $this->addError('email', 'حسابك في انتظار موافقة الإدارة. يرجى التواصل مع المدير.');
-            return;
+            if (! Auth::user()->is_approved && $roleName !== 'employee') {
+                Auth::logout();
+                session()->invalidate();
+                session()->regenerateToken();
+                $this->addError('email', 'حسابك في انتظار موافقة الإدارة. يرجى التواصل مع المدير.');
+
+                return;
+            }
+
+            $defaultPath = match ($roleName) {
+                'super_admin' => '/admin',
+                'hr_manager' => '/hr',
+                'project_manager' => '/pm',
+                'accountant' => '/accountant',
+                'employee' => '/employee',
+                default => null,
+            };
+
+            if (! $defaultPath) {
+                Auth::logout();
+                session()->invalidate();
+                session()->regenerateToken();
+
+                $this->addError('email', 'حسابك لا يملك صلاحية للدخول إلى النظام.');
+
+                return;
+            }
+
+            // 3. التوجيه الذكي:
+            // سيتم توجيهه للرابط الذي كان يقصده قبل الدخول (إن وُجد)، أو للمسار الافتراضي للوحته
+            return redirect($defaultPath);
         }
 
-        $defaultPath = match ($roleName) {
-            'super_admin'     => '/admin',
-            'hr_manager'      => '/hr',
-            'project_manager' => '/pm',
-            'accountant'      => '/accountant',
-            'employee'        => '/employee',
-            default           => null,
-        };
+        if (Auth::guard('client')->attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+            $client = Auth::guard('client')->user();
 
-        if (!$defaultPath) {
-            Auth::logout();
-            session()->invalidate();
-            session()->regenerateToken();
+            if (! $client->is_active) {
+                Auth::guard('client')->logout();
+                session()->invalidate();
+                session()->regenerateToken();
+                $this->addError('email', 'حسابك غير مفعّل. يرجى التواصل مع الإدارة.');
 
-            $this->addError('email', 'حسابك لا يملك صلاحية للدخول إلى النظام.');
-            return;
+                return;
+            }
+
+            session()->regenerate();
+
+            return redirect('/client');
         }
 
-        // 3. التوجيه الذكي:
-        // سيتم توجيهه للرابط الذي كان يقصده قبل الدخول (إن وُجد)، أو للمسار الافتراضي للوحته
-        return redirect($defaultPath);
+        $this->addError('email', 'بيانات الدخول غير صحيحة.');
     }
 
-    $this->addError('email', 'بيانات الدخول غير صحيحة.');
-}
     public function render()
     {
         return view('livewire.auth.login')->layout('components.layouts.app');

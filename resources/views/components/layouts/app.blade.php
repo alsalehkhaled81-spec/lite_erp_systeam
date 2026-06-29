@@ -5,8 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ __('filament.auth.app_title') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 30%, #cbd5e1 60%, #f1f5f9 100%);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(0, 0, 0, 0.1);
+            --card-shadow: 0 32px 80px rgba(0,0,0,0.1), 0 0 120px rgba(99,102,241,0.04);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-label: #334155;
+            --input-bg: #f8fafc;
+            --input-border: #cbd5e1;
+            --input-text: #0f172a;
+            --input-placeholder: #94a3b8;
+            --input-focus-bg: #ffffff;
+            --link-color: #4f46e5;
+            --link-hover: #4338ca;
+            --lang-bg: rgba(0,0,0,0.05);
+            --lang-bg-hover: rgba(0,0,0,0.1);
+            --lang-border: rgba(0,0,0,0.1);
+        }
+
+        .dark {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 30%, #312e81 60%, #1e293b 100%);
+            --card-bg: rgba(255, 255, 255, 0.06);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-shadow: 0 32px 80px rgba(0,0,0,0.25), 0 0 120px rgba(99,102,241,0.04);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.45);
+            --text-label: rgba(255,255,255,0.6);
+            --input-bg: rgba(255,255,255,0.05);
+            --input-border: rgba(255,255,255,0.08);
+            --input-text: #ffffff;
+            --input-placeholder: rgba(255,255,255,0.25);
+            --input-focus-bg: rgba(255,255,255,0.08);
+            --link-color: #818cf8;
+            --link-hover: #a5b4fc;
+            --lang-bg: rgba(255,255,255,0.1);
+            --lang-bg-hover: rgba(255,255,255,0.2);
+            --lang-border: rgba(255,255,255,0.2);
+        }
 
         body {
             font-family: 'Tajawal', 'Inter', sans-serif;
@@ -14,7 +61,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 30%, #312e81 60%, #1e293b 100%);
+            background: var(--bg-gradient);
             position: relative;
             overflow: hidden;
             -webkit-font-smoothing: antialiased;
@@ -53,14 +100,14 @@
             width: 100%;
             max-width: 440px;
             padding: 2.5rem;
-            background: rgba(255, 255, 255, 0.06);
+            background: var(--card-bg);
             backdrop-filter: blur(28px);
             -webkit-backdrop-filter: blur(28px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
             border-radius: 28px;
-            box-shadow: 0 32px 80px rgba(0,0,0,0.25), 0 0 120px rgba(99,102,241,0.04);
+            box-shadow: var(--card-shadow);
             animation: cardFadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-            color: #e2e8f0;
+            color: var(--text-primary);
         }
 
         @keyframes cardFadeIn {
@@ -71,14 +118,14 @@
         .auth-card h2 {
             font-size: 1.6rem;
             font-weight: 800;
-            color: #ffffff;
+            color: var(--text-primary);
             margin-bottom: 0.25rem;
             letter-spacing: -0.02em;
         }
 
         .auth-card .subtitle {
             font-size: 0.88rem;
-            color: rgba(255,255,255,0.45);
+            color: var(--text-secondary);
             margin-bottom: 2rem;
         }
 
@@ -88,43 +135,77 @@
             display: block;
             font-size: 0.82rem;
             font-weight: 600;
-            color: rgba(255,255,255,0.6);
+            color: var(--text-label);
             margin-bottom: 0.4rem;
         }
 
         .form-group input,
-        .form-group select {
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 0.75rem 1rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
             border-radius: 12px;
-            color: #ffffff;
+            color: var(--input-text);
             font-family: inherit;
             font-size: 0.92rem;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             outline: none;
         }
 
-        .form-group input::placeholder { color: rgba(255,255,255,0.25); }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder { color: var(--input-placeholder); }
 
         .form-group input:focus,
-        .form-group select:focus {
+        .form-group select:focus,
+        .form-group textarea:focus {
             border-color: rgba(99,102,241,0.5);
             box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
-            background: rgba(255,255,255,0.08);
+            background: var(--input-focus-bg);
         }
 
         .form-group select option {
-            background: #1e293b;
-            color: #e2e8f0;
+            background: var(--input-bg);
+            color: var(--input-text);
+        }
+
+        .form-group input[type="file"] {
+            padding: 0.45rem 0.75rem;
+        }
+        
+        .form-group input[type="file"]::file-selector-button {
+            background: var(--input-focus-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            padding: 0.4rem 0.8rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-inline-end: 1rem;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .form-group input[type="file"]::file-selector-button:hover {
+            border-color: var(--link-color);
+            color: var(--link-color);
         }
 
         .error-text {
-            color: #fca5a5;
+            color: #ef4444;
             font-size: 0.75rem;
             margin-top: 0.35rem;
             display: block;
+        }
+        .dark .error-text {
+            color: #fca5a5;
         }
 
         .form-row {
@@ -139,7 +220,7 @@
             align-items: center;
             gap: 0.5rem;
             font-size: 0.85rem;
-            color: rgba(255,255,255,0.55);
+            color: var(--text-secondary);
             cursor: pointer;
         }
 
@@ -150,13 +231,13 @@
         }
 
         .link {
-            color: #818cf8;
+            color: var(--link-color);
             font-size: 0.85rem;
-            font-weight: 500;
+            font-weight: 600;
             text-decoration: none;
             transition: color 0.15s ease;
         }
-        .link:hover { color: #a5b4fc; }
+        .link:hover { color: var(--link-hover); }
 
         .btn-primary {
             width: 100%;
@@ -192,26 +273,29 @@
             text-align: center;
             margin-top: 1.75rem;
             font-size: 0.85rem;
-            color: rgba(255,255,255,0.4);
+            color: var(--text-secondary);
         }
         .footer-text a {
-            color: #818cf8;
+            color: var(--link-color);
             font-weight: 700;
             text-decoration: none;
             transition: color 0.15s ease;
         }
-        .footer-text a:hover { color: #a5b4fc; }
+        .footer-text a:hover { color: var(--link-hover); }
 
         .success-alert {
             padding: 0.85rem 1rem;
             background: rgba(16,185,129,0.1);
             border: 1px solid rgba(16,185,129,0.2);
             border-radius: 12px;
-            color: #6ee7b7;
+            color: #059669;
             font-size: 0.85rem;
             font-weight: 600;
             text-align: center;
             margin-bottom: 1.2rem;
+        }
+        .dark .success-alert {
+            color: #6ee7b7;
         }
 
         @media (max-width: 480px) {
@@ -221,11 +305,22 @@
     @livewireStyles
 </head>
 <body>
-    <div style="position: absolute; top: 1.5rem; right: {{ app()->getLocale() === 'ar' ? 'auto' : '1.5rem' }}; left: {{ app()->getLocale() === 'ar' ? '1.5rem' : 'auto' }}; z-index: 50;">
+    <div style="position: absolute; top: 1.5rem; right: {{ app()->getLocale() === 'ar' ? 'auto' : '1.5rem' }}; left: {{ app()->getLocale() === 'ar' ? '1.5rem' : 'auto' }}; z-index: 50; display: flex; gap: 0.5rem;">
+        <!-- Dark Mode Toggle -->
+        <button onclick="toggleDarkMode()" style="display: flex; align-items: center; justify-content: center; background: var(--lang-bg); backdrop-filter: blur(10px); padding: 0.5rem; border-radius: 50%; color: var(--text-primary); border: 1px solid var(--lang-border); transition: all 0.2s ease; cursor: pointer;"
+                onmouseover="this.style.background='var(--lang-bg-hover)'"
+                onmouseout="this.style.background='var(--lang-bg)'">
+            <!-- Sun Icon (hidden in dark mode, shown in light mode) -->
+            <svg style="width: 20px; height: 20px; display: none;" class="dark-hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <!-- Moon Icon (shown in dark mode, hidden in light mode) -->
+            <svg style="width: 20px; height: 20px;" class="light-hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        </button>
+
+        <!-- Language Switcher -->
         <a href="{{ route('switch-language', ['locale' => app()->getLocale() === 'ar' ? 'en' : 'ar']) }}" 
-           style="display: flex; items-center; gap: 0.5rem; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 0.5rem 1rem; border-radius: 20px; color: white; text-decoration: none; font-size: 0.9rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.2); transition: all 0.2s ease;"
-           onmouseover="this.style.background='rgba(255,255,255,0.2)'"
-           onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+           style="display: flex; align-items: center; gap: 0.5rem; background: var(--lang-bg); backdrop-filter: blur(10px); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-primary); text-decoration: none; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--lang-border); transition: all 0.2s ease;"
+           onmouseover="this.style.background='var(--lang-bg-hover)'"
+           onmouseout="this.style.background='var(--lang-bg)'">
             <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
             </svg>
@@ -237,5 +332,22 @@
         {{ $slot }}
     </div>
     @livewireScripts
+    <style>
+        html:not(.dark) .dark-hidden { display: block !important; }
+        html:not(.dark) .light-hidden { display: none !important; }
+        html.dark .dark-hidden { display: none !important; }
+        html.dark .light-hidden { display: block !important; }
+    </style>
+    <script>
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
 </body>
 </html>

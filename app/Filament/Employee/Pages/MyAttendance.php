@@ -46,7 +46,14 @@ class MyAttendance extends Page
         }
 
         $now = now();
-        $status = $now->format('H:i:s') > '09:15:00' ? 'late' : 'present';
+        $time = $now->format('H:i:s');
+        if ($time < '09:00:00') {
+            $status = 'over_time';
+        } elseif ($time > '09:15:00') {
+            $status = 'late';
+        } else {
+            $status = 'present';
+        }
 
         if ($existing) {
             $existing->update(['check_in' => $now, 'status' => $status]);
@@ -84,10 +91,24 @@ class MyAttendance extends Page
 
         $now = now();
         $hoursWorked = Attendance::calculateHoursWorked($attendance->check_in, $now);
+        $overtimeHours = max(0, $hoursWorked - 8);
+
+        $status = $attendance->status;
+        if ($hoursWorked < 4) {
+            $status = 'absent';
+        } elseif ($hoursWorked < 7) {
+            $status = 'half_day';
+        } else {
+            if ($now->format('H:i:s') >= '17:00:00' && $hoursWorked > 8) {
+                $status = 'over_time';
+            }
+        }
 
         $attendance->update([
             'check_out' => $now,
             'hours_worked' => $hoursWorked,
+            'overtime_hours' => $overtimeHours,
+            'status' => $status,
         ]);
 
         Notification::make()->title(__('filament.attendance.check_out_success'))->success()->send();

@@ -6,6 +6,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use App\Filament\Hr\Pages\Profile;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -34,6 +35,8 @@ class HrPanelProvider extends PanelProvider
             ->font('Cairo')
             ->sidebarCollapsibleOnDesktop()
             ->spa()
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('30s')
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->maxContentWidth('full')
             ->renderHook(
@@ -45,6 +48,7 @@ class HrPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Hr/Pages'), for: 'App\\Filament\\Hr\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                Profile::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Hr/Widgets'), for: 'App\\Filament\\Hr\\Widgets')
             ->widgets([

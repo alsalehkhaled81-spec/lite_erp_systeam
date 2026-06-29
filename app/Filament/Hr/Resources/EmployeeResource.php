@@ -6,6 +6,7 @@ use App\Filament\Hr\Resources\EmployeeResource\Pages;
 use App\Filament\Hr\Resources\EmployeeResource\RelationManagers;
 use App\Models\Employee;
 use App\Notifications\JobApplicationStatusNotification;
+use App\Services\AiEvaluationService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -21,6 +22,11 @@ class EmployeeResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $navigationGroup = null;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->whereNotIn('status', ['pending', 'rejected']);
+    }
 
     public static function form(Form $form): Form
     {
@@ -46,7 +52,7 @@ class EmployeeResource extends Resource
                     ->createOptionForm([
                         Forms\Components\TextInput::make('name')->label(__('filament.fields.full_name'))->required(),
                         Forms\Components\TextInput::make('email')->label(__('filament.fields.email'))->email()->required()->unique('users', 'email'),
-                        Forms\Components\TextInput::make('password')->label(__('filament.fields.password'))->password()->required(),
+                        Forms\Components\TextInput::make('password')->label(__('filament.fields.password'))->password()->revealable()->required(),
                     ])
                     ->createOptionUsing(function (array $data) {
                         $role = \App\Models\Role::where('name', 'employee')->first();
@@ -132,7 +138,6 @@ class EmployeeResource extends Resource
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('filament.filters.filter_by_status'))
                     ->options([
-                        'pending' => __('filament.status.under_review'),
                         'active' => __('filament.status.active'),
                         'on_leave' => __('filament.status.on_leave'),
                         'terminated' => __('filament.status.terminated'),
@@ -140,44 +145,34 @@ class EmployeeResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-
-                Tables\Actions\Action::make('accept')
-                    ->label(__('filament.actions.accept_employment'))
-                    ->color('success')
-                    ->icon('heroicon-o-check-circle')
+                
+                Tables\Actions\Action::make('ai_evaluate')
+                    ->label(__('filament.actions.ai_evaluate'))
+                    ->icon('heroicon-o-cpu-chip')
+                    ->color('info')
                     ->requiresConfirmation()
-                    ->action(function (Employee $record) {
-                        $record->update([
-                            'status' => 'active',
-                            'hire_date' => now(),
-                        ]);
-
-                        if ($record->user) {
-                            $record->user->notify(new JobApplicationStatusNotification('active', $record->user->name));
-                        }
+                    ->modalHeading(__('filament.actions.ai_evaluate_heading'))
+                    ->modalWidth(\Filament\Support\Enums\MaxWidth::SevenExtraLarge)
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('إغلاق')
+                    ->modalContent(function (Employee $record) {
+                        $evaluation = app(\App\Services\AiEvaluationService::class)->evaluate($record);
+                        return new \Illuminate\Support\HtmlString('<div class="prose max-w-none dark:prose-invert" style="max-height: 70vh; overflow-y: auto; padding: 1rem;">' . \Illuminate\Support\Str::markdown($evaluation) . '</div>');
                     })
-                    ->visible(fn (Employee $record) => $record->status === 'pending'),
-
-                Tables\Actions\Action::make('reject')
-                    ->label(__('filament.actions.reject_request'))
-                    ->color('danger')
-                    ->icon('heroicon-o-x-circle')
-                    ->form([
-                        Forms\Components\Textarea::make('rejection_reason')
-                            ->label(__('filament.actions.rejection_reason') . ' (' . __('filament.actions.rejection_reason_desc') . ')')
-                            ->required()
-                    ])
-                    ->action(function (Employee $record, array $data) {
-                        $record->update([
-                            'status' => 'rejected',
-                            'rejection_reason' => $data['rejection_reason'],
-                        ]);
-
-                        if ($record->user) {
-                            $record->user->notify(new JobApplicationStatusNotification('rejected', $record->user->name));
-                        }
-                    })
-                    ->visible(fn (Employee $record) => $record->status === 'pending'),
+                    ->visible(function (Employee $record) {
+                        if ($record->status !== 'active') return false;
+                        
+                        $user = $record->user;
+                        if (!$user) return true;
+                        
+                        // إخفاء الزر عن الموظفين الذين هم مدراء نظام (Super Admin)
+                        if ($user->role && $user->role->name === 'super_admin') return false;
+                        
+                        // إخفاء الزر إذا كان الموظف هو نفسه المستخدم الحالي (HR نفسه)
+                        if ($user->id === auth()->id()) return false;
+                        
+                        return true;
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

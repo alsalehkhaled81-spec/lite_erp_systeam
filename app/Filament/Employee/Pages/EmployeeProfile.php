@@ -96,18 +96,15 @@ class EmployeeProfile extends Page implements HasForms
                     ->schema([
                         TextInput::make('current_password')
                             ->label(__('filament.fields.current_password'))
-                            ->password()
-                            ->dehydrated(false),
+                            ->password()->revealable(),
                         TextInput::make('new_password')
                             ->label(__('filament.fields.new_password'))
-                            ->password()
-                            ->minLength(8)
-                            ->dehydrated(false),
+                            ->password()->revealable()
+                            ->minLength(8),
                         TextInput::make('new_password_confirmation')
                             ->label(__('filament.fields.confirm_new_password'))
-                            ->password()
-                            ->same('new_password')
-                            ->dehydrated(false),
+                            ->password()->revealable()
+                            ->same('new_password'),
                     ])->columns(3),
             ])
             ->statePath('data');

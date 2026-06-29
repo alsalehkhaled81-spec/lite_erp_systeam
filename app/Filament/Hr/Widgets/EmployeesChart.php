@@ -48,7 +48,7 @@ class EmployeesChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'pie';
+        return 'doughnut';
     }
 
     protected function getOptions(): array
@@ -57,9 +57,21 @@ class EmployeesChart extends ChartWidget
             'plugins' => [
                 'legend' => [
                     'position' => 'bottom',
-                    'labels' => ['padding' => 16, 'usePointStyle' => true, 'pointStyle' => 'circle'],
+                    'labels' => [
+                        'padding' => 16,
+                        'usePointStyle' => true,
+                    ],
                 ],
             ],
+            'scales' => [
+                'x' => [
+                    'display' => false,
+                ],
+                'y' => [
+                    'display' => false,
+                ],
+            ],
+            'cutout' => '70%',
         ];
     }
 }

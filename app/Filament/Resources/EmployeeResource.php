@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class EmployeeResource extends Resource
 {
@@ -20,6 +21,11 @@ class EmployeeResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $navigationGroup = null;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->whereNotIn('status', ['pending', 'rejected']);
+    }
 
     public static function form(Form $form): Form
     {
@@ -115,10 +121,15 @@ class EmployeeResource extends Resource
                     ->label(__('filament.actions.ai_evaluate'))
                     ->icon('heroicon-o-cpu-chip')
                     ->color('info')
+                    ->requiresConfirmation()
                     ->modalHeading(__('filament.actions.ai_evaluate_heading'))
+                    ->modalWidth(\Filament\Support\Enums\MaxWidth::SevenExtraLarge)
                     ->modalSubmitAction(false)
-                    ->modalCancelActionLabel(__('filament.actions.close'))
-                    ->modalContent(fn (Employee $record) => view('filament.pages.ai-evaluation', ['evaluation' => app(AiEvaluationService::class)->evaluate($record)]))
+                    ->modalCancelActionLabel('إغلاق')
+                    ->modalContent(function (Employee $record) {
+                        $evaluation = app(AiEvaluationService::class)->evaluate($record);
+                        return new \Illuminate\Support\HtmlString('<div class="prose max-w-none dark:prose-invert" style="max-height: 70vh; overflow-y: auto; padding: 1rem;">' . \Illuminate\Support\Str::markdown($evaluation) . '</div>');
+                    })
                     ->visible(fn (Employee $record) => $record->status === 'active'),
             ])
             ->bulkActions([

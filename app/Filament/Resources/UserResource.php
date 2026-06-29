@@ -61,7 +61,7 @@ class UserResource extends Resource
                             ->maxLength(255),
                         Forms\Components\TextInput::make('password')
                             ->label(__('filament.fields.password'))
-                            ->password()
+                            ->password()->revealable()
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Toggle::make('is_approved')

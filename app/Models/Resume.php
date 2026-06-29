@@ -9,7 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Resume extends Model
 {
     use HasFactory;
-    protected $fillable =['employee_id', 'file_path', 'resume_text'];
+    protected $fillable = ['employee_id', 'file_path', 'resume_text', 'ai_score', 'ai_summary', 'ai_report', 'ai_recommendation', 'analyzed_at'];
+
+    protected $casts = [
+        'ai_score' => 'integer',
+        'analyzed_at' => 'datetime',
+    ];
 
     public function employee(): BelongsTo
     {

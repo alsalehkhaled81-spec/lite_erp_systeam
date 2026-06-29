@@ -61,7 +61,22 @@ class AttendanceResource extends Resource
                             $in = $get('check_in');
                             $out = $get('check_out');
                             if ($in && $out) {
-                                $set('hours_worked', Attendance::calculateHoursFromTimes($in, $out));
+                                $hours = Attendance::calculateHoursFromTimes($in, $out);
+                                $set('hours_worked', $hours);
+                                $set('overtime_hours', max(0, $hours - 8));
+                                if ($hours < 4) {
+                                    $set('status', 'absent');
+                                } elseif ($hours < 7) {
+                                    $set('status', 'half_day');
+                                } else {
+                                    $inTime = is_string($in) ? $in : $in->format('H:i:s');
+                                    $outTime = is_string($out) ? $out : $out->format('H:i:s');
+                                    if ($inTime < '09:00:00' || ($outTime >= '17:00:00' && $hours > 8)) {
+                                        $set('status', 'over_time');
+                                    } else {
+                                        $set('status', $inTime > '09:15:00' ? 'late' : 'present');
+                                    }
+                                }
                             }
                         }),
                     Forms\Components\TimePicker::make('check_out')
@@ -82,7 +97,22 @@ class AttendanceResource extends Resource
                             $in = $get('check_in');
                             $out = $get('check_out');
                             if ($in && $out) {
-                                $set('hours_worked', Attendance::calculateHoursFromTimes($in, $out));
+                                $hours = Attendance::calculateHoursFromTimes($in, $out);
+                                $set('hours_worked', $hours);
+                                $set('overtime_hours', max(0, $hours - 8));
+                                if ($hours < 4) {
+                                    $set('status', 'absent');
+                                } elseif ($hours < 7) {
+                                    $set('status', 'half_day');
+                                } else {
+                                    $inTime = is_string($in) ? $in : $in->format('H:i:s');
+                                    $outTime = is_string($out) ? $out : $out->format('H:i:s');
+                                    if ($inTime < '09:00:00' || ($outTime >= '17:00:00' && $hours > 8)) {
+                                        $set('status', 'over_time');
+                                    } else {
+                                        $set('status', $inTime > '09:15:00' ? 'late' : 'present');
+                                    }
+                                }
                             }
                         }),
                     Forms\Components\TextInput::make('hours_worked')
@@ -92,6 +122,12 @@ class AttendanceResource extends Resource
                         ->suffix(__('filament.fields.hours_unit'))
                         ->helperText(__('filament.fields.hours_worked_auto'))
                         ->default(0),
+                    Forms\Components\TextInput::make('overtime_hours')
+                        ->label(__('filament.fields.overtime_hours'))
+                        ->numeric()
+                        ->readOnly()
+                        ->suffix(__('filament.fields.hours_unit'))
+                        ->default(0),
                     Forms\Components\Select::make('status')
                         ->label(__('filament.fields.status'))
                         ->options([
@@ -99,6 +135,7 @@ class AttendanceResource extends Resource
                             'late' => __('filament.attendance.late'),
                             'absent' => __('filament.attendance.absent'),
                             'half_day' => __('filament.attendance.half_day'),
+                            'over_time' => __('filament.attendance.over_time'),
                         ])->default('present'),
                     Forms\Components\Textarea::make('notes')
                         ->label(__('filament.fields.notes'))
@@ -127,6 +164,9 @@ class AttendanceResource extends Resource
                 Tables\Columns\TextColumn::make('hours_worked')
                     ->label(__('filament.fields.hours_worked'))
                     ->suffix(' ' . __('filament.fields.hours_unit')),
+                Tables\Columns\TextColumn::make('overtime_hours')
+                    ->label(__('filament.fields.overtime_hours'))
+                    ->suffix(' ' . __('filament.fields.hours_unit')),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('filament.columns.status'))
                     ->badge()
@@ -135,6 +175,7 @@ class AttendanceResource extends Resource
                         'late' => 'warning',
                         'absent' => 'danger',
                         'half_day' => 'info',
+                        'over_time' => 'primary',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
@@ -142,6 +183,7 @@ class AttendanceResource extends Resource
                         'late' => __('filament.attendance.late'),
                         'absent' => __('filament.attendance.absent'),
                         'half_day' => __('filament.attendance.half_day'),
+                        'over_time' => __('filament.attendance.over_time'),
                         default => $state,
                     }),
             ])
@@ -157,6 +199,7 @@ class AttendanceResource extends Resource
                         'late' => __('filament.attendance.late'),
                         'absent' => __('filament.attendance.absent'),
                         'half_day' => __('filament.attendance.half_day'),
+                        'over_time' => __('filament.attendance.over_time'),
                     ]),
                 Tables\Filters\Filter::make('date')
                     ->label(__('filament.fields.date'))

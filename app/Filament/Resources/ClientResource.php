@@ -4,15 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Accountant\Resources\ClientResource\RelationManagers\InvoicesRelationManager;
 use App\Filament\Resources\ClientResource\Pages;
-use App\Filament\Resources\ClientResource\RelationManagers;
 use App\Models\Client;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ClientResource extends Resource
 {
@@ -51,6 +48,20 @@ class ClientResource extends Resource
                             ->label(__('filament.fields.address'))
                             ->columnSpanFull(),
                     ])->columns(2),
+
+                Forms\Components\Section::make(__('filament.client_portal.portal_access'))
+                    ->description(__('filament.client_portal.portal_access_desc'))
+                    ->schema([
+                        Forms\Components\TextInput::make('password')
+                            ->label(__('filament.fields.password'))
+                            ->password()->revealable()
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->revealable()
+                            ->helperText(__('filament.client_portal.password_helper')),
+                        Forms\Components\Toggle::make('is_active')
+                            ->label(__('filament.client_portal.is_active'))
+                            ->default(true),
+                    ])->columns(2),
             ]);
     }
 
@@ -71,6 +82,9 @@ class ClientResource extends Resource
                 Tables\Columns\TextColumn::make('phone')
                     ->label(__('filament.columns.phone'))
                     ->searchable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label(__('filament.client_portal.is_active'))
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -118,11 +132,11 @@ class ClientResource extends Resource
     {
         return __('filament.model.clients');
     }
+
     public static function getNavigationGroup(): ?string
     {
         return __('filament.group.finance');
     }
-
 
     public static function getNavigationLabel(): string
     {

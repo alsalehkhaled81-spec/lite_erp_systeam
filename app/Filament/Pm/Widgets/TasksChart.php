@@ -4,33 +4,49 @@ namespace App\Filament\Pm\Widgets;
 
 use App\Models\Task;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class TasksChart extends ChartWidget
 {
+    use InteractsWithPageFilters;
+
     protected static ?int $sort = 2;
     protected static ?string $maxHeight = '280px';
 
     public function getHeading(): string
     {
-        return __('filament.widgets.tasks_stats');
+        return __('filament.widgets.tasks_stats') ?? 'إحصائيات المهام';
     }
 
     protected function getData(): array
     {
+        $startDate = $this->filters['startDate'] ?? null;
+        $endDate = $this->filters['endDate'] ?? null;
+
+        $query = Task::query();
+
+        if ($startDate) {
+            $query->whereDate('created_at', '>=', $startDate);
+        }
+
+        if ($endDate) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
+
+        $todo = (clone $query)->where('status', 'todo')->count();
+        $inProgress = (clone $query)->where('status', 'in_progress')->count();
+        $review = (clone $query)->where('status', 'review')->count();
+        $done = (clone $query)->where('status', 'done')->count();
+
         return [
             'datasets' => [[
-                'label' => __('filament.widgets.tasks_count'),
-                'data' => [
-                    Task::where('status', 'todo')->count(),
-                    Task::where('status', 'in_progress')->count(),
-                    Task::where('status', 'review')->count(),
-                    Task::where('status', 'done')->count(),
-                ],
+                'label' => __('filament.widgets.tasks_count') ?? 'عدد المهام',
+                'data' => [$todo, $inProgress, $review, $done],
                 'backgroundColor' => [
-                    'rgba(99, 102, 241, 0.75)',
-                    'rgba(245, 158, 11, 0.75)',
-                    'rgba(59, 130, 246, 0.75)',
-                    'rgba(16, 185, 129, 0.75)',
+                    'rgba(99, 102, 241, 0.75)', // todo: indigo
+                    'rgba(245, 158, 11, 0.75)', // in_progress: amber
+                    'rgba(59, 130, 246, 0.75)', // review: blue
+                    'rgba(16, 185, 129, 0.75)', // done: emerald
                 ],
                 'borderColor' => [
                     'rgb(99, 102, 241)',
@@ -43,10 +59,10 @@ class TasksChart extends ChartWidget
                 'borderSkipped' => false,
             ]],
             'labels' => [
-                __('filament.status.todo'),
-                __('filament.status.in_progress'),
-                __('filament.status.review'),
-                __('filament.status.done'),
+                __('filament.status.todo') ?? 'للتنفيذ',
+                __('filament.status.in_progress') ?? 'قيد التنفيذ',
+                __('filament.status.review') ?? 'قيد المراجعة',
+                __('filament.status.done') ?? 'مكتملة',
             ],
         ];
     }
@@ -60,11 +76,17 @@ class TasksChart extends ChartWidget
     {
         return [
             'plugins' => [
-                'legend' => ['display' => false],
+                'legend' => [
+                    'display' => false,
+                ],
             ],
             'scales' => [
-                'x' => ['grid' => ['display' => false]],
-                'y' => ['grid' => ['color' => 'rgba(0,0,0,0.04)'], 'beginAtZero' => true],
+                'y' => [
+                    'beginAtZero' => true,
+                    'ticks' => [
+                        'stepSize' => 1,
+                    ],
+                ],
             ],
         ];
     }

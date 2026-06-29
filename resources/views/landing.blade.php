@@ -1,864 +1,464 @@
+@php
+    $locale = app()->getLocale();
+    $isAr = $locale == 'ar';
+@endphp
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ $locale }}" dir="{{ $isAr ? 'rtl' : 'ltr' }}" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERP Lite - نظام الإدارة المركزي</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <title>{{ $isAr ? 'ERP Lite - نظام الإدارة المركزي' : 'ERP Lite - Central Management System' }}</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        },
+                        dark: '#0f172a'
+                    },
+                    animation: {
+                        'float': 'float 5s ease-in-out infinite',
+                        'float-delayed': 'float 5s ease-in-out infinite 2.5s',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-15px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: 'Tajawal', sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 30%, #312e81 60%, #1e293b 100%);
-            color: #e2e8f0;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            direction: rtl;
-        }
-
-        .orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.3;
-            pointer-events: none;
-            z-index: 0;
-            animation: floatOrb 14s ease-in-out infinite;
-        }
-        .orb-1 {
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(99,102,241,0.3), transparent);
-            top: -10%; right: -5%;
-        }
-        .orb-2 {
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(59,130,246,0.25), transparent);
-            bottom: 10%; left: -5%;
-            animation-delay: -7s;
-        }
-        .orb-3 {
-            width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(168,85,247,0.2), transparent);
-            top: 40%; left: 30%;
-            animation-delay: -3s;
-        }
-
-        @keyframes floatOrb {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(25px, -25px) scale(1.03); }
-            66% { transform: translate(-15px, 15px) scale(0.97); }
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.7s ease, transform 0.7s ease;
-        }
-
-        .animate-on-scroll.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .navbar {
-            position: fixed;
-            top: 0;
-            right: 0;
-            left: 0;
-            z-index: 100;
-            padding: 1rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            transition: all 0.3s ease;
-        }
-
-        .navbar.scrolled {
-            background: rgba(15, 23, 42, 0.85);
-            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
-        }
-
-        .nav-logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #818cf8, #6366f1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: rgba(255,255,255,0.6);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: color 0.2s ease;
-        }
-
-        .nav-links a:hover { color: #ffffff; }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .btn-ghost {
-            padding: 0.55rem 1.25rem;
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 10px;
-            color: #e2e8f0;
-            font-family: inherit;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .btn-ghost:hover {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.25);
-        }
-
-        .btn-primary {
-            padding: 0.55rem 1.25rem;
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            border: none;
-            border-radius: 10px;
-            color: #ffffff;
-            font-family: inherit;
-            font-size: 0.9rem;
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 16px rgba(99,102,241,0.25);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 28px rgba(99,102,241,0.35);
-        }
-
-        .btn-primary:active { transform: translateY(0); }
-
-        .btn-lg {
-            padding: 0.9rem 2rem;
-            font-size: 1rem;
-            border-radius: 14px;
-        }
-
-        .btn-outline-lg {
-            padding: 0.9rem 2rem;
-            font-size: 1rem;
-            border-radius: 14px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: #e2e8f0;
-            font-family: inherit;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            display: inline-block;
-        }
-
-        .btn-outline-lg:hover {
-            background: rgba(255,255,255,0.12);
-            transform: translateY(-2px);
-        }
-
-        .mobile-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: #e2e8f0;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        .hero {
-            position: relative;
-            z-index: 1;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 8rem 2rem 4rem;
-        }
-
-        .hero-content {
-            max-width: 800px;
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.45rem 1.2rem;
-            background: rgba(99,102,241,0.12);
-            border: 1px solid rgba(99,102,241,0.25);
-            border-radius: 50px;
-            color: #a5b4fc;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 2rem;
-        }
-
-        .hero h1 {
-            font-size: 3.2rem;
-            font-weight: 900;
-            color: #ffffff;
-            line-height: 1.3;
-            margin-bottom: 1.5rem;
-            letter-spacing: -0.02em;
-        }
-
-        .hero p {
-            font-size: 1.15rem;
-            color: rgba(255,255,255,0.5);
-            line-height: 1.8;
-            margin-bottom: 2.5rem;
-            max-width: 600px;
-            margin-right: auto;
-            margin-left: auto;
-        }
-
-        .hero-actions {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .section {
-            position: relative;
-            z-index: 1;
-            padding: 5rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 3.5rem;
-        }
-
-        .section-title h2 {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 0.75rem;
-        }
-
-        .section-title p {
-            font-size: 1rem;
-            color: rgba(255,255,255,0.4);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-        }
-
-        .feature-card {
-            padding: 2rem;
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-6px);
-            background: rgba(255,255,255,0.07);
-            border-color: rgba(255,255,255,0.12);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-        }
-
-        .feature-icon {
-            width: 52px;
-            height: 52px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(99,102,241,0.05));
-            border-radius: 14px;
-            margin-bottom: 1.25rem;
-        }
-
-        .feature-icon svg {
-            width: 26px;
-            height: 26px;
-            stroke: #818cf8;
-        }
-
-        .feature-card h3 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 0.6rem;
-        }
-
-        .feature-card p {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.45);
-            line-height: 1.7;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-        }
-
-        .stat-card {
-            text-align: center;
-            padding: 2.5rem 1.5rem;
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            background: rgba(255,255,255,0.07);
-        }
-
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #818cf8, #6366f1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 0.5rem;
-            line-height: 1;
-        }
-
-        .stat-card:nth-child(2) .stat-number {
-            background: linear-gradient(135deg, #34d399, #10b981);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-card:nth-child(3) .stat-number {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-card:nth-child(4) .stat-number {
-            background: linear-gradient(135deg, #f472b6, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            font-size: 0.95rem;
-            color: rgba(255,255,255,0.5);
-            font-weight: 500;
-        }
-
-        .panels-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-        }
-
-        .panel-card {
-            padding: 2rem;
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 20px;
-            border-top: 3px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .panel-card:hover {
-            transform: translateY(-6px);
-            background: rgba(255,255,255,0.07);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-        }
-
-        .panel-card.amber { border-top-color: #f59e0b; }
-        .panel-card.rose { border-top-color: #f43f5e; }
-        .panel-card.blue { border-top-color: #3b82f6; }
-        .panel-card.emerald { border-top-color: #10b981; }
-        .panel-card.indigo { border-top-color: #6366f1; }
-
-        .panel-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-left: 0.5rem;
-        }
-
-        .panel-card.amber .panel-dot { background: #f59e0b; }
-        .panel-card.rose .panel-dot { background: #f43f5e; }
-        .panel-card.blue .panel-dot { background: #3b82f6; }
-        .panel-card.emerald .panel-dot { background: #10b981; }
-        .panel-card.indigo .panel-dot { background: #6366f1; }
-
-        .panel-card h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .panel-card p {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.45);
-            line-height: 1.7;
-        }
-
-        .cta-section {
-            position: relative;
-            z-index: 1;
-            padding: 5rem 2rem;
-            text-align: center;
-        }
-
-        .cta-box {
-            max-width: 700px;
-            margin: 0 auto;
-            padding: 4rem 3rem;
-            background: rgba(99,102,241,0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(99,102,241,0.2);
-            border-radius: 28px;
-        }
-
-        .cta-box h2 {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 0.75rem;
-        }
-
-        .cta-box p {
-            font-size: 1rem;
-            color: rgba(255,255,255,0.45);
-            margin-bottom: 2rem;
-        }
-
-        .footer {
-            position: relative;
-            z-index: 1;
-            padding: 2.5rem 2rem;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            text-align: center;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .footer-copy {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.35);
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        .footer-links a {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.4);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .footer-links a:hover { color: #a5b4fc; }
-
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 0;
-            right: 0;
-            left: 0;
-            bottom: 0;
-            background: rgba(15, 23, 42, 0.97);
-            backdrop-filter: blur(20px);
-            z-index: 200;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2rem;
-        }
-
-        .mobile-menu.open { display: flex; }
-
-        .mobile-menu a {
-            color: #e2e8f0;
-            text-decoration: none;
-            font-size: 1.3rem;
-            font-weight: 600;
-        }
-
-        .mobile-close {
-            position: absolute;
-            top: 1.5rem;
-            left: 1.5rem;
-            background: none;
-            border: none;
-            color: #e2e8f0;
-            cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            .nav-links, .nav-actions { display: none; }
-            .mobile-toggle { display: block; }
-
-            .hero h1 { font-size: 2rem; }
-            .hero p { font-size: 1rem; }
-            .hero { padding: 7rem 1.5rem 3rem; }
-
-            .features-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-
-            .stat-number { font-size: 2.2rem; }
-
-            .panels-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .section { padding: 3rem 1.5rem; }
-
-            .section-title h2 { font-size: 1.6rem; }
-
-            .cta-box { padding: 2.5rem 1.5rem; }
-            .cta-box h2 { font-size: 1.5rem; }
-
-            .footer-content { flex-direction: column; text-align: center; }
-
-            .hero-actions { flex-direction: column; }
-            .hero-actions a, .hero-actions button { width: 100%; text-align: center; }
-        }
-
-        @media (max-width: 480px) {
-            .features-grid { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: 1fr; }
+        .glass {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        
+        .dark .glass {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: none;
         }
     </style>
 </head>
-<body>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
+<body class="bg-slate-50 dark:bg-dark text-slate-800 dark:text-slate-300 font-sans antialiased overflow-x-hidden selection:bg-primary-500 selection:text-white relative transition-colors duration-300">
+    
+    <!-- Background Orbs -->
+    <div class="fixed top-[-10%] right-[-5%] w-[600px] h-[600px] bg-primary-600/20 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+    <div class="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
 
-    <nav class="navbar" id="navbar">
-        <a href="/" class="nav-logo">ERP Lite</a>
+    <!-- Navigation -->
+    <nav x-data="{ scrolled: false, mobileMenuOpen: false }" 
+         @scroll.window="scrolled = (window.pageYOffset > 20)"
+         :class="{ 'bg-white/90 dark:bg-slate-900/90 shadow-lg backdrop-blur-md border-b border-slate-200 dark:border-white/5': scrolled, 'bg-transparent border-transparent': !scrolled }"
+         class="fixed w-full z-50 transition-all duration-300 border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0">
+                    <a href="/" class="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 dark:from-primary-400 dark:to-primary-600 bg-clip-text text-transparent">
+                        ERP Lite
+                    </a>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8 space-x-reverse">
+                        <a href="#home" class="text-slate-800 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-semibold transition">{{ $isAr ? 'الرئيسية' : 'Home' }}</a>
+                        <a href="#about" class="text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-semibold transition">{{ $isAr ? 'من نحن' : 'About Us' }}</a>
+                        <a href="#services" class="text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-semibold transition">{{ $isAr ? 'خدماتنا' : 'Services' }}</a>
+                        <a href="#vacancies" class="text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-semibold transition">{{ $isAr ? 'الوظائف الشاغرة' : 'Vacancies' }}</a>
+                        <a href="#contact" class="text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-semibold transition">{{ $isAr ? 'تواصل معنا' : 'Contact Us' }}</a>
+                    </div>
+                </div>
 
-        <ul class="nav-links">
-            <li><a href="#features">الميزات</a></li>
-            <li><a href="#stats">الإحصائيات</a></li>
-            <li><a href="#contact">تواصل معنا</a></li>
-        </ul>
+                <div class="hidden md:flex items-center gap-4">
+                    <!-- Language Switcher -->
+                    @if($isAr)
+                        <a href="{{ route('switch-language', 'en') }}" class="text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition uppercase">EN</a>
+                    @else
+                        <a href="{{ route('switch-language', 'ar') }}" class="text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition">عربي</a>
+                    @endif
+                    
+                    <!-- Dark Mode Toggle -->
+                    <button onclick="toggleDarkMode()" class="text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+                    
+                    <div class="w-px h-5 bg-slate-300 dark:bg-slate-700"></div>
+                    
+                    <a href="/login" class="text-sm font-semibold text-slate-800 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition">{{ $isAr ? 'تسجيل الدخول' : 'Login' }}</a>
+                    <a href="/register" class="bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-lg shadow-primary-600/30">{{ $isAr ? 'إنشاء حساب' : 'Register' }}</a>
+                </div>
 
-        <div class="nav-actions">
-            <a href="/login" class="btn-ghost">تسجيل الدخول</a>
-            <a href="/register" class="btn-primary">إنشاء حساب</a>
+                <!-- Mobile menu button -->
+                <div class="-mr-2 flex md:hidden items-center gap-4">
+                    <!-- Mobile Language Switcher -->
+                    @if($isAr)
+                        <a href="{{ route('switch-language', 'en') }}" class="text-sm font-bold text-slate-600 dark:text-slate-300 uppercase">EN</a>
+                    @else
+                        <a href="{{ route('switch-language', 'ar') }}" class="text-sm font-bold text-slate-600 dark:text-slate-300">عربي</a>
+                    @endif
+                    
+                    <!-- Mobile Dark Mode Toggle -->
+                    <button onclick="toggleDarkMode()" class="text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition p-2">
+                        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none">
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path :class="{'hidden': mobileMenuOpen, 'inline-flex': !mobileMenuOpen }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            <path :class="{'hidden': !mobileMenuOpen, 'inline-flex': mobileMenuOpen }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <button class="mobile-toggle" onclick="document.getElementById('mobileMenu').classList.add('open')" aria-label="القائمة">
-            <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-        </button>
+        <!-- Mobile Menu -->
+        <div x-show="mobileMenuOpen" 
+             class="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/5 absolute w-full shadow-lg"
+             @click.away="mobileMenuOpen = false">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" @click="mobileMenuOpen = false" class="text-slate-800 dark:text-white block px-3 py-2 rounded-md text-base font-medium">{{ $isAr ? 'الرئيسية' : 'Home' }}</a>
+                <a href="#about" @click="mobileMenuOpen = false" class="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white block px-3 py-2 rounded-md text-base font-medium">{{ $isAr ? 'من نحن' : 'About Us' }}</a>
+                <a href="#services" @click="mobileMenuOpen = false" class="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white block px-3 py-2 rounded-md text-base font-medium">{{ $isAr ? 'خدماتنا' : 'Services' }}</a>
+                <a href="#vacancies" @click="mobileMenuOpen = false" class="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white block px-3 py-2 rounded-md text-base font-medium">{{ $isAr ? 'الوظائف الشاغرة' : 'Vacancies' }}</a>
+                <a href="#contact" @click="mobileMenuOpen = false" class="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white block px-3 py-2 rounded-md text-base font-medium">{{ $isAr ? 'تواصل معنا' : 'Contact Us' }}</a>
+            </div>
+            <div class="pt-4 pb-4 border-t border-slate-200 dark:border-white/10 px-5 flex flex-col gap-3">
+                <a href="/login" class="text-center w-full block text-slate-800 dark:text-slate-300 font-semibold py-2">{{ $isAr ? 'تسجيل الدخول' : 'Login' }}</a>
+                <a href="/register" class="text-center w-full block bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-xl font-semibold transition">{{ $isAr ? 'إنشاء حساب' : 'Register' }}</a>
+            </div>
+        </div>
     </nav>
 
-    <div class="mobile-menu" id="mobileMenu">
-        <button class="mobile-close" onclick="document.getElementById('mobileMenu').classList.remove('open')">
-            <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-        </button>
-        <a href="#features" onclick="document.getElementById('mobileMenu').classList.remove('open')">الميزات</a>
-        <a href="#stats" onclick="document.getElementById('mobileMenu').classList.remove('open')">الإحصائيات</a>
-        <a href="#contact" onclick="document.getElementById('mobileMenu').classList.remove('open')">تواصل معنا</a>
-        <a href="/login" class="btn-ghost">تسجيل الدخول</a>
-        <a href="/register" class="btn-primary">إنشاء حساب</a>
-    </div>
-
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-                نظام إدارة مركزي متكامل
+    <!-- Hero Section -->
+    <section id="home" class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 flex items-center justify-center min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary-500/30 text-primary-600 dark:text-primary-300 text-sm font-semibold mb-8">
+                <span class="relative flex h-3 w-3">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-primary-500"></span>
+                </span>
+                {{ $isAr ? 'نظام إدارة مركزي متكامل ذكي' : 'Smart Integrated Central Management System' }}
             </div>
-            <h1>نظام إدارة مركزي متكامل لإدارة أعمالك</h1>
-            <p>منصة واحدة تجمع بين إدارة الموظفين، المشاريع، المالية، والمهام بكفاءة عالية</p>
-            <div class="hero-actions">
-                <a href="/register" class="btn-primary btn-lg">ابدأ الآن</a>
-                <a href="#features" class="btn-outline-lg">تعرف على المزيد</a>
+            
+            <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-8 leading-tight">
+                {{ $isAr ? 'أدر أعمالك بذكاء مع' : 'Manage your business smartly with' }} <br/>
+                <span class="bg-gradient-to-r from-primary-600 to-purple-600 dark:from-primary-400 dark:to-purple-500 bg-clip-text text-transparent">ERP Lite</span>
+            </h1>
+            
+            <p class="mt-4 text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+                {{ $isAr ? 'منصة سحابية متكاملة تجمع بين إدارة الموارد البشرية، المشاريع، المالية، والمهام. صممت لرفع كفاءة فريقك وتسريع وتيرة نمو شركتك.' : 'An integrated cloud platform combining HR, projects, finance, and tasks management. Designed to boost your team efficiency and accelerate your company growth.' }}
+            </p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="/register" class="bg-primary-600 hover:bg-primary-500 text-white px-8 py-4 rounded-2xl text-lg font-bold transition shadow-lg shadow-primary-600/30 flex items-center justify-center gap-2">
+                    {{ $isAr ? 'ابدأ تجربتك الآن' : 'Start your experience now' }}
+                    <svg class="w-5 h-5 {{ $isAr ? 'rtl:rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+                <a href="#services" class="glass hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-white px-8 py-4 rounded-2xl text-lg font-bold transition flex items-center justify-center">
+                    {{ $isAr ? 'اكتشف الميزات' : 'Discover Features' }}
+                </a>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 border-t border-slate-200 dark:border-white/10 pt-10">
+                <div class="text-center">
+                    <p class="text-4xl font-black text-primary-600 dark:text-white mb-2">{{ $stats['employees'] ?? 0 }}</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">{{ $isAr ? 'موظف نشط' : 'Active Employee' }}</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-4xl font-black text-primary-600 dark:text-white mb-2">{{ $stats['projects'] ?? 0 }}</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">{{ $isAr ? 'مشروع' : 'Project' }}</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-4xl font-black text-primary-600 dark:text-white mb-2">{{ $stats['tasks_completed'] ?? 0 }}</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">{{ $isAr ? 'مهمة منجزة' : 'Completed Task' }}</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-4xl font-black text-primary-600 dark:text-white mb-2">{{ $stats['clients'] ?? 0 }}</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">{{ $isAr ? 'عميل' : 'Client' }}</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="section" id="features">
-        <div class="section-title animate-on-scroll">
-            <h2>الميزات الرئيسية</h2>
-            <p>كل ما تحتاجه لإدارة أعمالك في مكان واحد</p>
-        </div>
-        <div class="features-grid">
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/>
-                    </svg>
+    <!-- About Section -->
+    <section id="about" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+                <div class="mb-12 lg:mb-0">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">{{ $isAr ? 'من نحن؟ رؤية تقنية لمستقبل الأعمال' : 'Who we are? Technical vision for future business' }}</h2>
+                    <p class="text-lg text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+                        {{ $isAr ? 'نحن في ERP Lite نؤمن بأن الإدارة يجب أن تكون سلسة وذكية ومترابطة. قمنا بتطوير هذا النظام ليكون الحل الأمثل للشركات التي تبحث عن الكفاءة والتميز دون التعقيدات المعتادة للأنظمة الكبيرة.' : 'At ERP Lite, we believe management should be seamless, smart, and interconnected. We developed this system to be the optimal solution for companies looking for efficiency and excellence without the usual complexities of large systems.' }}
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-500/20 flex items-center justify-center mt-1">
+                                <svg class="w-4 h-4 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <span class="text-slate-700 dark:text-slate-300">{{ $isAr ? 'أدوات متطورة تعتمد على الذكاء الاصطناعي لتحليل البيانات.' : 'Advanced AI-based tools for data analysis.' }}</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-500/20 flex items-center justify-center mt-1">
+                                <svg class="w-4 h-4 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <span class="text-slate-700 dark:text-slate-300">{{ $isAr ? 'واجهات استخدام عصرية مصممة لراحة العين وسرعة الإنجاز.' : 'Modern user interfaces designed for eye comfort and speed of achievement.' }}</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-500/20 flex items-center justify-center mt-1">
+                                <svg class="w-4 h-4 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <span class="text-slate-700 dark:text-slate-300">{{ $isAr ? 'أمان عالي وموثوقية في حفظ وإدارة بيانات شركتك.' : 'High security and reliability in saving and managing your company data.' }}</span>
+                        </li>
+                    </ul>
                 </div>
-                <h3>إدارة الموظفين</h3>
-                <p>إدارة شاملة للموظفين من التعيين حتى التقاعد</p>
-            </div>
-
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0"/>
-                    </svg>
+                <div class="relative">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-primary-400 to-purple-400 dark:from-primary-600 dark:to-purple-600 rounded-3xl transform rotate-3 opacity-30 dark:opacity-50 blur-lg"></div>
+                    <div class="glass p-8 rounded-3xl relative">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white/80 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm animate-float">
+                                <svg class="w-10 h-10 text-primary-500 dark:text-primary-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">{{ $isAr ? 'سرعة الأداء' : 'Fast Performance' }}</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">{{ $isAr ? 'تقنيات حديثة تضمن استجابة فورية.' : 'Modern technologies ensure instant response.' }}</p>
+                            </div>
+                            <!-- Added parent wrapper for translate-y-6 so animation works properly inside -->
+                            <div class="transform translate-y-6">
+                                <div class="bg-white/80 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm animate-float-delayed">
+                                    <svg class="w-10 h-10 text-purple-500 dark:text-purple-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">{{ $isAr ? 'حماية متقدمة' : 'Advanced Security' }}</h3>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">{{ $isAr ? 'تشفير كامل وصلاحيات دقيقة.' : 'Full encryption and precise permissions.' }}</p>
+                                </div>
+                            </div>
+                            <div class="bg-white/80 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm animate-float-delayed">
+                                <svg class="w-10 h-10 text-emerald-500 dark:text-emerald-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">{{ $isAr ? 'تقارير دقيقة' : 'Accurate Reports' }}</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">{{ $isAr ? 'إحصائيات ورسوم بيانية محدثة.' : 'Updated stats and charts.' }}</p>
+                            </div>
+                            <div class="transform translate-y-6">
+                                <div class="bg-white/80 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm animate-float">
+                                    <svg class="w-10 h-10 text-rose-500 dark:text-rose-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">{{ $isAr ? 'فريق مترابط' : 'Connected Team' }}</h3>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">{{ $isAr ? 'تواصل ومشاركة للملفات بسهولة.' : 'Easy communication and file sharing.' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h3>إدارة المشاريع</h3>
-                <p>تخطيط وتتبع المشاريع بأدوات كانبان تفاعلية</p>
-            </div>
-
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/>
-                    </svg>
-                </div>
-                <h3>النظام المالي</h3>
-                <p>فواتير، مصروفات، ورواتب في مكان واحد</p>
-            </div>
-
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/>
-                    </svg>
-                </div>
-                <h3>الذكاء الاصطناعي</h3>
-                <p>تحليل السير الذاتية وتقييم الأداء بالذكاء الاصطناعي</p>
-            </div>
-
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/>
-                    </svg>
-                </div>
-                <h3>التقارير واللوحات</h3>
-                <p>لوحات تحكم تفاعلية وتقارير PDF</p>
-            </div>
-
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
-                    </svg>
-                </div>
-                <h3>نظام الصلاحيات</h3>
-                <p>5 لوحات تحكم منفصلة لكل دور وظيفي</p>
             </div>
         </div>
     </section>
 
-    <section class="section" id="stats">
-        <div class="section-title animate-on-scroll">
-            <h2>بالأرقام</h2>
-            <p>إحصائيات حية من نظامنا</p>
-        </div>
-        <div class="stats-grid">
-            <div class="stat-card animate-on-scroll">
-                <div class="stat-number" data-target="{{ $stats['employees'] }}">0</div>
-                <div class="stat-label">الموظفين النشطين</div>
+    <!-- Services Section -->
+    <section id="services" class="py-24 bg-slate-100 dark:bg-slate-900/50 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{{ $isAr ? 'خدماتنا ونظامنا المتكامل' : 'Our Services and Integrated System' }}</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-400">{{ $isAr ? 'يغطي ERP Lite كافة الأقسام الرئيسية في شركتك لضمان سير العمل بمرونة وسهولة.' : 'ERP Lite covers all main departments in your company to ensure a flexible workflow.' }}</p>
             </div>
-            <div class="stat-card animate-on-scroll">
-                <div class="stat-number" data-target="{{ $stats['projects'] }}">0</div>
-                <div class="stat-label">المشاريع المنجزة</div>
-            </div>
-            <div class="stat-card animate-on-scroll">
-                <div class="stat-number" data-target="{{ $stats['tasks_completed'] }}">0</div>
-                <div class="stat-label">المهام المكتملة</div>
-            </div>
-            <div class="stat-card animate-on-scroll">
-                <div class="stat-number" data-target="{{ $stats['clients'] }}">0</div>
-                <div class="stat-label">العملاء</div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section" id="panels">
-        <div class="section-title animate-on-scroll">
-            <h2>لوحات تحكم مخصصة لكل دور</h2>
-            <p>كل دور وظيفي يحصل على لوحة تحكم خاصة به</p>
-        </div>
-        <div class="panels-grid">
-            <div class="panel-card amber animate-on-scroll">
-                <h3>لوحة المدير العام <span class="panel-dot"></span></h3>
-                <p>إدارة شاملة للنظام والتحكم في جميع العمليات والإعدادات</p>
-            </div>
-            <div class="panel-card rose animate-on-scroll">
-                <h3>الموارد البشرية <span class="panel-dot"></span></h3>
-                <p>التوظيف والإجازات والمهارات وإدارة شؤون الموظفين</p>
-            </div>
-            <div class="panel-card blue animate-on-scroll">
-                <h3>إدارة المشاريع <span class="panel-dot"></span></h3>
-                <p>المشاريع والمهام وكانبان وتتبع التقدم والإنجاز</p>
-            </div>
-            <div class="panel-card emerald animate-on-scroll">
-                <h3>المحاسب <span class="panel-dot"></span></h3>
-                <p>الفواتير والمصروفات والرواتب والتقارير المالية</p>
-            </div>
-            <div class="panel-card indigo animate-on-scroll">
-                <h3>لوحة الموظف <span class="panel-dot"></span></h3>
-                <p>المهام والتقارير والإجازات والملف الشخصي</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="glass p-8 rounded-3xl hover:-translate-y-2 transition duration-300 group border border-transparent dark:border-white/5 hover:border-blue-500/30 dark:hover:border-blue-500/50">
+                    <div class="w-14 h-14 bg-blue-100 dark:bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-200 dark:group-hover:bg-blue-500/20 transition">
+                        <svg class="w-7 h-7 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ $isAr ? 'إدارة الموارد البشرية (HR)' : 'Human Resources (HR)' }}</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">{{ $isAr ? 'نظام كامل لإدارة الموظفين، الحضور والانصراف، الإجازات، والرواتب مع تقييم أداء شامل واستقطاب المواهب.' : 'Full system for managing employees, attendance, leaves, and payroll with performance evaluation.' }}</p>
+                </div>
+                
+                <div class="glass p-8 rounded-3xl hover:-translate-y-2 transition duration-300 group border border-transparent dark:border-white/5 hover:border-purple-500/30 dark:hover:border-purple-500/50">
+                    <div class="w-14 h-14 bg-purple-100 dark:bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-200 dark:group-hover:bg-purple-500/20 transition">
+                        <svg class="w-7 h-7 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ $isAr ? 'إدارة المشاريع والمهام (PM)' : 'Project Management (PM)' }}</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">{{ $isAr ? 'تخطيط وتتبع المشاريع، توزيع المهام، لوحات كانبان التفاعلية، ومراقبة الجداول الزمنية بكل دقة.' : 'Planning and tracking projects, task distribution, interactive Kanban boards, and timeline monitoring.' }}</p>
+                </div>
+                
+                <div class="glass p-8 rounded-3xl hover:-translate-y-2 transition duration-300 group border border-transparent dark:border-white/5 hover:border-emerald-500/30 dark:hover:border-emerald-500/50">
+                    <div class="w-14 h-14 bg-emerald-100 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-500/20 transition">
+                        <svg class="w-7 h-7 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ $isAr ? 'الإدارة المالية (Finance)' : 'Financial Management' }}</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">{{ $isAr ? 'تسجيل المصروفات، إصدار الفواتير للعملاء، ومتابعة الميزانيات بدقة متناهية مع تقارير مالية مفصلة.' : 'Recording expenses, issuing client invoices, and tracking budgets accurately with detailed reports.' }}</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="cta-section" id="contact">
-        <div class="cta-box animate-on-scroll">
-            <h2>ابدأ رحلتك معنا اليوم</h2>
-            <p>سجل الآن واحصل على تجربة مجانية</p>
-            <a href="/register" class="btn-primary btn-lg">إنشاء حساب مجاني</a>
+    <!-- Latest Vacancies Section -->
+    <section id="vacancies" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                <div class="max-w-2xl">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{{ $isAr ? 'أحدث الوظائف المتاحة' : 'Latest Available Vacancies' }}</h2>
+                    <p class="text-lg text-slate-600 dark:text-slate-400">{{ $isAr ? 'انضم إلى فريقنا واصنع الفارق. تصفح أحدث الفرص الوظيفية المتاحة لدينا.' : 'Join our team and make a difference. Browse our latest job opportunities.' }}</p>
+                </div>
+                <a href="{{ route('vacancies.index') }}" class="inline-flex items-center gap-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white px-6 py-3 rounded-xl font-semibold transition border border-slate-300 dark:border-slate-700 whitespace-nowrap">
+                    {{ $isAr ? 'تصفح جميع الوظائف' : 'Browse All Jobs' }}
+                    <svg class="w-5 h-5 {{ $isAr ? 'rtl:rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+            </div>
+
+            @if(isset($vacancies) && count($vacancies) > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($vacancies as $vacancy)
+                    <div class="glass p-6 rounded-2xl flex flex-col h-full border border-slate-200 dark:border-white/10 hover:border-primary-500/50 transition duration-300 bg-white dark:bg-slate-800/30 text-start">
+                        <div class="mb-4">
+                            <span class="inline-block px-3 py-1 bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 text-xs font-bold rounded-full mb-3">{{ $vacancy->department?->name ?? ($isAr ? 'عام' : 'General') }}</span>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">{{ $vacancy->title }}</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-3">{{ $vacancy->description }}</p>
+                        </div>
+                        
+                        <div class="mt-auto pt-4 border-t border-slate-100 dark:border-white/5">
+                            <div class="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-300 mb-6">
+                                <span class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    {{ $vacancy->location ?? ($isAr ? 'الشركة' : 'Company') }}
+                                </span>
+                                <span class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                    {{ $isAr ? (['full_time' => 'دوام كامل', 'part_time' => 'دوام جزئي', 'contract' => 'عقد', 'freelance' => 'عمل حر', 'internship' => 'تدريب'][$vacancy->employment_type] ?? 'دوام كامل') : (['full_time' => 'Full Time', 'part_time' => 'Part Time', 'contract' => 'Contract', 'freelance' => 'Freelance', 'internship' => 'Internship'][$vacancy->employment_type] ?? 'Full Time') }}
+                                </span>
+                                <span class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                    {{ $vacancy->applicants_count }} {{ $isAr ? 'متقدم' : 'Applicants' }}
+                                </span>
+                            </div>
+                            <a href="/register" class="w-full block text-center bg-primary-600 hover:bg-primary-500 text-white px-4 py-2.5 rounded-xl font-bold transition">
+                                {{ $isAr ? 'التقدم للوظيفة' : 'Apply Now' }}
+                            </a>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="glass p-12 rounded-3xl text-center border border-slate-200 dark:border-white/5">
+                    <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-10 h-10 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">{{ $isAr ? 'لا توجد وظائف شاغرة حالياً' : 'No Vacancies Available' }}</h3>
+                    <p class="text-slate-600 dark:text-slate-400">{{ $isAr ? 'يرجى العودة والتحقق في وقت لاحق للفرص الجديدة.' : 'Please check back later for new opportunities.' }}</p>
+                </div>
+            @endif
         </div>
     </section>
 
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-copy">&copy; 2026 ERP Lite - نظام الإدارة المركزي</div>
-            <div class="footer-links">
-                <a href="#">سياسة الخصوصية</a>
-                <a href="#">شروط الاستخدام</a>
-                <a href="/lang/en">English</a>
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 bg-slate-100 dark:bg-slate-900/50 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:grid lg:grid-cols-2 lg:gap-16">
+                <div class="mb-12 lg:mb-0 text-start">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">{{ $isAr ? 'تواصل معنا' : 'Contact Us' }}</h2>
+                    <p class="text-lg text-slate-600 dark:text-slate-400 mb-10 leading-relaxed">
+                        {{ $isAr ? 'نحن هنا لمساعدتك والإجابة على كافة استفساراتك حول النظام وكيفية الاستفادة منه في أعمالك.' : 'We are here to help and answer all your inquiries about the system.' }}
+                    </p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center flex-shrink-0 border border-slate-200 dark:border-white/5 shadow-sm">
+                                <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </div>
+                            <div class="text-start">
+                                <h4 class="text-slate-900 dark:text-white font-bold mb-1">{{ $isAr ? 'العنوان' : 'Address' }}</h4>
+                                <p class="text-slate-600 dark:text-slate-400">{{ $isAr ? 'دمشق، الجمهورية العربية السورية' : 'Damascus, Syrian Arab Republic' }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center flex-shrink-0 border border-slate-200 dark:border-white/5 shadow-sm">
+                                <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <div class="text-start">
+                                <h4 class="text-slate-900 dark:text-white font-bold mb-1">{{ $isAr ? 'البريد الإلكتروني' : 'Email' }}</h4>
+                                <p class="text-slate-600 dark:text-slate-400">info@erplite.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <form class="glass p-8 rounded-3xl space-y-5 border border-slate-200 dark:border-white/10 text-start">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">{{ $isAr ? 'الاسم الكامل' : 'Full Name' }}</label>
+                            <input type="text" class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition" placeholder="{{ $isAr ? 'أدخل اسمك' : 'Enter your name' }}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">{{ $isAr ? 'البريد الإلكتروني' : 'Email Address' }}</label>
+                            <input type="email" class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition" placeholder="your@email.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">{{ $isAr ? 'الرسالة' : 'Message' }}</label>
+                            <textarea rows="4" class="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition" placeholder="{{ $isAr ? 'كيف يمكننا مساعدتك؟' : 'How can we help you?' }}"></textarea>
+                        </div>
+                        <button type="button" class="w-full bg-primary-600 hover:bg-primary-500 text-white px-6 py-3.5 rounded-xl font-bold transition shadow-lg shadow-primary-600/20">
+                            {{ $isAr ? 'إرسال الرسالة' : 'Send Message' }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 dark:border-white/5 py-10 bg-slate-50 dark:bg-dark relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 dark:from-primary-400 dark:to-primary-600 bg-clip-text text-transparent">
+                ERP Lite
+            </div>
+            <p class="text-slate-500 text-sm">
+                {{ $isAr ? 'جميع الحقوق محفوظة' : 'All Rights Reserved' }} &copy; {{ date('Y') }} ERP Lite
+            </p>
+            <div class="flex gap-4">
+                <a href="#" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-white dark:hover:bg-primary-600 transition">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                </a>
+                <a href="#" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-white dark:hover:bg-primary-600 transition">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </a>
             </div>
         </div>
     </footer>
 
     <script>
-        (function () {
-            var navbar = document.getElementById('navbar');
-            window.addEventListener('scroll', function () {
-                if (window.scrollY > 50) {
-                    navbar.classList.add('scrolled');
-                } else {
-                    navbar.classList.remove('scrolled');
-                }
-            });
-
-            var animatedEls = document.querySelectorAll('.animate-on-scroll');
-            var observer = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
-            animatedEls.forEach(function (el) {
-                observer.observe(el);
-            });
-
-            var statNumbers = document.querySelectorAll('.stat-number[data-target]');
-            var statObserver = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (entry.isIntersecting) {
-                        var el = entry.target;
-                        var target = parseInt(el.getAttribute('data-target'), 10);
-                        var duration = 1500;
-                        var start = 0;
-                        var startTime = null;
-
-                        function animate(currentTime) {
-                            if (!startTime) startTime = currentTime;
-                            var progress = Math.min((currentTime - startTime) / duration, 1);
-                            var eased = 1 - Math.pow(1 - progress, 3);
-                            el.textContent = Math.floor(eased * target);
-                            if (progress < 1) {
-                                requestAnimationFrame(animate);
-                            } else {
-                                el.textContent = target;
-                            }
-                        }
-
-                        requestAnimationFrame(animate);
-                        statObserver.unobserve(el);
-                    }
-                });
-            }, { threshold: 0.5 });
-
-            statNumbers.forEach(function (el) {
-                statObserver.observe(el);
-            });
-        })();
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
     </script>
 </body>
 </html>

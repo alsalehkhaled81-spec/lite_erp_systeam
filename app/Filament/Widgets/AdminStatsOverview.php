@@ -17,6 +17,25 @@ class AdminStatsOverview extends BaseWidget
         $employeeCount = Employee::count();
         $activeProjects = Project::where('status', 'in_progress')->count();
         $totalRevenue = Invoice::where('status', 'paid')->sum('amount');
+        $totalBilled = Invoice::sum('amount');
+        $revenuePercentage = $totalBilled > 0
+            ? round(($totalRevenue / $totalBilled) * 100, 1)
+            : 0;
+
+        $monthlyRates = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $monthBilled = Invoice::whereYear('issue_date', $month->year)
+                ->whereMonth('issue_date', $month->month)
+                ->sum('amount');
+            $monthCollected = Invoice::where('status', 'paid')
+                ->whereYear('issue_date', $month->year)
+                ->whereMonth('issue_date', $month->month)
+                ->sum('amount');
+            $monthlyRates[] = $monthBilled > 0
+                ? (int) round(($monthCollected / $monthBilled) * 100)
+                : 0;
+        }
 
         return [
             Stat::make(__('filament.widgets.total_employees'), $employeeCount)
@@ -38,6 +57,13 @@ class AdminStatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->chart([3, 5, 7, 4, 6, 8])
                 ->color('success')
+                ->extraAttributes(['class' => 'cursor-pointer transition-all duration-300']),
+
+            Stat::make(__('filament.widgets.revenue_percentage'), $revenuePercentage . '%')
+                ->description(__('filament.widgets.revenue_percentage_desc'))
+                ->descriptionIcon('heroicon-m-chart-pie')
+                ->chart($monthlyRates)
+                ->color('info')
                 ->extraAttributes(['class' => 'cursor-pointer transition-all duration-300']),
         ];
     }

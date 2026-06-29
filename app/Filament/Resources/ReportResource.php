@@ -48,13 +48,16 @@ class ReportResource extends Resource
                             ->label(__('filament.fields.sender'))
                             ->relationship('sender', 'job_title')
                             ->searchable()
+                            ->default(fn () => auth()->user()?->employee?->id)
                             ->getSearchResultsUsing(fn (string $search) => \App\Models\Employee::where('job_title', 'like', "%{$search}%")->orWhereHas('user', fn ($q) => $q->where('name', 'like', "%{$search}%"))->limit(20)->get()->mapWithKeys(fn ($e) => [$e->id => $e->user?->name . ' - ' . $e->job_title]))
+                            ->getOptionLabelUsing(fn ($value): ?string => \App\Models\Employee::with('user')->find($value)?->user?->name)
                             ->required(),
                         Forms\Components\Select::make('receiver_id')
                             ->label(__('filament.fields.receiver'))
                             ->relationship('receiver', 'job_title')
                             ->searchable()
                             ->getSearchResultsUsing(fn (string $search) => \App\Models\Employee::where('job_title', 'like', "%{$search}%")->orWhereHas('user', fn ($q) => $q->where('name', 'like', "%{$search}%"))->limit(20)->get()->mapWithKeys(fn ($e) => [$e->id => $e->user?->name . ' - ' . $e->job_title]))
+                            ->getOptionLabelUsing(fn ($value): ?string => \App\Models\Employee::with('user')->find($value)?->user?->name)
                             ->required(),
                         Forms\Components\TextInput::make('title')
                             ->label(__('filament.fields.report_title'))
