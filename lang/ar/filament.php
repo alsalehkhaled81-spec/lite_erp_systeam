@@ -786,6 +786,7 @@ return [
     ],
 
     'auth' => [
+        'back_to_home' => 'الرجوع للصفحة الرئيسية',
         'login_title' => 'تسجيل الدخول',
         'login_subtitle' => 'أدخل بياناتك للوصول إلى لوحة التحكم',
         'create_employee_account' => 'إنشاء حساب موظف',

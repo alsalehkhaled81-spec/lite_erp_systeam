@@ -784,6 +784,7 @@ return [
     ],
 
     'auth' => [
+        'back_to_home' => 'Back to Home Page',
         'login_title' => 'Sign In',
         'login_subtitle' => 'Enter your credentials to access the dashboard',
         'create_employee_account' => 'Create Employee Account',

@@ -9,10 +9,6 @@ class LogoutResponse implements LogoutResponseContract
 {
     public function toResponse($request): RedirectResponse
     {
-        if ($request->is('client/*')) {
-            return redirect()->to('/client/login');
-        }
-
         return redirect()->route('login');
     }
 }

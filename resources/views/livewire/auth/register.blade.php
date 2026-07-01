@@ -1,4 +1,13 @@
 <div>
+    <div style="margin-bottom: 1.5rem;">
+        <a href="{{ url('/') }}" class="link" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.95rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; transform: {{ app()->getLocale() === 'ar' ? 'rotate(180deg)' : 'none' }};" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            {{ __('filament.auth.back_to_home') }}
+        </a>
+    </div>
+
     <div style="text-align: center; margin-bottom: 2rem;">
         <h2>{{ __('filament.auth.create_employee_account') }}</h2>
         <p class="subtitle">{{ __('filament.auth.join_team') }}</p>
