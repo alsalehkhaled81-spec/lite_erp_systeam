@@ -52,7 +52,21 @@ class AttendanceResource extends Resource
                         ->label(__('filament.fields.date'))
                         ->required()
                         ->default(now())
-                        ->live(),
+                        ->live()
+                        ->rule(function (Forms\Get $get, ?Attendance $record) {
+                            return function (string $attribute, $value, \Closure $fail) use ($get, $record) {
+                                $employeeId = $get('employee_id');
+                                if ($employeeId && $value) {
+                                    $exists = Attendance::where('employee_id', $employeeId)
+                                        ->whereDate('date', $value)
+                                        ->when($record, fn ($q) => $q->where('id', '!=', $record->id))
+                                        ->exists();
+                                    if ($exists) {
+                                        $fail(__('filament.validation.duplicate_attendance'));
+                                    }
+                                }
+                            };
+                        }),
                     Forms\Components\TimePicker::make('check_in')
                         ->label(__('filament.fields.check_in_time'))
                         ->seconds(false)
@@ -237,6 +251,7 @@ class AttendanceResource extends Resource
             'index' => Pages\ListAttendances::route('/'),
             'create' => Pages\CreateAttendance::route('/create'),
             'edit' => Pages\EditAttendance::route('/{record}/edit'),
+            'daily' => Pages\DailyAttendance::route('/daily'),
         ];
     }
 }

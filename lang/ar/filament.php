@@ -439,6 +439,7 @@ return [
         'due_date_after_start' => 'يجب أن يكون :attribute مساوياً أو بعد تاريخ البداية.',
         'due_date_after_issue' => 'يجب أن يكون :attribute مساوياً أو بعد تاريخ الإصدار.',
         'expiry_after_issue' => 'يجب أن يكون :attribute مساوياً أو بعد تاريخ الإصدار.',
+        'duplicate_attendance' => 'يوجد سجل حضور لهذا الموظف في نفس اليوم بالفعل.',
     ],
 
     'filters' => [
@@ -736,6 +737,16 @@ return [
         'today_status' => 'حالة اليوم',
         'monthly_records' => 'سجل الشهر',
         'no_records' => 'لا توجد سجلات',
+        'daily_attendance' => 'الحضور اليومي',
+        'daily_attendance_title' => 'كشف الحضور اليومي للموظفين',
+        'daily_attendance_desc' => 'عرض جميع الموظفين النشطين وحالة حضورهم في اليوم المحدد',
+        'on_duty' => 'مداوم',
+        'not_on_duty' => 'غير مداوم',
+        'not_recorded' => 'لم يسجل',
+        'total_employees' => 'إجمالي الموظفين',
+        'present_today' => 'الحاضرون اليوم',
+        'absent_today' => 'الغائبون اليوم',
+        'choose_date' => 'اختر التاريخ',
     ],
 
     'training' => [

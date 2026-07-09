@@ -50,6 +50,8 @@ class TaskResource extends Resource
                                 name: 'employee.user',
                                 titleAttribute: 'name',
                                 modifyQueryUsing: function (Builder $query, Forms\Get $get) {
+                                    $query->whereHas('employee', fn ($q) => $q->where('status', 'active'))
+                                          ->where('is_approved', true);
                                     if ($projectId = $get('project_id')) {
                                         $query->whereHas('employee.projects', fn ($q) => $q->where('projects.id', $projectId));
                                     }

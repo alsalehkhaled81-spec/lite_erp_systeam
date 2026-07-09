@@ -438,6 +438,7 @@ return [
         'due_date_after_start' => 'The :attribute must be on or after the start date.',
         'due_date_after_issue' => 'The :attribute must be on or after the issue date.',
         'expiry_after_issue' => 'The :attribute must be on or after the issue date.',
+        'duplicate_attendance' => 'An attendance record already exists for this employee on the same day.',
     ],
 
     'filters' => [
@@ -734,6 +735,16 @@ return [
         'today_status' => 'Today\'s Status',
         'monthly_records' => 'Monthly Records',
         'no_records' => 'No records',
+        'daily_attendance' => 'Daily Attendance',
+        'daily_attendance_title' => 'Daily Employee Attendance Sheet',
+        'daily_attendance_desc' => 'Shows all active employees and their attendance status for the selected day',
+        'on_duty' => 'On Duty',
+        'not_on_duty' => 'Not On Duty',
+        'not_recorded' => 'Not Recorded',
+        'total_employees' => 'Total Employees',
+        'present_today' => 'Present Today',
+        'absent_today' => 'Absent Today',
+        'choose_date' => 'Select Date',
     ],
 
     'training' => [

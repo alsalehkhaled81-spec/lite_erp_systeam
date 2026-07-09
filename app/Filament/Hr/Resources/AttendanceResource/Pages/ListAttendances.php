@@ -12,6 +12,13 @@ class ListAttendances extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [Actions\CreateAction::make()];
+        return [
+            Actions\Action::make('daily_attendance')
+                ->label(__('filament.attendance.daily_attendance'))
+                ->icon('heroicon-o-calendar-days')
+                ->color('info')
+                ->url(fn () => DailyAttendance::getUrl()),
+            Actions\CreateAction::make(),
+        ];
     }
 }
