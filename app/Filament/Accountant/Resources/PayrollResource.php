@@ -49,6 +49,7 @@ class PayrollResource extends Resource
                         Forms\Components\Select::make('employee_id')
                             ->label(__('filament.fields.employee'))
                             ->searchable()
+                            ->getOptionLabelUsing(fn ($value): ?string => Employee::find($value)?->user?->name . ' - ' . Employee::find($value)?->job_title)
                             ->getSearchResultsUsing(fn (string $search) => Employee::where('job_title', 'like', "%{$search}%")->orWhereHas('user', fn ($q) => $q->where('name', 'like', "%{$search}%"))->limit(20)->get()->mapWithKeys(fn ($e) => [$e->id => $e->user?->name . ' - ' . $e->job_title]))
                             ->required()
                             ->reactive()

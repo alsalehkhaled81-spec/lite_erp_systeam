@@ -142,6 +142,7 @@ return [
         'allowances' => 'Allowances',
         'insurance_and_absence' => 'Insurance & Absence',
         'net_salary_section' => 'Net Salary',
+        'net_salary' => 'Net Salary',
         'invoice_items' => 'Invoice Items',
         'invoice_totals' => 'Invoice Totals',
     ],
@@ -274,6 +275,7 @@ return [
         'vat_rate' => 'VAT Rate',
         'vat_amount' => 'VAT Amount',
         'total_with_vat' => 'Total with VAT',
+        'total' => 'Total',
         'invoice_items' => 'Invoice Items',
         'housing_allowance' => 'Housing Allowance',
         'transport_allowance' => 'Transport Allowance',
@@ -363,6 +365,7 @@ return [
         'remaining_balance' => 'Remaining Balance',
         'vat_amount' => 'VAT',
         'total_with_vat' => 'Total with VAT',
+        'subtotal' => 'Subtotal',
         'housing_allowance' => 'Housing Allowance',
         'absence_days' => 'Absence Days',
         'absence_deduction' => 'Absence Deduction',
@@ -513,6 +516,7 @@ return [
         'rejection_reason_desc' => 'Will be shown to applicant',
         'view_reply' => 'View / Reply',
         'view_resume' => 'View Resume',
+        'export_excel' => 'Export Excel',
     ],
 
     'widgets' => [
@@ -792,6 +796,7 @@ return [
         'training_participants' => 'Participants',
         'employee_certificates' => 'Employee Certificates',
         'employee_payrolls' => 'Payroll History',
+        'invoice_items' => 'Invoice Items',
     ],
 
     'auth' => [

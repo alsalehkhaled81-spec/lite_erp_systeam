@@ -4,21 +4,40 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\InvoiceResource\Pages;
 use App\Models\Invoice;
+use App\Services\InvoicePdfService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class InvoiceResource extends Resource
 {
     protected static ?string $model = Invoice::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-currency-dollar';
-
     protected static ?string $navigationGroup = null;
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.group.finance');
+    }
+
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.nav.invoices');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.model.invoice');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.model.invoices');
+    }
 
     public static function form(Form $form): Form
     {
@@ -35,19 +54,11 @@ class InvoiceResource extends Resource
                             ->afterStateUpdated(fn (Forms\Set $set) => $set('project_id', null)),
                         Forms\Components\Select::make('project_id')
                             ->label(__('filament.fields.project_optional'))
-                            ->relationship('project', 'name', modifyQueryUsing: fn (Builder $query, Forms\Get $get) => 
+                            ->relationship('project', 'name', modifyQueryUsing: fn (Builder $query, Forms\Get $get) =>
                                 $query->when($get('client_id'), fn ($q, $client) => $q->where('client_id', $client))
                             )
                             ->searchable()
-                            ->createOptionForm([
-                                Forms\Components\Hidden::make('client_id')
-                                    ->default(fn (Forms\Get $get) => $get('client_id')),
-                                Forms\Components\TextInput::make('name')
-                                    ->label(__('filament.fields.project_name'))
-                                    ->required(),
-                                Forms\Components\Textarea::make('description')
-                                    ->label(__('filament.fields.description')),
-                            ]),
+                            ->preload(),
                     ])->columns(2),
 
                 Forms\Components\Section::make(__('filament.sections.invoice_data'))
@@ -56,12 +67,6 @@ class InvoiceResource extends Resource
                             ->label(__('filament.fields.invoice_number'))
                             ->required()
                             ->unique(ignoreRecord: true),
-                        Forms\Components\TextInput::make('amount')
-                            ->label(__('filament.fields.amount'))
-                            ->numeric()
-                            ->minValue(0)
-                            ->required()
-                            ->prefix('$'),
                         Forms\Components\Select::make('status')
                             ->label(__('filament.fields.status'))
                             ->options([
@@ -79,7 +84,87 @@ class InvoiceResource extends Resource
                             ->validationMessages([
                                 'after_or_equal' => __('filament.validation.due_date_after_issue', ['attribute' => __('filament.fields.due_date_invoice')]),
                             ]),
-                    ])->columns(3),
+                    ])->columns(2),
+
+                Forms\Components\Section::make(__('filament.sections.invoice_items'))
+                    ->schema([
+                        Forms\Components\Repeater::make('items')
+                            ->label(__('filament.fields.invoice_items'))
+                            ->relationship()
+                            ->schema([
+                                Forms\Components\TextInput::make('description')
+                                    ->label(__('filament.fields.item_description'))
+                                    ->required()
+                                    ->columnSpan(2),
+                                Forms\Components\TextInput::make('quantity')
+                                    ->label(__('filament.fields.quantity'))
+                                    ->numeric()
+                                    ->default(1)
+                                    ->minValue(0.01)
+                                    ->required()
+                                    ->live(debounce: 500)
+                                    ->afterStateUpdated(fn (Forms\Set $set, Forms\Get $get) => $set('total', round((float)($get('quantity') ?? 0) * (float)($get('unit_price') ?? 0), 2))),
+                                Forms\Components\TextInput::make('unit_price')
+                                    ->label(__('filament.fields.unit_price'))
+                                    ->numeric()
+                                    ->prefix('$')
+                                    ->minValue(0)
+                                    ->required()
+                                    ->live(debounce: 500)
+                                    ->afterStateUpdated(fn (Forms\Set $set, Forms\Get $get) => $set('total', round((float)($get('quantity') ?? 0) * (float)($get('unit_price') ?? 0), 2))),
+                                Forms\Components\TextInput::make('total')
+                                    ->label(__('filament.fields.total'))
+                                    ->numeric()
+                                    ->prefix('$')
+                                    ->disabled()
+                                    ->dehydrated(),
+                            ])->columns(5)
+                            ->reorderable()
+                            ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                                $items = $get('items') ?? [];
+                                $subtotal = collect($items)->sum(fn ($item) => (float)($item['total'] ?? 0));
+                                $vatRate = (float)($get('vat_rate') ?? 0);
+                                $set('amount', round($subtotal, 2));
+                                $set('vat_amount', round($subtotal * ($vatRate / 100), 2));
+                                $set('total_with_vat', round($subtotal + ($subtotal * ($vatRate / 100)), 2));
+                            }),
+                    ]),
+
+                Forms\Components\Section::make(__('filament.sections.invoice_totals'))
+                    ->schema([
+                        Forms\Components\TextInput::make('amount')
+                            ->label(__('filament.fields.subtotal'))
+                            ->numeric()
+                            ->prefix('$')
+                            ->dehydrated(),
+                        Forms\Components\TextInput::make('vat_rate')
+                            ->label(__('filament.fields.vat_rate'))
+                            ->numeric()
+                            ->suffix('%')
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->default(0)
+                            ->live(debounce: 500)
+                            ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                                $subtotal = (float)($get('amount') ?? 0);
+                                $rate = (float)($get('vat_rate') ?? 0);
+                                $vat = round($subtotal * ($rate / 100), 2);
+                                $set('vat_amount', $vat);
+                                $set('total_with_vat', round($subtotal + $vat, 2));
+                            }),
+                        Forms\Components\TextInput::make('vat_amount')
+                            ->label(__('filament.fields.vat_amount'))
+                            ->numeric()
+                            ->prefix('$')
+                            ->disabled()
+                            ->dehydrated(),
+                        Forms\Components\TextInput::make('total_with_vat')
+                            ->label(__('filament.fields.total_with_vat'))
+                            ->numeric()
+                            ->prefix('$')
+                            ->disabled()
+                            ->dehydrated(),
+                    ])->columns(4),
             ]);
     }
 
@@ -90,15 +175,20 @@ class InvoiceResource extends Resource
                 Tables\Columns\TextColumn::make('client.name')
                     ->label(__('filament.columns.client'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('project.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('invoice_number')
                     ->label(__('filament.columns.invoice_number'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->label(__('filament.columns.amount'))
+                    ->label(__('filament.columns.subtotal'))
+                    ->money('usd')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('vat_amount')
+                    ->label(__('filament.columns.vat_amount'))
+                    ->money('usd')
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('total_with_vat')
+                    ->label(__('filament.columns.total_with_vat'))
                     ->money('usd')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('issue_date')
@@ -114,15 +204,13 @@ class InvoiceResource extends Resource
                         'unpaid' => 'warning',
                         'paid' => 'success',
                         'overdue' => 'danger',
+                    })
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'unpaid' => __('filament.status.unpaid'),
+                        'paid' => __('filament.status.paid'),
+                        'overdue' => __('filament.status.overdue'),
+                        default => $state,
                     }),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
@@ -134,6 +222,10 @@ class InvoiceResource extends Resource
                     ]),
             ])
             ->actions([
+                Tables\Actions\Action::make('download_pdf')
+                    ->label(__('filament.actions.download_invoice_pdf'))
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->action(fn (Invoice $record) => app(InvoicePdfService::class)->generate($record)),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -145,9 +237,7 @@ class InvoiceResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
@@ -157,26 +247,6 @@ class InvoiceResource extends Resource
             'create' => Pages\CreateInvoice::route('/create'),
             'edit' => Pages\EditInvoice::route('/{record}/edit'),
         ];
-    }
-
-    public static function getModelLabel(): string
-    {
-        return __('filament.model.invoice');
-    }
-
-    public static function getPluralModelLabel(): string
-    {
-        return __('filament.model.invoices');
-    }
-    public static function getNavigationGroup(): ?string
-    {
-        return __('filament.group.finance');
-    }
-
-
-    public static function getNavigationLabel(): string
-    {
-        return __('filament.nav.invoices');
     }
 
     public static function getGloballySearchableAttributes(): array

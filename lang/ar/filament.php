@@ -142,6 +142,7 @@ return [
         'allowances' => 'البدلات',
         'insurance_and_absence' => 'التأمينات والغياب',
         'net_salary_section' => 'صافي الراتب',
+        'net_salary' => 'صافي الراتب',
         'invoice_items' => 'بنود الفاتورة',
         'invoice_totals' => 'إجماليات الفاتورة',
     ],
@@ -275,6 +276,7 @@ return [
         'vat_rate' => 'نسبة الضريبة',
         'vat_amount' => 'مبلغ الضريبة',
         'total_with_vat' => 'الإجمالي مع الضريبة',
+        'total' => 'الإجمالي',
         'invoice_items' => 'بنود الفاتورة',
         'housing_allowance' => 'بدل سكن',
         'transport_allowance' => 'بدل نقل',
@@ -364,6 +366,7 @@ return [
         'remaining_balance' => 'الرصيد المتبقي',
         'vat_amount' => 'الضريبة',
         'total_with_vat' => 'الإجمالي مع الضريبة',
+        'subtotal' => 'المجموع الفرعي',
         'housing_allowance' => 'بدل السكن',
         'absence_days' => 'أيام الغياب',
         'absence_deduction' => 'خصم الغياب',
@@ -514,6 +517,7 @@ return [
         'rejection_reason_desc' => 'سيتم عرضه للمتقدم',
         'view_reply' => 'عرض / رد',
         'view_resume' => 'عرض السيرة الذاتية',
+        'export_excel' => 'تصدير Excel',
     ],
 
     'widgets' => [
@@ -794,6 +798,7 @@ return [
         'training_participants' => 'المشاركون',
         'employee_certificates' => 'شهادات الموظف',
         'employee_payrolls' => 'أرشيف الرواتب',
+        'invoice_items' => 'بنود الفاتورة',
     ],
 
     'auth' => [
