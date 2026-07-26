@@ -47,19 +47,19 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
-   public function canAccessPanel(Panel $panel): bool
-    {
+    public function canAccessPanel(Panel $panel): bool
+     {
         // 1. إذا لم يكن للمستخدم أي دور، نمنعه من الدخول
         if (!$this->role) {
             return false;
         }
 
-        $roleName = $this->role->name;
+        // 2. لوحة الموظف تتطلب موافقة الإدارة (حساب معتمد) - المتقدمون المعلّقون لا يدخلون اللوحة
+        if ($panel->getId() === 'employee' && !$this->is_approved) {
+            return false;
+        }
 
-        // 2. المدير العام له الحق في دخول أي لوحة تحكم في النظام
-        // if ($roleName === 'super_admin') {
-        //     return true;
-        // }
+        $roleName = $this->role->name;
 
         // 3. توجيه بقية الأدوار للوحاتهم المخصصة فقط
         return match ($panel->getId()) {

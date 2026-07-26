@@ -1,0 +1,204 @@
+<mxfile host="app.diagrams.net" agent="LiteERP">
+  <diagram id="lite-erp-erd" name="Lite ERP — ERD">
+    <mxGraphModel dx="2943" dy="1629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3400" pageHeight="2400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="roles" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" value="roles&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;UQ  name : varchar&#xa;    description : text (null)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="110" width="260" x="60" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="users" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" value="users&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  role_id → roles.id (null)&#xa;    name : varchar&#xa;UQ  email : varchar&#xa;    profile_photo_path (null)&#xa;    is_approved : boolean (false)&#xa;    password : varchar (hashed)&#xa;    remember_token&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="180" width="280" x="60" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="departments" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" value="departments&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;    name : varchar&#xa;FK  head_id → employees.id (null)&#xa;    created_at, updated_at&#xa;&#xa;» Self-ref circular" vertex="1">
+          <mxGeometry height="120" width="270" x="420" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="vacancies" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" value="vacancies&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;    title : varchar&#xa;    description : longText (null)&#xa;    requirements : longText (null)&#xa;    location (null)&#xa;    employment_type (full_time)&#xa;    salary_min / salary_max (null)&#xa;FK  department_id → departments.id&#xa;    status (open), positions_count&#xa;FK  created_by → users.id (null)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="230" width="290" x="750" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="employees" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="employees ★ (محور العلاقات)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;UQ  user_id → users.id (cascade)&#xa;FK  department_id → departments.id (null)&#xa;FK  vacancy_id → vacancies.id (null)&#xa;    job_title (null)&#xa;    salary : decimal(10,2) (null)&#xa;    status : ENUM(pending,active,on_leave,&#xa;           terminated,rejected)&#xa;    rejection_reason (null)&#xa;    hire_date (null)&#xa;    annual_leave_balance : int (21)&#xa;    used_leave_days : int (0)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="240" width="300" x="420" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="resumes" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" value="resumes&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;UQ  employee_id → employees.id (cascade)&#xa;    file_path (null)&#xa;    resume_text : longText (null)&#xa;    ai_score : int (null)&#xa;    ai_summary : longText (null)&#xa;    ai_report : longText (null)&#xa;    ai_recommendation (null)&#xa;    analyzed_at (null)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="190" width="300" x="420" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="skills" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="skills&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;UQ  name : varchar&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="80" width="260" x="60" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="employee_skill" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" value="employee_skill (Pivot M:N)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;PK  employee_id → employees.id&#xa;PK  skill_id → skills.id&#xa;    (مفتاح مركب)" vertex="1">
+          <mxGeometry height="90" width="260" x="60" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="clients" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" value="clients&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;    name : varchar&#xa;    company_name (null)&#xa;UQ  email (null)&#xa;    password (null, hashed)&#xa;    is_active : boolean (true)&#xa;    profile_photo_path (null)&#xa;    phone (null)&#xa;    address (null)&#xa;    remember_token&#xa;    created_at, updated_at&#xa;&#xa;» Client Auth Guard منفصل" vertex="1">
+          <mxGeometry height="220" width="290" x="750" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="projects" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" value="projects&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  client_id → clients.id (null)&#xa;    name : varchar&#xa;    description : text (null)&#xa;    budget : decimal(12,2) (null)&#xa;    start_date (null)&#xa;    end_date (null)&#xa;    status : ENUM(pending,in_progress,&#xa;           completed,canceled)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="190" width="290" x="1100" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="employee_project" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" value="employee_project (Pivot M:N)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;PK  project_id → projects.id&#xa;PK  employee_id → employees.id&#xa;    (مفتاح مركب - فرق العمل)" vertex="1">
+          <mxGeometry height="90" width="290" x="1100" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="tasks" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="tasks&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  project_id → projects.id (cascade)&#xa;FK  employee_id → employees.id (null)&#xa;    title : varchar&#xa;    description : text (null)&#xa;    start_date (null)&#xa;    due_date (null)&#xa;    status : ENUM(todo,in_progress,review,done)&#xa;    priority : ENUM(low,medium,high)&#xa;    sort_order : int (0)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="200" width="290" x="1100" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="task_comments" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="task_comments&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  task_id → tasks.id (cascade)&#xa;FK  user_id → users.id (cascade)&#xa;    comment : text&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="110" width="270" x="1450" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="task_attachments" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="task_attachments&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  task_id → tasks.id (cascade)&#xa;FK  user_id → users.id (cascade)&#xa;    file_name : varchar&#xa;    file_path : varchar&#xa;    file_type (null)&#xa;    file_size : bigint (null)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="150" width="270" x="1450" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="time_entries" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="time_entries&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  task_id → tasks.id (cascade)&#xa;FK  employee_id → employees.id (cascade)&#xa;    date : date&#xa;    hours : decimal(5,2)&#xa;    description (null)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="130" width="290" x="1100" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="invoices" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" value="invoices&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  client_id → clients.id (cascade)&#xa;FK  project_id → projects.id (null)&#xa;UQ  invoice_number : varchar&#xa;    amount : decimal(12,2)&#xa;    vat_rate : decimal(5,2) (0)&#xa;    vat_amount : decimal(12,2) (0)&#xa;    total_with_vat : decimal(12,2) (0)&#xa;    issue_date, due_date (null)&#xa;    status : ENUM(unpaid,paid,overdue)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="220" width="290" x="1100" y="770" as="geometry" />
+        </mxCell>
+        <mxCell id="invoice_items" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" value="invoice_items&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  invoice_id → invoices.id (cascade)&#xa;    description : varchar&#xa;    quantity : decimal(10,2) (1)&#xa;    unit_price : decimal(12,2) (0)&#xa;    total : decimal(12,2) (0)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="130" width="270" x="1450" y="770" as="geometry" />
+        </mxCell>
+        <mxCell id="expenses" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" value="expenses&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  user_id → users.id (cascade)&#xa;FK  project_id → projects.id (null)&#xa;    title : varchar&#xa;    category (null)&#xa;    amount : decimal(12,2)&#xa;    expense_date (null)&#xa;    receipt_url (null)&#xa;    status : ENUM(pending,approved,rejected)&#xa;FK  approved_by → users.id (null)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="190" width="270" x="1450" y="930" as="geometry" />
+        </mxCell>
+        <mxCell id="payrolls" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" value="payrolls&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  employee_id → employees.id (cascade)&#xa;    month_year : varchar&#xa;    basic_salary : decimal(10,2)&#xa;    bonuses : decimal(10,2) (0)&#xa;    deductions : decimal(10,2) (0)&#xa;    housing_allowance (0)&#xa;    transport_allowance (0)&#xa;    phone_allowance (0)&#xa;    social_insurance_rate (0)&#xa;    social_insurance_amount (0)&#xa;    absence_days : int (0)&#xa;    absence_deduction (0)&#xa;    net_salary : decimal(10,2)&#xa;    status : varchar (unpaid)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="280" width="290" x="1100" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="leaves" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" value="leaves&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  employee_id → employees.id (cascade)&#xa;    type : varchar&#xa;    start_date : date&#xa;    end_date : date&#xa;    reason : text&#xa;    status : ENUM(pending,approved_by_head,&#xa;           approved_by_hr,rejected)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="150" width="290" x="750" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="attendances" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" value="attendances&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  employee_id → employees.id (cascade)&#xa;    date : date&#xa;    check_in : dateTime (null)&#xa;    check_out : dateTime (null)&#xa;    hours_worked : decimal(5,2)&#xa;    overtime_hours : decimal(5,2)&#xa;    status : ENUM(present,late,absent,&#xa;           half_day,over_time)&#xa;    notes (null)&#xa;UQ  (employee_id, date)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="200" width="290" x="750" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="reports" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" value="reports&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  sender_id → employees.id (cascade)&#xa;FK  receiver_id → employees.id (cascade)&#xa;    title : varchar&#xa;    content : text&#xa;    feedback (null)&#xa;    status : ENUM(unread,read,replied)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="150" width="290" x="750" y="980" as="geometry" />
+        </mxCell>
+        <mxCell id="trainings" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="trainings&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;    title : varchar&#xa;    description (null)&#xa;    trainer (null)&#xa;    start_date : date&#xa;    end_date : date&#xa;    status : ENUM(upcoming,ongoing,completed)&#xa;    location (null)&#xa;    max_participants (null)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="170" width="290" x="420" y="710" as="geometry" />
+        </mxCell>
+        <mxCell id="employee_training" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" value="employee_training (Pivot غني)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  employee_id → employees.id (cascade)&#xa;FK  training_id → trainings.id (cascade)&#xa;    status : ENUM(enrolled,completed,certified)&#xa;    certificate_url (null)&#xa;    completion_date (null)&#xa;UQ  (employee_id, training_id)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="160" width="290" x="420" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="certificates" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="certificates&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  employee_id → employees.id (cascade)&#xa;    title : varchar&#xa;    issuer : varchar&#xa;    issue_date : date&#xa;    expiry_date (null)&#xa;    certificate_url (null)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="130" width="290" x="750" y="1170" as="geometry" />
+        </mxCell>
+        <mxCell id="career_plans" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="career_plans&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  employee_id → employees.id (cascade)&#xa;    current_role : varchar&#xa;    target_role : varchar&#xa;    timeline_months : int&#xa;    required_skills (null)&#xa;    notes (null)&#xa;    status : ENUM(draft,active,completed)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="160" width="290" x="420" y="1110" as="geometry" />
+        </mxCell>
+        <mxCell id="project_templates" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="project_templates&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;    name : varchar&#xa;    description (null)&#xa;    budget : decimal(12,2) (null)&#xa;    estimated_days : int (null)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="120" width="290" x="750" y="1330" as="geometry" />
+        </mxCell>
+        <mxCell id="task_templates" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="task_templates&#xa;━━━━━━━━━━━━━━━━&#xa;PK  id : bigint&#xa;FK  project_template_id → project_templates.id&#xa;    title : varchar&#xa;    description (null)&#xa;    priority : ENUM(low,medium,high)&#xa;    estimated_hours (null)&#xa;    sort_order : int (0)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="140" width="290" x="420" y="1300" as="geometry" />
+        </mxCell>
+        <mxCell id="notifications" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=11;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;" value="notifications (Polymorphic)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;PK  id : uuid&#xa;    type : varchar&#xa;    notifiable_type : varchar (Morph)&#xa;    notifiable_id : bigint (Morph)&#xa;    data : text (JSON)&#xa;    read_at (null)&#xa;    created_at, updated_at" vertex="1">
+          <mxGeometry height="130" width="300" x="60" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=15;align=left;spacingLeft=10;spacingTop=2;fontSize=12;fillColor=#fafafa;strokeColor=#999999;fontStyle=0;" value="🎨 مفتاح الألوان (Color Legend)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;🔵 أزرق  : المستخدمون والأدوار (users, roles)&#xa;🟢 أخضر : الموظفون والمشاريع والتدريب&#xa;🟡 أصفر: الأقسام&#xa;🟣 بنفسجي: الموارد البشرية (إجازات، حضور، سير)&#xa;🟠 برتقالي: المالية (فواتير، مصروفات، رواتب)&#xa;🔴 أحمر : العملاء والـ Pivots&#xa;⚪ رمادي: النظام (إشعارات)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;PK = Primary Key | FK = Foreign Key&#xa;UQ = Unique | Cascade = حذف متسلسل&#xa;NULL = قابل للفراغ" vertex="1">
+          <mxGeometry height="210" width="320" x="60" y="860" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" edge="1" parent="1" source="users" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#6c8ebf;strokeWidth=2;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="roles">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r2" edge="1" parent="1" source="employees" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#6c8ebf;strokeWidth=2;endArrow=ERone;startArrow=ERone;startFill=0;endFill=0;" target="users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r3" edge="1" parent="1" source="employees" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#d6b656;strokeWidth=2;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="departments">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r4" edge="1" parent="1" source="departments" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#d6b656;strokeWidth=2;endArrow=ERone;startArrow=ERone;startFill=0;endFill=0;dashed=1;" target="employees">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="720" y="100" />
+              <mxPoint x="720" y="250" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r5" edge="1" parent="1" source="employees" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9673a6;strokeWidth=2;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;dashed=1;" target="vacancies">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r6" edge="1" parent="1" source="resumes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9673a6;strokeWidth=2;endArrow=ERone;startArrow=ERone;startFill=0;endFill=0;" target="employees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r7" edge="1" parent="1" source="employee_skill" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#b85450;strokeWidth=1.5;endArrow=ERmany;startArrow=ERmany;startFill=0;endFill=0;dashed=1;" target="employees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r8" edge="1" parent="1" source="employee_skill" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#b85450;strokeWidth=1.5;endArrow=ERmany;startArrow=ERmany;startFill=0;endFill=0;dashed=1;" target="skills">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r9" edge="1" parent="1" source="projects" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#b85450;strokeWidth=2;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="clients">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r10" edge="1" parent="1" source="employee_project" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#b85450;strokeWidth=1.5;endArrow=ERmany;startArrow=ERmany;startFill=0;endFill=0;dashed=1;" target="projects">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r11" edge="1" parent="1" source="employee_project" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#b85450;strokeWidth=1.5;endArrow=ERmany;startArrow=ERmany;startFill=0;endFill=0;dashed=1;" target="employees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r12" edge="1" parent="1" source="tasks" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;strokeWidth=2;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="projects">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r13" edge="1" parent="1" source="tasks" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;strokeWidth=2;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;dashed=1;" target="employees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r14" edge="1" parent="1" source="task_comments" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="tasks">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r15" edge="1" parent="1" source="task_attachments" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="tasks">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r16" edge="1" parent="1" source="time_entries" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="tasks">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r17" edge="1" parent="1" source="time_entries" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;dashed=1;" target="employees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r18" edge="1" parent="1" source="invoices" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#d79b00;strokeWidth=2;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="clients">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r19" edge="1" parent="1" source="invoices" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#d79b00;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;dashed=1;" target="projects">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r20" edge="1" parent="1" source="invoice_items" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#d79b00;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="invoices">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r21" edge="1" parent="1" source="expenses" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#d79b00;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;dashed=1;" target="users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r22" edge="1" parent="1" source="expenses" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#d79b00;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;dashed=1;" target="projects">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r23" edge="1" parent="1" source="payrolls" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#d79b00;strokeWidth=2;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="employees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r24" edge="1" parent="1" source="leaves" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9673a6;strokeWidth=2;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="employees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r25" edge="1" parent="1" source="attendances" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9673a6;strokeWidth=2;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="employees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r26" edge="1" parent="1" source="reports" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9673a6;strokeWidth=2;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="employees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r27" edge="1" parent="1" source="employee_training" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#b85450;strokeWidth=1.5;endArrow=ERmany;startArrow=ERmany;startFill=0;endFill=0;dashed=1;" target="employees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r28" edge="1" parent="1" source="employee_training" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#b85450;strokeWidth=1.5;endArrow=ERmany;startArrow=ERmany;startFill=0;endFill=0;dashed=1;" target="trainings">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r29" edge="1" parent="1" source="certificates" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="employees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r30" edge="1" parent="1" source="career_plans" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="employees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r31" edge="1" parent="1" source="task_templates" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#82b366;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;" target="project_templates">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r32" edge="1" parent="1" source="vacancies" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9673a6;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;dashed=1;" target="departments">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r33" edge="1" parent="1" source="vacancies" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9673a6;strokeWidth=1.5;endArrow=ERmany;startArrow=ERone;startFill=0;endFill=0;dashed=1;" target="users">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

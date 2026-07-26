@@ -1,0 +1,154 @@
+@startuml
+' ============================================
+'  مخطط حالات الاستخدام — HR + التوظيف
+' ============================================
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing true
+skinparam roundCorner 12
+
+skinparam usecase<<hr>> {
+  BackgroundColor #f8cecc
+  BorderColor #b85450
+}
+skinparam usecase<<system>> {
+  BackgroundColor #f5f5f5
+  BorderColor #666666
+}
+skinparam usecase<<ai>> {
+  BackgroundColor #fff2cc
+  BorderColor #d6b656
+}
+
+title مخطط حالات الاستخدام - الموارد البشرية والتوظيف
+
+actor "مدير الموارد البشرية (HR)" as HR
+actor "المتقدم للوظيفة" as App
+actor "خدمة الذكاء الاصطناعي" as AI
+
+rectangle "نظام Lite ERP" {
+
+  package "المصادقة" {
+    usecase "تسجيل الدخول" as UC_Login <<system>>
+    usecase "تسجيل حساب جديد" as UC_Register <<system>>
+    usecase "تحديث الملف الشخصي" as UC_Profile <<system>>
+  }
+
+  package "إدارة الموظفين" {
+    usecase "إدارة الموظفين" as UC_ManageEmp <<hr>>
+    usecase "إنشاء موظف جديد" as UC_CreateEmp <<hr>>
+    usecase "إنشاء حساب مستخدم مدمج" as UC_CreateUser <<hr>>
+    usecase "تقييم أداء الموظف بالـ AI" as UC_AIEvalEmp <<hr>>
+    usecase "إدارة الأقسام" as UC_Depts <<hr>>
+    usecase "تعيين رئيس القسم" as UC_DeptHead <<hr>>
+    usecase "إدارة المهارات" as UC_Skills <<hr>>
+    usecase "ربط المهارات بالموظفين" as UC_EmpSkills <<hr>>
+    usecase "إدارة الشهادات" as UC_Certs <<hr>>
+    usecase "إدارة خطط التطوير" as UC_Career <<hr>>
+  }
+
+  package "التوظيف" {
+    usecase "نشر وظيفة شاغرة" as UC_PostVacancy <<hr>>
+    usecase "تصفح الوظائف الشاغرة" as UC_BrowseVacancy <<system>>
+    usecase "تقديم طلب توظيف" as UC_Apply <<system>>
+    usecase "رفع السيرة الذاتية" as UC_UploadCV <<system>>
+    usecase "استخراج نص السيرة الذاتية" as UC_ExtractText <<system>>
+    usecase "عرض طلبات التوظيف" as UC_ViewApplicants <<hr>>
+    usecase "تحليل السيرة الذاتية بالـ AI" as UC_AIResume <<hr>>
+    usecase "قبول المتقدم وتوظيفه" as UC_AcceptApp <<hr>>
+    usecase "رفض المتقدم" as UC_RejectApp <<hr>>
+    usecase "متابعة حالة الطلب" as UC_TrackApp <<system>>
+  }
+
+  package "الإجازات والحضور" {
+    usecase "إدارة طلبات الإجازات" as UC_ManageLeave <<hr>>
+    usecase "الموافقة النهائية على الإجازة" as UC_LeaveHR <<hr>>
+    usecase "رفض الإجازة" as UC_RejectLeave <<hr>>
+    usecase "خصم أيام الإجازة" as UC_DeductLeave <<system>>
+    usecase "إدارة سجلات الحضور" as UC_ManageAttend <<hr>>
+    usecase "حساب ساعات العمل تلقائياً" as UC_CalcHours <<system>>
+    usecase "عرض تقويم الفريق" as UC_TeamCal <<hr>>
+  }
+
+  package "خدمات الذكاء الاصطناعي" {
+    usecase "تقييم أداء شامل (Markdown)" as UC_AIEvaluate <<ai>>
+    usecase "تحليل سيرة ذاتية (JSON)" as UC_AIAnalyze <<ai>>
+  }
+}
+
+' === علاقات HR ===
+HR --> UC_Login
+HR --> UC_Profile
+HR --> UC_ManageEmp
+HR --> UC_CreateEmp
+HR --> UC_AIEvalEmp
+HR --> UC_Depts
+HR --> UC_DeptHead
+HR --> UC_Skills
+HR --> UC_EmpSkills
+HR --> UC_Certs
+HR --> UC_Career
+HR --> UC_PostVacancy
+HR --> UC_ViewApplicants
+HR --> UC_AIResume
+HR --> UC_AcceptApp
+HR --> UC_RejectApp
+HR --> UC_ManageLeave
+HR --> UC_LeaveHR
+HR --> UC_RejectLeave
+HR --> UC_ManageAttend
+HR --> UC_TeamCal
+
+UC_CreateEmp ..> UC_CreateUser : <<include>>
+UC_LeaveHR ..> UC_DeductLeave : <<include>>
+UC_ManageLeave ..> UC_LeaveHR : <<extend>>
+UC_ManageLeave ..> UC_RejectLeave : <<extend>>
+UC_ManageAttend ..> UC_CalcHours : <<include>>
+UC_AcceptApp ..> UC_CreateUser : <<extend>>
+
+' === علاقات المتقدم ===
+App --> UC_Login
+App --> UC_Register
+App --> UC_BrowseVacancy
+App --> UC_Apply
+App --> UC_TrackApp
+
+UC_Apply ..> UC_UploadCV : <<include>>
+UC_UploadCV ..> UC_ExtractText : <<include>>
+
+' === علاقات الذكاء الاصطناعي ===
+UC_AIEvalEmp ..> UC_AIEvaluate : <<include>>
+UC_AIResume ..> UC_AIAnalyze : <<include>>
+UC_AIEvaluate --> AI
+UC_AIAnalyze --> AI
+
+note right of AI
+  فاعل ثانوي
+  النموذج: Gemini-3-Flash
+  المهلة: 120 ثانية
+end note
+
+note right of UC_AIEvaluate
+  مخرجات التقييم:
+  - التقييم العام
+  - تحليل الأداء المهامي
+  - نقاط القوة والضعف
+  - التوصيات والخلاصة
+end note
+
+note right of UC_AIAnalyze
+  مخرجات التحليل:
+  - score (0-100)
+  - report
+  - strengths / weaknesses
+  - recommendation
+end note
+
+legend right
+  |<#f8cecc>| الموارد البشرية |
+  |<#fff2cc>| الذكاء الاصطناعي |
+  |<#f5f5f5>| النظام |
+endlegend
+
+@enduml

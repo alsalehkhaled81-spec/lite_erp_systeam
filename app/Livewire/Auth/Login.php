@@ -23,9 +23,11 @@ class Login extends Component
         if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
             session()->regenerate();
 
-            $roleName = Auth::user()->role->name ?? null;
+            $user = Auth::user();
+            $roleName = $user->role->name ?? null;
 
-            if (! Auth::user()->is_approved && $roleName !== 'employee') {
+            // منع دخول الحسابات غير المعتمدة عدا دور الموظف (يسمح له برؤية حالة طلبه فقط)
+            if (! $user->is_approved && $roleName !== 'employee') {
                 Auth::logout();
                 session()->invalidate();
                 session()->regenerateToken();
@@ -39,7 +41,7 @@ class Login extends Component
                 'hr_manager' => '/hr',
                 'project_manager' => '/pm',
                 'accountant' => '/accountant',
-                'employee' => '/employee',
+                'employee' => $user->is_approved ? '/employee' : '/apply',
                 default => null,
             };
 

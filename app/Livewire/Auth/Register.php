@@ -40,18 +40,12 @@ class Register extends Component
             'email' => $this->email,
             'password' => Hash::make($this->password),
             'role_id' => $role->id,
-            'is_approved' => true,
+            'is_approved' => false,
         ]);
 
-        $isEmployee = true;
+        Auth::login($user);
 
-        if ($isEmployee) {
-            Auth::login($user);
-
-            return redirect()->route('job.apply');
-        }
-
-        return redirect()->route('login');
+        return redirect()->route('job.apply');
     }
 
     public function render()

@@ -1,0 +1,138 @@
+@startuml
+' ============================================
+'  مخطط حالات الاستخدام — الموظف + العميل
+' ============================================
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing true
+skinparam roundCorner 12
+
+skinparam usecase<<employee>> {
+  BackgroundColor #d5e8d4
+  BorderColor #82b366
+}
+skinparam usecase<<client>> {
+  BackgroundColor #e1d5e7
+  BorderColor #9673a6
+}
+skinparam usecase<<system>> {
+  BackgroundColor #f5f5f5
+  BorderColor #666666
+}
+
+title مخطط حالات الاستخدام - الموظف والعميل
+
+actor "الموظف" as Emp
+actor "العميل" as Cli
+
+rectangle "نظام Lite ERP" {
+
+  package "مصادقة الموظف" {
+    usecase "تسجيل الدخول" as UC_Login <<system>>
+    usecase "تحديث الملف الشخصي" as UC_Profile <<system>>
+    usecase "تغيير كلمة المرور" as UC_ChangePass <<system>>
+    usecase "رفع الصورة الشخصية" as UC_Photo <<system>>
+  }
+
+  package "مهام الموظف" {
+    usecase "عرض مهامي المسندة" as UC_MyTasks <<employee>>
+    usecase "تحديث حالة المهمة" as UC_UpdateTask <<employee>>
+    usecase "عرض لوحة كانبان لمهامي" as UC_MyKanban <<employee>>
+    usecase "سحب وإفلات المهام" as UC_DragDrop <<employee>>
+  }
+
+  package "إجازات الموظف" {
+    usecase "تقديم طلب إجازة" as UC_RequestLeave <<employee>>
+    usecase "عرض رصيد الإجازات" as UC_LeaveBalance <<employee>>
+  }
+
+  package "حضور الموظف" {
+    usecase "تسجيل الحضور (Check-in)" as UC_CheckIn <<employee>>
+    usecase "تسجيل الانصراف (Check-out)" as UC_CheckOut <<employee>>
+    usecase "حساب ساعات العمل تلقائياً" as UC_CalcHours <<system>>
+    usecase "عرض سجل الحضور الشهري" as UC_ViewAttend <<employee>>
+  }
+
+  package "تقارير الموظف" {
+    usecase "إرسال تقرير داخلي" as UC_SendReport <<system>>
+    usecase "استقبال تقرير" as UC_ReceiveReport <<system>>
+    usecase "الرد على تقرير" as UC_ReplyReport <<system>>
+    usecase "عرض تقاريري" as UC_MyReports <<system>>
+  }
+
+  package "إحصائيات الموظف" {
+    usecase "عرض إحصائياتي" as UC_MyStats <<employee>>
+    usecase "عرض تقويمي الشخصي" as UC_MyCalendar <<employee>>
+    usecase "عرض حلقة تقدمي" as UC_MyProgress <<employee>>
+  }
+
+  package "بوابة العميل" {
+    usecase "تسجيل دخول العميل" as UC_ClientLogin <<client>>
+    usecase "تحديث ملف العميل" as UC_ClientProfile <<client>>
+    usecase "عرض مشاريعي" as UC_ClientProj <<client>>
+    usecase "عرض مهام مشاريعي" as UC_ClientTasks <<client>>
+    usecase "عرض فواتيري" as UC_ClientInvoices <<client>>
+    usecase "تنزيل فاتورتي PDF" as UC_ClientInvPDF <<client>>
+    usecase "إحصائيات العميل" as UC_ClientStats <<client>>
+    usecase "تقدم المشاريع" as UC_ClientProgress <<client>>
+  }
+}
+
+' === علاقات الموظف ===
+Emp --> UC_Login
+Emp --> UC_Profile
+Emp --> UC_ChangePass
+Emp --> UC_Photo
+Emp --> UC_MyTasks
+Emp --> UC_UpdateTask
+Emp --> UC_MyKanban
+Emp --> UC_RequestLeave
+Emp --> UC_LeaveBalance
+Emp --> UC_CheckIn
+Emp --> UC_CheckOut
+Emp --> UC_ViewAttend
+Emp --> UC_SendReport
+Emp --> UC_ReceiveReport
+Emp --> UC_ReplyReport
+Emp --> UC_MyReports
+Emp --> UC_MyStats
+Emp --> UC_MyCalendar
+Emp --> UC_MyProgress
+
+UC_MyKanban ..> UC_DragDrop : <<include>>
+UC_RequestLeave ..> UC_LeaveBalance : <<include>>
+UC_CheckOut ..> UC_CalcHours : <<include>>
+UC_ReceiveReport ..> UC_ReplyReport : <<extend>>
+
+' === علاقات العميل ===
+Cli --> UC_ClientLogin
+Cli --> UC_ClientProfile
+Cli --> UC_ClientProj
+Cli --> UC_ClientTasks
+Cli --> UC_ClientInvoices
+Cli --> UC_ClientInvPDF
+Cli --> UC_ClientStats
+Cli --> UC_ClientProgress
+
+note right of UC_CheckIn
+  منطق تلقائي:
+  - قبل 09:00 → over_time
+  - 09:00-09:15 → present
+  - بعد 09:15 → late
+end note
+
+note bottom of UC_CheckOut
+  منطق تلقائي:
+  - أقل من 4 ساعات → absent
+  - أقل من 7 ساعات → half_day
+  - أكثر من 8 ساعات + بعد 17:00 → over_time
+end note
+
+legend right
+  |<#d5e8d4>| الموظف (Employee) |
+  |<#e1d5e7>| العميل (Client) |
+  |<#f5f5f5>| النظام (System) |
+endlegend
+
+@enduml

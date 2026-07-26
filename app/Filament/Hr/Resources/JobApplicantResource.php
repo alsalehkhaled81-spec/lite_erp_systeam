@@ -157,6 +157,7 @@ class JobApplicantResource extends Resource
                         ]);
 
                         if ($record->user) {
+                            $record->user->update(['is_approved' => true]);
                             $record->user->notify(new JobApplicationStatusNotification('active', $record->user->name));
                         }
                     })

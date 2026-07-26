@@ -1,0 +1,115 @@
+@startuml
+' ============================================
+'  مخطط حالات الاستخدام — المدير العام + مدير المشاريع
+' ============================================
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing true
+skinparam roundCorner 12
+
+skinparam usecase<<pm>> {
+  BackgroundColor #dae8fc
+  BorderColor #6c8ebf
+}
+skinparam usecase<<system>> {
+  BackgroundColor #f5f5f5
+  BorderColor #666666
+}
+
+title مخطط حالات الاستخدام - المدير العام ومدير المشاريع
+
+actor "المدير العام" as Admin
+actor "مدير المشاريع" as PM
+
+rectangle "نظام Lite ERP" {
+
+  package "لوحة المدير العام" {
+    usecase "لوحة معلومات تنفيذية" as UC_AdminDash <<system>>
+    usecase "مؤشرات الأداء KPIs" as UC_AdminKPIs <<system>>
+    usecase "مخطط الإيرادات والمصروفات" as UC_RevChart <<system>>
+    usecase "خريطة حرارة النشاط" as UC_Heatmap <<system>>
+    usecase "سجل النشاط المباشر" as UC_ActivityFeed <<system>>
+    usecase "تصدير تقرير PDF" as UC_ExportDashPDF <<system>>
+    usecase "إدارة المستخدمين والصلاحيات" as UC_ManageUsers <<system>>
+    usecase "عرض جميع التقارير" as UC_AllReports <<system>>
+  }
+
+  package "إدارة المشاريع" {
+    usecase "إدارة المشاريع" as UC_ManageProj <<pm>>
+    usecase "إنشاء مشروع جديد" as UC_CreateProj <<pm>>
+    usecase "ربط فريق بالمشروع" as UC_ProjTeam <<pm>>
+    usecase "حساب نسبة الإنجاز" as UC_ProjProgress <<system>>
+    usecase "إدارة قوالب المشاريع" as UC_ProjTemplates <<pm>>
+    usecase "إنشاء مشروع من قالب" as UC_ProjFromTemplate <<pm>>
+  }
+
+  package "إدارة المهام" {
+    usecase "إدارة المهام" as UC_ManageTasks <<pm>>
+    usecase "إنشاء مهمة جديدة" as UC_CreateTask <<pm>>
+    usecase "إسناد مهمة لموظف" as UC_AssignTask <<pm>>
+    usecase "تعليقات على المهمة" as UC_TaskComments <<pm>>
+    usecase "رفع مرفقات للمهمة" as UC_TaskAttach <<pm>>
+    usecase "تتبع وقت العمل" as UC_TimeTrack <<pm>>
+    usecase "عرض لوحة كانبان" as UC_Kanban <<pm>>
+    usecase "سحب وإفلات المهام" as UC_DragDrop <<pm>>
+    usecase "عرض مخطط جانت" as UC_Gantt <<pm>>
+  }
+
+  package "التقارير" {
+    usecase "إرسال تقرير داخلي" as UC_SendReport <<system>>
+    usecase "استقبال تقرير" as UC_ReceiveReport <<system>>
+    usecase "عرض تقويم الفريق" as UC_TeamCal <<pm>>
+    usecase "تسجيل الحضور" as UC_CheckIn <<pm>>
+    usecase "تسجيل الانصراف" as UC_CheckOut <<pm>>
+  }
+}
+
+' === علاقات المدير العام ===
+Admin --> UC_AdminDash
+Admin --> UC_AdminKPIs
+Admin --> UC_RevChart
+Admin --> UC_Heatmap
+Admin --> UC_ActivityFeed
+Admin --> UC_ExportDashPDF
+Admin --> UC_ManageUsers
+Admin --> UC_ManageProj
+Admin --> UC_ManageTasks
+Admin --> UC_Kanban
+Admin --> UC_AllReports
+
+' === علاقات مدير المشاريع ===
+PM --> UC_ManageProj
+PM --> UC_CreateProj
+PM --> UC_ProjTeam
+PM --> UC_ManageTasks
+PM --> UC_CreateTask
+PM --> UC_AssignTask
+PM --> UC_TaskComments
+PM --> UC_TaskAttach
+PM --> UC_TimeTrack
+PM --> UC_Kanban
+PM --> UC_DragDrop
+PM --> UC_Gantt
+PM --> UC_ProjTemplates
+PM --> UC_ProjFromTemplate
+PM --> UC_SendReport
+PM --> UC_ReceiveReport
+PM --> UC_TeamCal
+PM --> UC_CheckIn
+PM --> UC_CheckOut
+
+UC_CreateProj ..> UC_ProjProgress : <<include>>
+UC_ProjFromTemplate ..> UC_CreateProj : <<include>>
+UC_ManageProj ..> UC_ProjTeam : <<extend>>
+UC_ManageTasks ..> UC_TaskComments : <<extend>>
+UC_ManageTasks ..> UC_TaskAttach : <<extend>>
+UC_ManageTasks ..> UC_TimeTrack : <<extend>>
+UC_Kanban ..> UC_DragDrop : <<include>>
+
+legend right
+  |<#dae8fc>| المشاريع والمهام (PM) |
+  |<#f5f5f5>| النظام (System) |
+endlegend
+
+@enduml

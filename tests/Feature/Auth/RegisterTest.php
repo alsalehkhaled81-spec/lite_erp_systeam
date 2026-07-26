@@ -24,7 +24,7 @@ describe('Register', function () {
 
         $this->assertDatabaseHas('users', [
             'email' => 'test@example.com',
-            'is_approved' => true,
+            'is_approved' => false,
         ]);
     });
 

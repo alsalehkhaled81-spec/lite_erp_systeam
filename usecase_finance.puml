@@ -1,0 +1,113 @@
+@startuml
+' ============================================
+'  مخطط حالات الاستخدام — المحاسب المالي
+' ============================================
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing true
+skinparam roundCorner 12
+
+skinparam usecase<<finance>> {
+  BackgroundColor #ffe6cc
+  BorderColor #d79b00
+}
+skinparam usecase<<system>> {
+  BackgroundColor #f5f5f5
+  BorderColor #666666
+}
+skinparam usecase<<ai>> {
+  BackgroundColor #fff2cc
+  BorderColor #d6b656
+}
+
+title مخطط حالات الاستخدام - المحاسب المالي
+
+actor "المحاسب المالي" as Acc
+actor "خدمة الذكاء الاصطناعي" as AI
+
+rectangle "نظام Lite ERP" {
+
+  package "إدارة العملاء" {
+    usecase "إدارة العملاء" as UC_ManageClients <<finance>>
+    usecase "تفعيل بوابة العميل" as UC_ActivateClient <<finance>>
+  }
+
+  package "إدارة الفواتير" {
+    usecase "إدارة الفواتير" as UC_ManageInvoices <<finance>>
+    usecase "إنشاء فاتورة مع بنود" as UC_CreateInvoice <<finance>>
+    usecase "احتساب الضريبة VAT" as UC_CalcVAT <<system>>
+    usecase "تنزيل فاتورة PDF" as UC_InvoicePDF <<finance>>
+    usecase "تنبيه الفواتير المتأخرة" as UC_OverdueAlert <<finance>>
+  }
+
+  package "إدارة المصروفات" {
+    usecase "تسجيل مصروف" as UC_AddExpense <<finance>>
+    usecase "اعتماد مصروف" as UC_ApproveExp <<finance>>
+    usecase "رفض مصروف" as UC_RejectExp <<finance>>
+  }
+
+  package "إدارة الرواتب" {
+    usecase "إنشاء مسيرة راتب" as UC_CreatePayroll <<finance>>
+    usecase "حساب صافي الراتب" as UC_CalcNet <<system>>
+    usecase "حساب الغياب من الحضور" as UC_CalcAbsence <<system>>
+    usecase "تنزيل قسيمة راتب PDF" as UC_PayslipPDF <<finance>>
+    usecase "تصدير الرواتب CSV" as UC_ExportCSV <<finance>>
+    usecase "توليد رسالة تحفيزية بالـ AI" as UC_AIMotivational <<ai>>
+  }
+
+  package "التقارير المالية" {
+    usecase "عرض المؤشرات المالية" as UC_FinanceKPIs <<finance>>
+    usecase "عرض التدفق النقدي" as UC_Cashflow <<finance>>
+    usecase "تقرير الضريبة" as UC_TaxReport <<finance>>
+  }
+}
+
+' === علاقات المحاسب ===
+Acc --> UC_ManageClients
+Acc --> UC_ActivateClient
+Acc --> UC_ManageInvoices
+Acc --> UC_CreateInvoice
+Acc --> UC_InvoicePDF
+Acc --> UC_OverdueAlert
+Acc --> UC_AddExpense
+Acc --> UC_ApproveExp
+Acc --> UC_RejectExp
+Acc --> UC_CreatePayroll
+Acc --> UC_PayslipPDF
+Acc --> UC_ExportCSV
+Acc --> UC_FinanceKPIs
+Acc --> UC_Cashflow
+Acc --> UC_TaxReport
+
+UC_CreateInvoice ..> UC_CalcVAT : <<include>>
+UC_CreatePayroll ..> UC_CalcNet : <<include>>
+UC_CreatePayroll ..> UC_CalcAbsence : <<include>>
+UC_PayslipPDF ..> UC_AIMotivational : <<include>>
+UC_ManageInvoices ..> UC_InvoicePDF : <<extend>>
+UC_AddExpense ..> UC_ApproveExp : <<extend>>
+UC_AddExpense ..> UC_RejectExp : <<extend>>
+
+' === الذكاء الاصطناعي ===
+UC_AIMotivational --> AI
+
+note right of AI
+  فاعل ثانوي
+  يولّد رسالة تشجيعية قصيرة
+  بالإنجليزية للموظف
+  فشل صامت إن تعذر
+end note
+
+note bottom of UC_CreatePayroll
+  معادلة الراتب:
+  صافي = أساسي + مكافآت + بدلات
+  - خصومات - تأمينات - غياب
+end note
+
+legend right
+  |<#ffe6cc>| المالية (Finance) |
+  |<#fff2cc>| الذكاء الاصطناعي |
+  |<#f5f5f5>| النظام (System) |
+endlegend
+
+@enduml
